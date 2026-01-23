@@ -1444,8 +1444,8 @@
             <div class="modal-body">
                 <form id="forgotPasswordForm">
                     <div class="form-group">
-                        <label class="form-label">Employee ID</label>
-                        <input type="text" class="form-control" id="forgotEmployeeId" placeholder="Enter your Employee ID" required>
+                        <label class="form-label">Email</label>
+                        <input type="text" class="form-control" id="forgotEmail" placeholder="Enter your Email" required>
                     </div>
                     <div id="securityQuestionContainer" class="hidden">
                         <div class="form-group">
@@ -1634,8 +1634,8 @@
             <!-- Login Form -->
             <form id="loginForm" class="login-form active">
                 <div class="form-group">
-                    <label class="form-label">Employee ID</label>
-                    <input type="text" class="form-control" id="loginEmployeeId" placeholder="Enter your Employee ID" required>
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" id="loginEmail" placeholder="Enter your Email" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Password</label>
@@ -2142,7 +2142,7 @@
                     <table class="table" id="usersTable">
                         <thead>
                             <tr>
-                                <th>Employee ID</th>
+                                <th>Email</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Department</th>
@@ -2551,87 +2551,85 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         // AUTHENTICATION FUNCTIONS - UPDATED
         // ============================================
         async function handleLogin() {
-            const employeeId = document.getElementById('loginEmployeeId').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            
-            if (!employeeId || !password) {
-                showToast('Please enter Employee ID and password', 'error');
+
+            if (!email || !password) {
+                showToast('Please enter Email and Password', 'error');
                 return;
             }
-            
-            console.log('Login attempt for:', employeeId);
-            
-            showLoading('Signing in...');
-            
+
+            showLoading(true);
+
             try {
-                // First, get user by employee_id to get email
-                const { data: user, error: userError } = await supabase
+                // Sign in with Supabase Auth (standard)
+                const { data: authRes, error: authError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (authError) throw authError;
+                if (!authRes || !authRes.user) throw new Error('Login failed. Please try again.');
+
+                // Fetch user profile from database (works after login due to RLS)
+                const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('*')
-                    .eq('employee_id', employeeId)
+                    .eq('auth_id', authRes.user.id)
                     .eq('status', 'active')
-                    .single();
-                
-                if (userError || !user) {
-                    hideLoading();
-                    showToast('Invalid Employee ID or account is inactive', 'error');
-                    return;
+                    .maybeSingle();
+
+                if (userError) {
+                    // If profile missing or blocked, still allow session but warn
+                    console.warn('Profile fetch error:', userError);
                 }
-                
-                // Authenticate with Supabase Auth using email
-                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                    email: user.email,
-                    password: password
-                });
-                
-                if (authError) {
-                    hideLoading();
-                    showToast('Invalid password', 'error');
-                    return;
+
+                if (!userData) {
+                    // Profile row not found yet (trigger missing or not backfilled)
+                    // Still proceed with basic auth info
+                    currentUser = {
+                        id: null,
+                        auth_id: authRes.user.id,
+                        employee_id: null,
+                        name: authRes.user.user_metadata?.full_name || authRes.user.email,
+                        email: authRes.user.email,
+                        role: 'user',
+                        department: null,
+                        position: null
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showToast('Login success, but profile not found. Please contact admin or refresh after trigger setup.', 'warning');
+                } else {
+                    currentUser = {
+                        id: userData.id,
+                        auth_id: userData.auth_id,
+                        employee_id: userData.employee_id,
+                        name: userData.full_name,
+                        email: userData.email,
+                        role: userData.role,
+                        department: userData.department,
+                        position: userData.position
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showToast('Login successful!', 'success');
                 }
-                
-                // Success - set user data
-                AppState.currentUser = {
-                    id: user.id,
-                    auth_id: user.auth_id,
-                    employee_id: user.employee_id,
-                    name: user.full_name,
-                    email: user.email,
-                    role: user.role,
-                    department: user.department,
-                    position: user.position,
-                    phone: user.phone
-                };
-                
-                AppState.sessionToken = authData.session.access_token;
-                AppState.isAdmin = user.role === 'admin' || user.role === 'super_admin';
-                AppState.isSuperAdmin = user.role === 'super_admin';
-                
-                // Update last login
-                await supabase
-                    .from('users')
-                    .update({ last_login: new Date().toISOString() })
-                    .eq('id', user.id);
-                
-                // Save session
-                localStorage.setItem('infinixSession', JSON.stringify({
-                    token: authData.session.access_token,
-                    refreshToken: authData.session.refresh_token,
-                    user: AppState.currentUser
-                }));
-                
-                hideLoading();
-                showToast('Login successful! Welcome ' + user.full_name, 'success');
-                
-                // Show main interface
-                setTimeout(() => {
-                    showMainInterface();
-                }, 500);
-                
+
+                // Update last login if profile exists
+                if (userData?.id) {
+                    await supabase
+                        .from('users')
+                        .update({ last_login: new Date().toISOString() })
+                        .eq('id', userData.id);
+                }
+
+                // Show main app
+                showMainApp();
+
             } catch (error) {
-                hideLoading();
                 console.error('Login error:', error);
-                showToast('Login failed: ' + error.message, 'error');
+                showToast(error.message || 'Login failed. Please try again.', 'error');
+            } finally {
+                showLoading(false);
             }
         }
 
@@ -2748,93 +2746,31 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         }
 
         async function handleForgotPassword() {
-            const employeeId = document.getElementById('forgotEmployeeId').value.trim();
-            const securityAnswer = document.getElementById('securityAnswer').value.trim();
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmNewPassword').value;
-            
-            if (!document.getElementById('securityQuestionContainer').classList.contains('hidden')) {
-                // Step 2: Reset password
-                if (!securityAnswer || !newPassword || !confirmPassword) {
-                    showToast('Please fill all fields', 'error');
-                    return;
-                }
-                
-                if (newPassword.length < 6) {
-                    showToast('Password must be at least 6 characters', 'error');
-                    return;
-                }
-                
-                if (newPassword !== confirmPassword) {
-                    showToast('Passwords do not match', 'error');
-                    return;
-                }
-                
-                showLoading('Resetting password...');
-                
-                try {
-                    // Get user by employee ID
-                    const { data: user, error: userError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('employee_id', employeeId)
-                        .single();
-                    
-                    if (userError || !user) {
-                        throw new Error('User not found');
-                    }
-                    
-                    // Verify security answer
-                    if (user.security_answer !== securityAnswer) {
-                        throw new Error('Invalid security answer');
-                    }
-                    
-                    // Reset password using Supabase Auth
-                    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-                        redirectTo: window.location.origin,
-                    });
-                    
-                    if (error) throw error;
-                    
-                    hideLoading();
-                    showToast('Password reset email sent! Check your inbox.', 'success');
-                    closeModal('forgotPasswordModal');
-                    
-                } catch (error) {
-                    hideLoading();
-                    showToast('Reset failed: ' + error.message, 'error');
-                }
-            } else {
-                // Step 1: Get security question
-                if (!employeeId) {
-                    showToast('Please enter Employee ID', 'error');
-                    return;
-                }
-                
-                showLoading('Verifying user...');
-                
-                try {
-                    const { data: user, error } = await supabase
-                        .from('users')
-                        .select('security_question')
-                        .eq('employee_id', employeeId)
-                        .eq('status', 'active')
-                        .single();
-                    
-                    if (error || !user) {
-                        throw new Error('Employee ID not found or account is inactive');
-                    }
-                    
-                    document.getElementById('securityQuestionLabel').textContent = user.security_question;
-                    document.getElementById('securityQuestionContainer').classList.remove('hidden');
-                    document.getElementById('forgotPasswordSubmit').textContent = 'Reset Password';
-                    hideLoading();
-                    showToast('Please answer your security question', 'success');
-                    
-                } catch (error) {
-                    hideLoading();
-                    showToast('Request failed: ' + error.message, 'error');
-                }
+            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+
+            if (!email) {
+                showToast('Please enter your Email', 'error');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                // Supabase standard password reset
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin
+                });
+
+                if (error) throw error;
+
+                showToast('Password reset email sent! Please check your inbox.', 'success');
+                closeForgotPasswordModal();
+
+            } catch (error) {
+                console.error('Forgot password error:', error);
+                showToast(error.message || 'Failed to send reset email', 'error');
+            } finally {
+                showLoading(false);
             }
         }
 
@@ -2844,109 +2780,82 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         async function handleRegistration() {
             const employeeId = document.getElementById('regEmployeeId').value.trim();
             const fullName = document.getElementById('regFullName').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const phone = document.getElementById('regPhone').value.trim();
-            const department = document.getElementById('regDepartment').value;
-            const position = document.getElementById('regPosition').value;
-            const securityQuestion = document.getElementById('regSecurityQuestion').value;
-            const securityAnswer = document.getElementById('regSecurityAnswer').value.trim();
+            const department = document.getElementById('regDepartment').value.trim();
+            const position = document.getElementById('regPosition').value.trim();
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
-            const terms = document.getElementById('regTerms').checked;
-            
-            if (!employeeId || !fullName || !email || !department || !position || 
-                !securityQuestion || !securityAnswer || !password) {
-                showToast('Please fill all required fields', 'error');
+
+            if (!fullName || !email || !password) {
+                showToast('Please complete required fields (Full Name, Email, Password)', 'error');
                 return;
             }
-            
+
             if (password.length < 6) {
                 showToast('Password must be at least 6 characters', 'error');
                 return;
             }
-            
+
             if (password !== confirmPassword) {
                 showToast('Passwords do not match', 'error');
                 return;
             }
-            
-            if (!terms) {
-                showToast('You must accept the terms and conditions', 'error');
-                return;
-            }
-            
-            showLoading('Creating account...');
-            
+
+            showLoading(true);
+
             try {
-                // Check if employee ID already exists
-                const { data: existingEmployee, error: checkError } = await supabase
-                    .from('users')
-                    .select('id')
-                    .eq('employee_id', employeeId)
-                    .single();
-                
-                if (existingEmployee) {
-                    throw new Error('Employee ID already registered');
-                }
-                
-                // Check if email already exists
-                const { data: existingEmail, error: emailCheckError } = await supabase
-                    .from('users')
-                    .select('id')
-                    .eq('email', email)
-                    .single();
-                
-                if (existingEmail) {
-                    throw new Error('Email already registered');
-                }
-                
-                // Create user in Supabase Auth
+                // Sign up with Supabase Auth (standard). Profile row should be created by trigger.
                 const { data: authData, error: authError } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
+                    email,
+                    password,
                     options: {
                         data: {
                             full_name: fullName,
-                            employee_id: employeeId
+                            employee_id: employeeId || null,
+                            phone: phone || null,
+                            department: department || null,
+                            position: position || null
                         }
                     }
                 });
-                
+
                 if (authError) throw authError;
-                
-                // Create user in users table
-                const userData = {
-                    auth_id: authData.user.id,
-                    employee_id: employeeId,
-                    full_name: fullName,
-                    email: email,
-                    phone: phone,
-                    department: department,
-                    position: position,
-                    role: 'user',
-                    status: 'active',
-                    security_question: securityQuestion,
-                    security_answer: securityAnswer,
-                    join_date: new Date().toISOString().split('T')[0],
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                };
-                
-                const { error: dbError } = await supabase
+
+                // If email confirmation is enabled, session may be null until confirmed
+                if (!authData.session) {
+                    showToast('Registration successful! Please check your email to confirm your account, then log in.', 'success');
+                    showLoginForm();
+                    return;
+                }
+
+                // If session exists, try fetch profile
+                const { data: userData } = await supabase
                     .from('users')
-                    .insert([userData]);
-                
-                if (dbError) throw dbError;
-                
-                hideLoading();
-                showToast('Account created successfully! Please login.', 'success');
-                switchLoginTab('login');
-                document.getElementById('loginEmployeeId').value = employeeId;
-                document.getElementById('loginPassword').value = password;
-                
+                    .select('*')
+                    .eq('auth_id', authData.user.id)
+                    .maybeSingle();
+
+                currentUser = {
+                    id: userData?.id || null,
+                    auth_id: authData.user.id,
+                    employee_id: userData?.employee_id || employeeId || null,
+                    name: userData?.full_name || fullName,
+                    email: userData?.email || email,
+                    role: userData?.role || 'user',
+                    department: userData?.department || department || null,
+                    position: userData?.position || position || null
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showToast('Registration successful!', 'success');
+                showMainApp();
+
             } catch (error) {
-                hideLoading();
-                showToast('Registration failed: ' + error.message, 'error');
+                console.error('Registration error:', error);
+                showToast(error.message || 'Registration failed', 'error');
+            } finally {
+                showLoading(false);
             }
         }
 
@@ -4258,7 +4167,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 
                 modalContent.innerHTML = `
                     <div class="form-group">
-                        <label class="form-label">Employee ID</label>
+                        <label class="form-label">Email</label>
                         <input type="text" class="form-control" value="${profile.employee_id || ''}" readonly>
                     </div>
                     <div class="form-group">
@@ -5229,7 +5138,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     modalContent.innerHTML = `
                         <form id="editUserForm">
                             <div class="form-group">
-                                <label class="form-label">Employee ID</label>
+                                <label class="form-label">Email</label>
                                 <input type="text" class="form-control" value="${user.employee_id}" readonly>
                             </div>
                             <div class="form-group">
