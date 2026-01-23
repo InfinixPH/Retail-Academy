@@ -12,7 +12,7 @@
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* All your original CSS stays exactly the same - DO NOT CHANGE */
+        /* All CSS styles remain exactly the same as your original */
         :root {
             --primary-color: #1E3A8A;
             --secondary-color: #3B82F6;
@@ -2196,10 +2196,10 @@
 
     <script>
         // ============================================
-        // SUPABASE CONFIGURATION
-        // ============================================
-        const SUPABASE_URL = 'https://tiwwntbjdeevcumxnlog.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpd3dudGJqZGVldmN1bXhubG9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMzI5OTUsImV4cCI6MjA4NDcwODk5NX0.vCwo09J3Fv5MXgIiOwZlDijpcm7_DhEiF4Fy5QXiduo';
+// SUPABASE CONFIGURATION - UPDATED
+// ============================================
+const SUPABASE_URL = 'https://udqjsmmvpopkzuyzwtah.supabase.co'; // ⬅️ YOUR NEW URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkcWpzbW12cG9wa3p1eXp3dGFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMzc5NjQsImV4cCI6MjA4NDcxMzk2NH0.lizXdiaH3tIRYe_25eiL7RZVayq7xT3JqBWxb0wdGJQ'; // ⬅️ YOUR NEW ANON KEY
         
         // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -2222,10 +2222,10 @@
         };
 
         // ============================================
-        // INITIALIZATION
+        // INITIALIZATION - UPDATED
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== APP LOADED ===');
+            console.log('=== INFINIX ACADEMY APP LOADED ===');
             
             // Set current year
             document.getElementById('currentYear').textContent = new Date().getFullYear();
@@ -2237,23 +2237,7 @@
             setupEventListeners();
             
             // Check for saved session
-            const savedSession = localStorage.getItem('infinixSession');
-            if (savedSession) {
-                try {
-                    const session = JSON.parse(savedSession);
-                    AppState.sessionToken = session.token;
-                    AppState.currentUser = session.user;
-                    console.log('Found saved session for user:', session.user?.email);
-                    validateSession();
-                } catch (e) {
-                    console.error('Invalid saved session:', e);
-                    localStorage.removeItem('infinixSession');
-                    showLoginInterface();
-                }
-            } else {
-                console.log('No saved session found');
-                showLoginInterface();
-            }
+            checkSavedSession();
             
             // Update last update time
             updateLastUpdateTime();
@@ -2261,6 +2245,67 @@
             // Start auto-refresh
             startAutoRefresh();
         });
+
+        async function checkSavedSession() {
+            const savedSession = localStorage.getItem('infinixSession');
+            if (savedSession) {
+                try {
+                    const session = JSON.parse(savedSession);
+                    AppState.sessionToken = session.token;
+                    AppState.currentUser = session.user;
+                    console.log('Found saved session for user:', session.user?.email);
+                    
+                    // Validate session with Supabase
+                    const { data, error } = await supabase.auth.getSession();
+                    
+                    if (error || !data.session) {
+                        throw new Error('Invalid session');
+                    }
+                    
+                    // Get user data from database
+                    const { data: userData, error: userError } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('auth_id', data.session.user.id)
+                        .eq('status', 'active')
+                        .single();
+                    
+                    if (userError || !userData) {
+                        throw new Error('User not found');
+                    }
+                    
+                    // Update AppState with user data
+                    AppState.currentUser = {
+                        id: userData.id,
+                        auth_id: userData.auth_id,
+                        employee_id: userData.employee_id,
+                        name: userData.full_name,
+                        email: userData.email,
+                        role: userData.role,
+                        department: userData.department,
+                        position: userData.position,
+                        phone: userData.phone
+                    };
+                    
+                    AppState.isAdmin = userData.role === 'admin' || userData.role === 'super_admin';
+                    AppState.isSuperAdmin = userData.role === 'super_admin';
+                    
+                    // Show main interface
+                    showMainInterface();
+                    
+                } catch (error) {
+                    console.error('Session validation error:', error);
+                    localStorage.removeItem('infinixSession');
+                    AppState.sessionToken = null;
+                    AppState.currentUser = null;
+                    showLoginInterface();
+                    showToast('Session expired. Please login again.', 'warning');
+                }
+            } else {
+                console.log('No saved session found');
+                showLoginInterface();
+            }
+        }
 
         function setupEventListeners() {
             // Login tabs
@@ -2315,7 +2360,7 @@
         }
 
         // ============================================
-        // UTILITY FUNCTIONS
+        // UTILITY FUNCTIONS - UPDATED
         // ============================================
         function showToast(message, type = 'success', duration = 3000) {
             Toastify({
@@ -2405,7 +2450,6 @@
             document.getElementById('lastUpdateTime').textContent = timeString;
         }
 
-        // FIXED: Auto-refresh - disable for admin pages
         function startAutoRefresh() {
             // Clear existing interval
             if (AppState.autoRefreshInterval) {
@@ -2449,7 +2493,7 @@
         }
 
         // ============================================
-        // INTERFACE SWITCHING FUNCTIONS (FIXED)
+        // INTERFACE SWITCHING FUNCTIONS - UPDATED
         // ============================================
         function showLoginInterface() {
             console.log('Showing login interface');
@@ -2504,7 +2548,7 @@
         }
 
         // ============================================
-        // AUTHENTICATION FUNCTIONS - SUPABASE VERSION
+        // AUTHENTICATION FUNCTIONS - UPDATED
         // ============================================
         async function handleLogin() {
             const employeeId = document.getElementById('loginEmployeeId').value.trim();
@@ -2520,23 +2564,23 @@
             showLoading('Signing in...');
             
             try {
-                // First, get user by employee_id
-                const { data: users, error: userError } = await supabase
+                // First, get user by employee_id to get email
+                const { data: user, error: userError } = await supabase
                     .from('users')
                     .select('*')
                     .eq('employee_id', employeeId)
                     .eq('status', 'active')
                     .single();
                 
-                if (userError || !users) {
+                if (userError || !user) {
                     hideLoading();
                     showToast('Invalid Employee ID or account is inactive', 'error');
                     return;
                 }
                 
-                // Now authenticate with email and password using Supabase Auth
+                // Authenticate with Supabase Auth using email
                 const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                    email: users.email,
+                    email: user.email,
                     password: password
                 });
                 
@@ -2548,19 +2592,26 @@
                 
                 // Success - set user data
                 AppState.currentUser = {
-                    id: users.id,
-                    employee_id: users.employee_id,
-                    name: users.full_name,
-                    email: users.email,
-                    role: users.role,
-                    department: users.department,
-                    position: users.position,
-                    phone: users.phone
+                    id: user.id,
+                    auth_id: user.auth_id,
+                    employee_id: user.employee_id,
+                    name: user.full_name,
+                    email: user.email,
+                    role: user.role,
+                    department: user.department,
+                    position: user.position,
+                    phone: user.phone
                 };
                 
                 AppState.sessionToken = authData.session.access_token;
-                AppState.isAdmin = users.role === 'admin' || users.role === 'super_admin';
-                AppState.isSuperAdmin = users.role === 'super_admin';
+                AppState.isAdmin = user.role === 'admin' || user.role === 'super_admin';
+                AppState.isSuperAdmin = user.role === 'super_admin';
+                
+                // Update last login
+                await supabase
+                    .from('users')
+                    .update({ last_login: new Date().toISOString() })
+                    .eq('id', user.id);
                 
                 // Save session
                 localStorage.setItem('infinixSession', JSON.stringify({
@@ -2570,7 +2621,7 @@
                 }));
                 
                 hideLoading();
-                showToast('Login successful! Welcome ' + users.full_name, 'success');
+                showToast('Login successful! Welcome ' + user.full_name, 'success');
                 
                 // Show main interface
                 setTimeout(() => {
@@ -2581,63 +2632,6 @@
                 hideLoading();
                 console.error('Login error:', error);
                 showToast('Login failed: ' + error.message, 'error');
-            }
-        }
-
-        async function validateSession() {
-            if (!AppState.sessionToken) {
-                console.log('No session to validate');
-                showLoginInterface();
-                return;
-            }
-            
-            console.log('Validating session...');
-            showLoading('Checking session...');
-            
-            try {
-                // Get current session from Supabase
-                const { data: { session }, error } = await supabase.auth.getSession();
-                
-                if (error || !session) {
-                    throw new Error('Invalid session');
-                }
-                
-                // Get user data from database
-                const { data: userData, error: userError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', AppState.currentUser?.id)
-                    .single();
-                
-                if (userError || !userData) {
-                    throw new Error('User not found');
-                }
-                
-                // Update AppState
-                AppState.currentUser = {
-                    id: userData.id,
-                    employee_id: userData.employee_id,
-                    name: userData.full_name,
-                    email: userData.email,
-                    role: userData.role,
-                    department: userData.department,
-                    position: userData.position,
-                    phone: userData.phone
-                };
-                
-                AppState.isAdmin = userData.role === 'admin' || userData.role === 'super_admin';
-                AppState.isSuperAdmin = userData.role === 'super_admin';
-                
-                hideLoading();
-                showMainInterface();
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Session validation error:', error);
-                localStorage.removeItem('infinixSession');
-                AppState.sessionToken = null;
-                showToast('Session expired. Please login again.', 'warning');
-                showLoginInterface();
             }
         }
 
@@ -2663,6 +2657,7 @@
                 try {
                     await supabase.auth.signOut();
                     
+                    // Clear local state
                     AppState.currentUser = null;
                     AppState.sessionToken = null;
                     AppState.isAdmin = false;
@@ -2691,7 +2686,7 @@
         }
 
         // ============================================
-        // PASSWORD FUNCTIONS - SUPABASE VERSION
+        // PASSWORD FUNCTIONS - UPDATED
         // ============================================
         function showChangePasswordModal() {
             document.getElementById('changePasswordForm').reset();
@@ -2728,8 +2723,8 @@
                 
                 if (error) throw error;
                 
-                // Also update password in users table for consistency
-                const { error: updateError } = await supabase
+                // Update password_updated_at in users table
+                await supabase
                     .from('users')
                     .update({ password_updated_at: new Date().toISOString() })
                     .eq('id', AppState.currentUser.id);
@@ -2794,27 +2789,16 @@
                         throw new Error('Invalid security answer');
                     }
                     
-                    // Get user's auth email
-                    const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(user.auth_id);
+                    // Reset password using Supabase Auth
+                    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+                        redirectTo: window.location.origin,
+                    });
                     
-                    if (authError) {
-                        throw new Error('Unable to find authentication record');
-                    }
-                    
-                    // Reset password using Admin API (requires service role)
-                    const { error: resetError } = await supabase.auth.admin.updateUserById(
-                        user.auth_id,
-                        { password: newPassword }
-                    );
-                    
-                    if (resetError) throw resetError;
+                    if (error) throw error;
                     
                     hideLoading();
-                    showToast('Password reset successfully!', 'success');
+                    showToast('Password reset email sent! Check your inbox.', 'success');
                     closeModal('forgotPasswordModal');
-                    document.getElementById('loginEmployeeId').value = employeeId;
-                    document.getElementById('loginPassword').value = newPassword;
-                    switchLoginTab('login');
                     
                 } catch (error) {
                     hideLoading();
@@ -2855,7 +2839,7 @@
         }
 
         // ============================================
-        // REGISTRATION FUNCTION - SUPABASE VERSION
+        // REGISTRATION FUNCTION - UPDATED
         // ============================================
         async function handleRegistration() {
             const employeeId = document.getElementById('regEmployeeId').value.trim();
@@ -2967,7 +2951,7 @@
         }
 
         // ============================================
-        // NAVIGATION & PAGE FUNCTIONS
+        // NAVIGATION & PAGE FUNCTIONS - UPDATED
         // ============================================
         function navigateTo(page) {
             if (!AppState.sessionToken) {
@@ -3019,7 +3003,7 @@
         }
 
         // ============================================
-        // DASHBOARD FUNCTIONS - SUPABASE VERSION
+        // DASHBOARD FUNCTIONS - UPDATED
         // ============================================
         async function loadDashboard() {
             if (!AppState.sessionToken) return;
@@ -3044,7 +3028,8 @@
                 // Get courses for progress info
                 const { data: courses, error: coursesError } = await supabase
                     .from('courses')
-                    .select('id, title');
+                    .select('id, title')
+                    .eq('status', 'active');
                 
                 if (coursesError) throw coursesError;
                 
@@ -3070,24 +3055,16 @@
                     : 0;
                 
                 // Update UI
-                const stats = {
-                    completedCourses: completedCourses,
-                    averageScore: averageScore,
-                    certificates: certificatesCount,
-                    inProgressCourses: inProgressCourses,
-                    totalCourses: totalCourses
-                };
+                document.getElementById('completedCourses').textContent = completedCourses;
+                document.getElementById('averageScore').textContent = averageScore + '%';
+                document.getElementById('certificatesCount').textContent = certificatesCount;
                 
-                document.getElementById('completedCourses').textContent = stats.completedCourses;
-                document.getElementById('averageScore').textContent = stats.averageScore + '%';
-                document.getElementById('certificatesCount').textContent = stats.certificates;
+                document.getElementById('progressCompleted').textContent = completedCourses;
+                document.getElementById('progressScore').textContent = averageScore + '%';
+                document.getElementById('progressTotal').textContent = totalCourses;
+                document.getElementById('progressInProgress').textContent = inProgressCourses;
                 
-                document.getElementById('progressCompleted').textContent = stats.completedCourses;
-                document.getElementById('progressScore').textContent = stats.averageScore + '%';
-                document.getElementById('progressTotal').textContent = stats.totalCourses;
-                document.getElementById('progressInProgress').textContent = stats.inProgressCourses;
-                
-                setupProgressChart(stats);
+                setupProgressChart(completedCourses, inProgressCourses, totalCourses);
                 loadContinueLearning();
                 loadNotifications();
                 hideLoading();
@@ -3162,7 +3139,7 @@
             }
         }
 
-        function setupProgressChart(stats) {
+        function setupProgressChart(completed, inProgress, total) {
             const ctx = document.getElementById('progressChart').getContext('2d');
             
             if (window.progressChart) {
@@ -3176,9 +3153,9 @@
                     datasets: [{
                         label: 'Courses',
                         data: [
-                            stats.completedCourses || 0,
-                            stats.inProgressCourses || 0,
-                            (stats.totalCourses || 0) - (stats.completedCourses || 0) - (stats.inProgressCourses || 0)
+                            completed || 0,
+                            inProgress || 0,
+                            (total || 0) - (completed || 0) - (inProgress || 0)
                         ],
                         backgroundColor: [
                             'rgba(16, 185, 129, 0.7)',
@@ -3218,7 +3195,7 @@
         }
 
         // ============================================
-        // COURSE FUNCTIONS - SUPABASE VERSION
+        // COURSE FUNCTIONS - UPDATED
         // ============================================
         async function loadCourses() {
             if (!AppState.sessionToken) return;
@@ -3231,6 +3208,7 @@
                     .from('courses')
                     .select('*')
                     .eq('status', 'active')
+                    .order('sort_order', { ascending: true })
                     .order('created_at', { ascending: false });
                 
                 if (coursesError) throw coursesError;
@@ -3241,11 +3219,21 @@
                     .select('course_id, progress, status, score')
                     .eq('user_id', AppState.currentUser.id);
                 
-                if (progressError && progressError.code !== 'PGRST116') throw progressError; // PGRST116 means no rows
+                if (progressError && progressError.code !== 'PGRST116') throw progressError;
+                
+                // Get course files count
+                const { data: files, error: filesError } = await supabase
+                    .from('course_files')
+                    .select('course_id')
+                    .eq('status', 'active');
+                
+                if (filesError) console.error('Files error:', filesError);
                 
                 // Merge course data with progress data
                 const coursesWithProgress = courses.map(course => {
                     const userProgress = progress?.find(p => p.course_id === course.id) || {};
+                    const fileCount = files?.filter(f => f.course_id === course.id).length || 0;
+                    
                     return {
                         id: course.id,
                         title: course.title,
@@ -3259,7 +3247,8 @@
                         status: userProgress.status || 'not-started',
                         score: userProgress.score || 0,
                         badge: course.badge_name,
-                        minReadTime: course.min_read_time_minutes
+                        minReadTime: course.min_read_time_minutes,
+                        filesCount: fileCount
                     };
                 });
                 
@@ -3298,7 +3287,6 @@
             filterCourses();
         }
 
-        // ENHANCED: Course card with file and exam buttons
         function createCourseCard(course) {
             const div = document.createElement('div');
             div.className = 'card course-card';
@@ -3327,10 +3315,10 @@
                 <div class="course-body">
                     <p class="course-description">${course.description || 'No description available.'}</p>
                     
-                    ${course.files && course.files.length > 0 ? `
+                    ${course.filesCount > 0 ? `
                     <div style="margin-bottom: 1rem;">
                         <span style="font-size: 0.875rem;">
-                            <i class="fas fa-file"></i> ${course.files.length} file(s) available
+                            <i class="fas fa-file"></i> ${course.filesCount} file(s) available
                         </span>
                     </div>
                     ` : ''}
@@ -3437,7 +3425,7 @@
             }
         }
 
-        // Course action functions - SUPABASE VERSION
+        // Course action functions
         async function startCourse(courseId) {
             showToast('Starting course...', 'info');
             await updateCourseProgress(courseId, 10, 'in-progress');
@@ -3527,7 +3515,7 @@
         }
 
         // ============================================
-        // FILE MANAGEMENT FUNCTIONS - SUPABASE VERSION
+        // FILE MANAGEMENT FUNCTIONS - UPDATED
         // ============================================
         async function showCourseFilesModal(courseId) {
             showLoading('Loading course files...');
@@ -3703,7 +3691,7 @@
         }
 
         // ============================================
-        // EXAM MANAGEMENT FUNCTIONS - SUPABASE VERSION
+        // EXAM MANAGEMENT FUNCTIONS - UPDATED
         // ============================================
         async function showExamManagementModal(courseId) {
             showLoading('Loading exam details...');
@@ -3866,7 +3854,7 @@
         }
 
         // ============================================
-        // PROGRESS FUNCTIONS - SUPABASE VERSION
+        // PROGRESS FUNCTIONS - UPDATED
         // ============================================
         async function loadProgress() {
             if (!AppState.sessionToken) return;
@@ -3874,23 +3862,11 @@
             showLoading('Loading progress...');
             
             try {
-                // Get user progress with course details
-                const { data: progress, error: progressError } = await supabase
-                    .from('user_progress')
-                    .select(`
-                        progress,
-                        status,
-                        score,
-                        last_accessed,
-                        courses (
-                            id,
-                            title,
-                            category,
-                            duration
-                        )
-                    `)
-                    .eq('user_id', AppState.currentUser.id)
-                    .order('last_accessed', { ascending: false });
+                // Get user progress with course details using the function
+                const { data: progress, error: progressError } = await supabase.rpc(
+                    'get_user_progress',
+                    { p_user_id: AppState.currentUser.id }
+                );
                 
                 if (progressError) throw progressError;
                 
@@ -3906,17 +3882,10 @@
                     : 0;
                 
                 // Update UI
-                const stats = {
-                    completedCourses: completedCourses,
-                    averageScore: averageScore,
-                    inProgressCourses: inProgressCourses,
-                    totalCourses: totalCourses
-                };
-                
-                document.getElementById('progressCompleted').textContent = stats.completedCourses;
-                document.getElementById('progressScore').textContent = stats.averageScore + '%';
-                document.getElementById('progressInProgress').textContent = stats.inProgressCourses;
-                document.getElementById('progressTotal').textContent = stats.totalCourses;
+                document.getElementById('progressCompleted').textContent = completedCourses;
+                document.getElementById('progressScore').textContent = averageScore + '%';
+                document.getElementById('progressInProgress').textContent = inProgressCourses;
+                document.getElementById('progressTotal').textContent = totalCourses;
                 
                 renderProgressTable(progress);
                 hideLoading();
@@ -3950,8 +3919,6 @@
             }
             
             progress.forEach(item => {
-                if (!item.courses) return;
-                
                 const row = document.createElement('tr');
                 
                 let statusBadge = '';
@@ -3964,8 +3931,8 @@
                 }
                 
                 row.innerHTML = `
-                    <td><strong>${item.courses.title}</strong></td>
-                    <td>${item.courses.category}</td>
+                    <td><strong>${item.course_title}</strong></td>
+                    <td>${item.course_category}</td>
                     <td>
                         <div style="width: 100px;">
                             <div class="progress-bar" style="height: 6px;">
@@ -3994,19 +3961,10 @@
             showLoading('Generating report...');
             
             try {
-                const { data: progress, error } = await supabase
-                    .from('user_progress')
-                    .select(`
-                        progress,
-                        status,
-                        score,
-                        last_accessed,
-                        courses (
-                            title,
-                            category
-                        )
-                    `)
-                    .eq('user_id', AppState.currentUser.id);
+                const { data: progress, error } = await supabase.rpc(
+                    'get_user_progress',
+                    { p_user_id: AppState.currentUser.id }
+                );
                 
                 if (error) throw error;
                 
@@ -4014,9 +3972,7 @@
                 let csvContent = "Course,Category,Progress %,Status,Score %,Last Accessed\n";
                 
                 progress.forEach(item => {
-                    if (item.courses) {
-                        csvContent += `"${item.courses.title}","${item.courses.category}",${item.progress},"${item.status}",${item.score || 0},"${item.last_accessed || 'Never'}"\n`;
-                    }
+                    csvContent += `"${item.course_title}","${item.course_category}",${item.progress},"${item.status}",${item.score || 0},"${item.last_accessed || 'Never'}"\n`;
                 });
                 
                 // Create and download CSV file
@@ -4043,7 +3999,7 @@
         }
 
         // ============================================
-        // CERTIFICATE FUNCTIONS - SUPABASE VERSION
+        // CERTIFICATE FUNCTIONS - UPDATED
         // ============================================
         async function loadCertificates() {
             if (!AppState.sessionToken) return;
@@ -4055,14 +4011,12 @@
                     .from('certificates')
                     .select(`
                         id,
+                        certificate_number,
                         score,
                         issue_date,
                         status,
                         courses (
                             title
-                        ),
-                        users (
-                            full_name
                         )
                     `)
                     .eq('user_id', AppState.currentUser.id)
@@ -4111,9 +4065,10 @@
                             <div class="certificate-body">
                                 <h3>${cert.courses?.title || 'Course'}</h3>
                                 <p>This certifies that</p>
-                                <h2>${cert.users?.full_name || 'User'}</h2>
+                                <h2>${AppState.currentUser.name}</h2>
                                 <p>has successfully completed the course</p>
                                 <div class="certificate-score">${cert.score}%</div>
+                                <p>Certificate: ${cert.certificate_number}</p>
                                 <p>Issued on: ${new Date(cert.issue_date).toLocaleDateString()}</p>
                                 <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
                                     <button class="btn btn-sm btn-primary" onclick="viewCertificate('${cert.id}')">
@@ -4151,7 +4106,7 @@
         }
 
         // ============================================
-        // NOTIFICATION FUNCTIONS - SUPABASE VERSION
+        // NOTIFICATION FUNCTIONS - UPDATED
         // ============================================
         async function loadNotifications() {
             if (!AppState.sessionToken) return;
@@ -4161,6 +4116,7 @@
                     .from('notifications')
                     .select('*')
                     .eq('user_id', AppState.currentUser.id)
+                    .eq('status', 'active')
                     .order('created_at', { ascending: false })
                     .limit(20);
                 
@@ -4282,7 +4238,7 @@
         }
 
         // ============================================
-        // PROFILE MODAL FUNCTIONS - SUPABASE VERSION
+        // PROFILE MODAL FUNCTIONS - UPDATED
         // ============================================
         async function showProfileModal() {
             if (!AppState.sessionToken) return;
@@ -4368,8 +4324,6 @@
                 position: document.getElementById('profilePosition').value
             };
             
-            console.log('Updating profile with:', profileData);
-            
             if (!profileData.full_name || !profileData.email) {
                 showToast('Full name and email are required', 'error');
                 return;
@@ -4408,7 +4362,7 @@
         }
 
         // ============================================
-        // SETTINGS FUNCTIONS
+        // SETTINGS FUNCTIONS - UPDATED
         // ============================================
         function showSettingsModal() {
             if (!AppState.sessionToken) return;
@@ -4458,7 +4412,7 @@
         }
 
         // ============================================
-        // ADMIN FUNCTIONS - SUPABASE VERSION
+        // ADMIN FUNCTIONS - UPDATED
         // ============================================
         async function loadAdminDashboard() {
             if (!AppState.sessionToken || (!AppState.isAdmin && !AppState.isSuperAdmin)) return;
@@ -4466,34 +4420,35 @@
             showLoading('Loading admin dashboard...');
             
             try {
-                // Get user stats
-                const { data: users, error: usersError } = await supabase
-                    .from('users')
-                    .select('id, status');
+                // Get user stats using view
+                const { data: userStats, error: userStatsError } = await supabase
+                    .from('user_dashboard_view')
+                    .select('*');
                 
-                if (usersError) throw usersError;
+                if (userStatsError) throw userStatsError;
                 
-                // Get course stats
-                const { data: courses, error: coursesError } = await supabase
-                    .from('courses')
-                    .select('id');
+                // Get course stats using view
+                const { data: courseStats, error: courseStatsError } = await supabase
+                    .from('course_statistics')
+                    .select('*');
                 
-                if (coursesError) throw coursesError;
+                if (courseStatsError) throw courseStatsError;
                 
                 // Get certificate stats
                 const { data: certificates, error: certError } = await supabase
                     .from('certificates')
-                    .select('id');
+                    .select('id')
+                    .eq('status', 'active');
                 
                 if (certError) throw certError;
                 
                 const stats = {
                     users: {
-                        total: users?.length || 0,
-                        active: users?.filter(u => u.status === 'active').length || 0
+                        total: userStats?.length || 0,
+                        active: userStats?.filter(u => u.total_courses_enrolled > 0).length || 0
                     },
                     courses: {
-                        total: courses?.length || 0
+                        total: courseStats?.length || 0
                     },
                     certificates: {
                         total: certificates?.length || 0
@@ -4524,6 +4479,7 @@
                 const { data: users, error } = await supabase
                     .from('users')
                     .select('*')
+                    .neq('status', 'deleted')
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
@@ -4542,6 +4498,8 @@
                 const { data: courses, error } = await supabase
                     .from('courses')
                     .select('*')
+                    .neq('status', 'deleted')
+                    .order('sort_order', { ascending: true })
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
@@ -4641,7 +4599,7 @@
                 const row = document.createElement('tr');
                 
                 row.innerHTML = `
-                    <td>${course.id}</td>
+                    <td>${course.course_code}</td>
                     <td><strong>${course.title}</strong></td>
                     <td>${course.category}</td>
                     <td>${course.duration}</td>
@@ -4679,38 +4637,43 @@
             try {
                 const { data: settings, error } = await supabase
                     .from('system_settings')
-                    .select('*')
-                    .single();
+                    .select('*');
                 
                 const modalContent = document.getElementById('adminSystemSettingsModalContent');
+                
+                // Convert settings array to object
+                const settingsObj = {};
+                settings?.forEach(setting => {
+                    settingsObj[setting.setting_key] = setting.setting_value;
+                });
                 
                 let settingsHtml = `
                     <div class="form-group">
                         <label class="form-label">Application Name</label>
-                        <input type="text" class="form-control" id="settingAppName" value="${settings?.app_name || 'Infinix Retail Academy'}">
+                        <input type="text" class="form-control" id="settingAppName" value="${settingsObj.app_name || 'Infinix Retail Academy'}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Session Timeout (minutes)</label>
-                        <input type="number" class="form-control" id="settingSessionTimeout" value="${settings?.session_timeout_minutes || '30'}" min="5" max="240">
+                        <input type="number" class="form-control" id="settingSessionTimeout" value="${settingsObj.session_timeout_minutes || '30'}" min="5" max="240">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Max Login Attempts</label>
-                        <input type="number" class="form-control" id="settingMaxLoginAttempts" value="${settings?.max_login_attempts || '5'}" min="1" max="10">
+                        <input type="number" class="form-control" id="settingMaxLoginAttempts" value="${settingsObj.max_login_attempts || '5'}" min="1" max="10">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Minimum Password Length</label>
-                        <input type="number" class="form-control" id="settingPasswordMinLength" value="${settings?.password_min_length || '6'}" min="4" max="20">
+                        <input type="number" class="form-control" id="settingPasswordMinLength" value="${settingsObj.password_min_length || '6'}" min="4" max="20">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">
-                                <input type="checkbox" id="settingAllowRegistration" ${settings?.allow_registration ? 'checked' : ''}>
+                                <input type="checkbox" id="settingAllowRegistration" ${settingsObj.allow_registration === 'true' ? 'checked' : ''}>
                                 Allow New Registrations
                             </label>
                         </div>
                         <div class="form-group">
                             <label class="form-label">
-                                <input type="checkbox" id="settingMaintenanceMode" ${settings?.maintenance_mode ? 'checked' : ''}>
+                                <input type="checkbox" id="settingMaintenanceMode" ${settingsObj.maintenance_mode === 'true' ? 'checked' : ''}>
                                 Maintenance Mode
                             </label>
                         </div>
@@ -4738,47 +4701,74 @@
                 return;
             }
             
-            const settings = {
-                app_name: document.getElementById('settingAppName').value,
-                session_timeout_minutes: parseInt(document.getElementById('settingSessionTimeout').value),
-                max_login_attempts: parseInt(document.getElementById('settingMaxLoginAttempts').value),
-                password_min_length: parseInt(document.getElementById('settingPasswordMinLength').value),
-                allow_registration: document.getElementById('settingAllowRegistration').checked,
-                maintenance_mode: document.getElementById('settingMaintenanceMode').checked,
-                updated_at: new Date().toISOString(),
-                updated_by: AppState.currentUser.id
-            };
+            const settings = [
+                {
+                    setting_key: 'app_name',
+                    setting_value: document.getElementById('settingAppName').value,
+                    setting_type: 'string',
+                    category: 'general',
+                    is_public: true
+                },
+                {
+                    setting_key: 'session_timeout_minutes',
+                    setting_value: parseInt(document.getElementById('settingSessionTimeout').value),
+                    setting_type: 'number',
+                    category: 'security',
+                    is_public: false
+                },
+                {
+                    setting_key: 'max_login_attempts',
+                    setting_value: parseInt(document.getElementById('settingMaxLoginAttempts').value),
+                    setting_type: 'number',
+                    category: 'security',
+                    is_public: false
+                },
+                {
+                    setting_key: 'password_min_length',
+                    setting_value: parseInt(document.getElementById('settingPasswordMinLength').value),
+                    setting_type: 'number',
+                    category: 'security',
+                    is_public: false
+                },
+                {
+                    setting_key: 'allow_registration',
+                    setting_value: document.getElementById('settingAllowRegistration').checked.toString(),
+                    setting_type: 'boolean',
+                    category: 'security',
+                    is_public: true
+                },
+                {
+                    setting_key: 'maintenance_mode',
+                    setting_value: document.getElementById('settingMaintenanceMode').checked.toString(),
+                    setting_type: 'boolean',
+                    category: 'system',
+                    is_public: true
+                }
+            ];
             
             showLoading('Saving settings...');
             
             try {
-                // Check if settings exist
-                const { data: existingSettings, error: checkError } = await supabase
+                // Delete existing settings
+                const { error: deleteError } = await supabase
                     .from('system_settings')
-                    .select('id')
-                    .single();
+                    .delete()
+                    .neq('id', '00000000-0000-0000-0000-000000000000');
                 
-                let error;
-                if (existingSettings) {
-                    // Update existing settings
-                    const { error: updateError } = await supabase
-                        .from('system_settings')
-                        .update(settings)
-                        .eq('id', existingSettings.id);
-                    error = updateError;
-                } else {
-                    // Create new settings
-                    const { error: insertError } = await supabase
-                        .from('system_settings')
-                        .insert([{
-                            ...settings,
-                            created_at: new Date().toISOString(),
-                            created_by: AppState.currentUser.id
-                        }]);
-                    error = insertError;
-                }
+                if (deleteError) throw deleteError;
                 
-                if (error) throw error;
+                // Insert new settings
+                const { error: insertError } = await supabase
+                    .from('system_settings')
+                    .insert(settings.map(s => ({
+                        ...s,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        created_by: AppState.currentUser.id,
+                        updated_by: AppState.currentUser.id
+                    })));
+                
+                if (insertError) throw insertError;
                 
                 hideLoading();
                 showToast('Settings saved successfully!', 'success');
@@ -4795,10 +4785,10 @@
             showLoading('Generating template...');
             
             // Create CSV template
-            const csvContent = `Course ID,Title,Description,Category,Duration,Difficulty,Has Exam,Exam Questions,Passing Score,Min Read Time,Badge Name,Status
-"COURSE001","Sample Course","This is a sample course description","product","60 min","beginner","Yes",10,70,15,"product-badge","active"
-"COURSE002","Advanced Sales Techniques","Learn advanced sales strategies","sales","90 min","intermediate","Yes",20,75,20,"sales-badge","active"
-"COURSE003","Customer Service Excellence","Master customer service skills","customer","45 min","beginner","No",0,0,10,"service-badge","active"
+            const csvContent = `Course Code,Title,Description,Category,Duration,Difficulty,Has Exam,Exam Questions,Passing Score,Min Read Time,Badge Name,Status
+"PROD101","Product Knowledge Fundamentals","Learn about product features","product","60 min","beginner","Yes",10,70,15,"product-badge","active"
+"CUST201","Customer Service Excellence","Master customer service skills","customer","90 min","intermediate","Yes",15,75,20,"customer-badge","active"
+"SALE301","Advanced Sales Techniques","Advanced sales strategies","sales","120 min","advanced","Yes",20,80,25,"sales-badge","active"
 `;
             
             // Create and download CSV file
@@ -4824,6 +4814,10 @@
             if (mode === 'create') {
                 modalContent.innerHTML = `
                     <form id="createCourseForm">
+                        <div class="form-group">
+                            <label class="form-label">Course Code *</label>
+                            <input type="text" class="form-control" id="courseCode" placeholder="e.g., PROD101" required>
+                        </div>
                         <div class="form-group">
                             <label class="form-label">Course Title *</label>
                             <input type="text" class="form-control" id="courseTitle" placeholder="Enter course title" required>
@@ -4932,6 +4926,7 @@
             if (!AppState.sessionToken || (!AppState.isAdmin && !AppState.isSuperAdmin)) return;
             
             const courseData = {
+                course_code: document.getElementById('courseCode').value,
                 title: document.getElementById('courseTitle').value,
                 description: document.getElementById('courseDescription').value,
                 category: document.getElementById('courseCategory').value,
@@ -4942,10 +4937,11 @@
                 passing_score: document.getElementById('coursePassingScore')?.value || 0,
                 min_read_time_minutes: parseInt(document.getElementById('courseMinReadTime').value),
                 badge_name: document.getElementById('courseBadge').value,
-                status: 'active'
+                status: 'active',
+                sort_order: 0
             };
             
-            if (!courseData.title || !courseData.category) {
+            if (!courseData.course_code || !courseData.title || !courseData.category) {
                 showToast('Please fill required fields', 'error');
                 return;
             }
@@ -4996,7 +4992,8 @@
                     .update({ 
                         status: 'deleted',
                         updated_at: new Date().toISOString(),
-                        deleted_by: AppState.currentUser.id
+                        deleted_by: AppState.currentUser.id,
+                        deleted_at: new Date().toISOString()
                     })
                     .eq('id', courseId);
                 
@@ -5086,17 +5083,8 @@
                 
                 if (userError) throw new Error('User not found');
                 
-                // Check if certificate already exists
-                const { data: existingCert, error: checkError } = await supabase
-                    .from('certificates')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .eq('course_id', courseId)
-                    .single();
-                
-                if (existingCert) {
-                    throw new Error('Certificate already exists for this user and course');
-                }
+                // Generate certificate number
+                const certificateNumber = 'CERT-' + employeeId + '-' + courseId + '-' + Date.now();
                 
                 // Create certificate
                 const { error } = await supabase
@@ -5104,6 +5092,7 @@
                     .insert([{
                         user_id: user.id,
                         course_id: courseId,
+                        certificate_number: certificateNumber,
                         score: score,
                         issue_date: issueDate,
                         status: status,
@@ -5142,7 +5131,8 @@
                     .update({ 
                         status: 'deleted',
                         updated_at: new Date().toISOString(),
-                        deleted_by: AppState.currentUser.id
+                        deleted_by: AppState.currentUser.id,
+                        deleted_at: new Date().toISOString()
                     })
                     .eq('id', certificateId);
                 
@@ -5452,29 +5442,6 @@
                 
                 if (error) throw error;
                 
-                // Update password if provided
-                if (password && AppState.isSuperAdmin) {
-                    // Get user's auth ID
-                    const { data: user, error: userError } = await supabase
-                        .from('users')
-                        .select('auth_id')
-                        .eq('employee_id', employeeId)
-                        .single();
-                    
-                    if (userError) throw userError;
-                    
-                    // Update password using Admin API (requires service role)
-                    const { error: passwordError } = await supabase.auth.admin.updateUserById(
-                        user.auth_id,
-                        { password: password }
-                    );
-                    
-                    if (passwordError) {
-                        console.warn('Password update failed:', passwordError.message);
-                        // Continue with user update even if password update fails
-                    }
-                }
-                
                 hideLoading();
                 showToast('User updated successfully!', 'success');
                 closeModal('adminUserModal');
@@ -5505,15 +5472,6 @@
             showLoading('Deleting user...');
             
             try {
-                // Get user data
-                const { data: user, error: userError } = await supabase
-                    .from('users')
-                    .select('auth_id')
-                    .eq('employee_id', employeeId)
-                    .single();
-                
-                if (userError) throw userError;
-                
                 // Soft delete user
                 const { error: deleteError } = await supabase
                     .from('users')
@@ -5542,7 +5500,7 @@
         }
 
         // ============================================
-        // WINDOW EXPORTS
+        // WINDOW EXPORTS - COMPLETE
         // ============================================
         window.navigateTo = navigateTo;
         window.startCourse = startCourse;
@@ -5581,7 +5539,6 @@
         window.editUserAdmin = editUserAdmin;
         window.deleteUserAdmin = deleteUserAdmin;
         window.deleteCertificateAdmin = deleteCertificateAdmin;
-        // NEW FUNCTIONS
         window.showCourseFilesModal = showCourseFilesModal;
         window.showAddFileModal = showAddFileModal;
         window.openFileLink = openFileLink;
