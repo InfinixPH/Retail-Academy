@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinix Retail Academy | Professional Learning Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- SUPABASE CLIENT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        /* ALL YOUR EXISTING CSS STAYS EXACTLY THE SAME */
+        :root {
+            --primary-color: #1E3A8A;
+            --secondary-color: #3B82F6;
+            --accent-color: #DC2626;
+            --success-color: #059669;
+            --warning-color: #D97706;
+            --info-color: #3B82F6;
+            --dark-color: #111827;
+            --light-color: #F3F4F6;
+            --white: #FFFFFF;
+            --gray-100: #F9FAFB;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            
+            --bg-primary: var(--white);
+            --bg-secondary: var(--light-color);
+            --text-primary: var(--dark-color);
+            --text-secondary: #4B5563;
+            --border-color: #D1D5DB;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 0.5rem;
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --bg-primary: #111827;
+            --bg-secondary: #1F2937;
+            --text-primary: #F9FAFB;
+            --text-secondary: #D1D5DB;
+            --border-color: #4B5563;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Notification Toast */
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Login Page */
+        .login-container {
+            max-width: 440px;
+            margin: 80px auto;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: block;
+        }
+
+        .login-hidden {
+            display: none !important;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .login-logo {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+        }
+
+        .login-tab.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563EB;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #D97706;
+        }
+
+        .btn-danger {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-xs {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Main App */
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-primary {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .notification-bell:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: var(--transition);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            z-index: 1000;
+            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-header {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .dropdown-item.danger {
+            color: var(--accent-color);
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        /* Main Content */
+        .app-container {
+            max-width: 1400px;
+            margin: 80px auto 0;
+            padding: 2rem;
+            display: none;
+        }
+
+        .page-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-left: 4px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card.success {
+            border-left-color: var(--success-color);
+        }
+
+        .stat-card.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .stat-card.danger {
+            border-left-color: var(--accent-color);
+        }
+
+        .stat-card.info {
+            border-left-color: var(--info-color);
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            opacity: 0.1;
+            color: currentColor;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--accent-color);
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 300px;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        /* Courses */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: var(--transition);
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .course-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: var(--radius) var(--radius) 0 0;
+            position: relative;
+        }
+
+        .course-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .course-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .course-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .course-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success-color);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .course-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-primary);
+        }
+
+        .table th {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .status-locked {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--accent-color);
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .role-user {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Forms */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9997;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Notifications Panel */
+        .notifications-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 400px;
+            max-width: 90vw;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            z-index: 9996;
+            display: none;
+        }
+
+        .notifications-panel.active {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        .notifications-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .notification-item.unread {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .notification-type {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .notification-type.info {
+            background: var(--info-color);
+        }
+
+        .notification-type.success {
+            background: var(--success-color);
+        }
+
+        .notification-type.warning {
+            background: var(--warning-color);
+        }
+
+        .notification-type.danger {
+            background: var(--accent-color);
+        }
+
+        /* Certificates */
+        .certificate-card {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .certificate-card:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .certificate-header {
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+        }
+
+        .certificate-body {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .certificate-body h3 {
+            text-align: center;
+            color: #1E3A8A;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .certificate-body p {
+            text-align: center;
+            color: #4B5563;
+            margin-bottom: 1rem;
+        }
+
+        .certificate-score {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #059669;
+            margin: 1rem 0;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        .visible {
+            display: block !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-muted {
+            color: var(--text-secondary);
+        }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        .ml-1 { margin-left: 0.5rem; }
+        .ml-2 { margin-left: 1rem; }
+        .p-1 { padding: 0.5rem; }
+        .p-2 { padding: 1rem; }
+        .p-3 { padding: 1.5rem; }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-3 { gap: 1.5rem; }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app-container {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+            
+            .courses-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header-container {
+                padding: 0.75rem 1rem;
+            }
+            
+            .nav-primary {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                margin: 40px 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .course-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-container {
+                font-size: 0.875rem;
+            }
+            
+            .notifications-panel {
+                width: 90vw;
+                right: 5vw;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .page-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            z-index: 9995;
+            display: none;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-nav-item {
+            display: block;
+            padding: 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .mobile-nav-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .mobile-nav-item.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Filters */
+        .filters-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .copyright {
+            font-size: 0.875rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* File Preview Styles */
+        .file-preview {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .pdf-icon { color: #DC2626; }
+        .word-icon { color: #3B82F6; }
+        .excel-icon { color: #059669; }
+        .ppt-icon { color: #D97706; }
+        .image-icon { color: #8B5CF6; }
+        .video-icon { color: #EF4444; }
+        .link-icon { color: #3B82F6; }
+        .file-icon-default { color: var(--text-secondary); }
+    </style>
+</head>
+<body class="light-mode">
+    <!-- [ALL YOUR EXISTING HTML STRUCTURE STAYS HERE - SAME AS BEFORE] -->
+    <!-- Keep ALL your modals, forms, headers, etc. exactly as they were -->
+    <!-- Only the JavaScript at the bottom will change -->
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-message" id="loadingMessage" style="color: white; margin-left: 1rem;"></div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="notification-toast" id="notificationToast"></div>
+
+    <!-- All your modals stay exactly the same -->
+    <div class="modal-overlay" id="profileModal">...</div>
+    <div class="modal-overlay" id="settingsModal">...</div>
+    <div class="modal-overlay" id="changePasswordModal">...</div>
+    <div class="modal-overlay" id="adminCourseModal">...</div>
+    <div class="modal-overlay" id="adminCertificateModal">...</div>
+    <div class="modal-overlay" id="adminUserModal">...</div>
+    <div class="modal-overlay" id="adminSystemSettingsModal">...</div>
+    <div class="modal-overlay" id="forgotPasswordModal">...</div>
+    <div class="modal-overlay" id="courseFilesModal">...</div>
+    <div class="modal-overlay" id="addFileModal">...</div>
+    <div class="modal-overlay" id="examManagementModal">...</div>
+    <div class="modal-overlay" id="createExamModal">...</div>
+
+    <!-- Notifications Panel -->
+    <div class="notifications-panel" id="notificationsPanel">...</div>
+
+    <!-- Login Page -->
+    <div id="loginModal" class="login-container">...</div>
+
+    <!-- Main App -->
+    <header id="mainHeader">...</div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">...</div>
+
+    <!-- Main Content -->
+    <div class="app-container" id="appContainer">
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page-content active">...</div>
+
+        <!-- Courses Page -->
+        <div id="coursesPage" class="page-content">...</div>
+
+        <!-- Progress Page -->
+        <div id="progressPage" class="page-content">...</div>
+
+        <!-- Certificates Page -->
+        <div id="certificatesPage" class="page-content">...</div>
+
+        <!-- Admin Page -->
+        <div id="adminPage" class="page-content">...</div>
+    </div>
+
+    <footer id="mainFooter">...</footer>
+
+    <!-- ============================================
+    SUPABASE JAVASCRIPT - THIS REPLACES ALL google.script.run CALLS
+    ============================================ -->
+    <script>
+        // ============================================
+        // SUPABASE CONFIGURATION - USE YOUR CREDENTIALS
+        // ============================================
+        const SUPABASE_URL = 'https://tiwwntbjdeevcumxnlog.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpd3dudGJqZGVldmN1bXhubG9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMzI5OTUsImV4cCI6MjA4NDcwODk5NX0.vCwo09J3Fv5MXgIiOwZlDijpcm7_DhEiF4Fy5QXiduo';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // ============================================
+        // GLOBAL STATE
+        // ============================================
+        const AppState = {
+            currentUser: null,
+            sessionId: null,
+            courses: [],
+            certificates: [],
+            notifications: [],
+            currentPage: 'dashboard',
+            isAdmin: false,
+            isSuperAdmin: false,
+            theme: localStorage.getItem('theme') || 'light',
+            autoRefreshInterval: null,
+            refreshInterval: 30000
+        };
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function hashPassword(password) {
+            // Simple SHA-256 hash (for demo - in production use proper bcrypt)
+            return CryptoJS.SHA256(password).toString();
+        }
+
+        function showToast(message, type = 'success', duration = 3000) {
+            Toastify({
+                text: message,
+                duration: duration,
+                gravity: "bottom",
+                position: "right",
+                backgroundColor: type === 'success' ? '#059669' : 
+                                type === 'error' ? '#DC2626' : 
+                                type === 'warning' ? '#D97706' : '#3B82F6',
+                stopOnFocus: true
+            }).showToast();
+        }
+
+        function showLoading(message = 'Loading...') {
+            document.getElementById('loadingMessage').textContent = message;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        // ============================================
+        // AUTHENTICATION FUNCTIONS
+        // ============================================
+        async function handleLogin() {
+            const employeeId = document.getElementById('loginEmployeeId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!employeeId || !password) {
+                showToast('Please enter Employee ID and password', 'error');
+                return;
+            }
+            
+            showLoading('Signing in...');
+            
+            try {
+                // Hash the password
+                const hashedPassword = hashPassword(password);
+                
+                // Check user credentials
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('employee_id', employeeId)
+                    .eq('password_hash', hashedPassword)
+                    .single();
+                
+                if (error || !users) {
+                    showToast('Invalid Employee ID or password', 'error');
+                    return;
+                }
+                
+                // Update user
+                await supabase
+                    .from('users')
+                    .update({ 
+                        last_login: new Date().toISOString(),
+                        login_attempts: 0 
+                    })
+                    .eq('id', users.id);
+                
+                // Set user session
+                AppState.currentUser = {
+                    id: users.id,
+                    employeeId: users.employee_id,
+                    name: users.full_name,
+                    email: users.email,
+                    role: users.role,
+                    department: users.department,
+                    position: users.position
+                };
+                
+                AppState.isAdmin = users.role === 'admin' || users.role === 'super_admin';
+                AppState.isSuperAdmin = users.role === 'super_admin';
+                
+                // Create session in localStorage
+                localStorage.setItem('infinixSession', JSON.stringify({
+                    userId: users.id,
+                    employeeId: users.employee_id,
+                    timestamp: Date.now()
+                }));
+                
+                showToast('Login successful! Welcome ' + users.full_name, 'success');
+                showMainInterface();
+                
+            } catch (error) {
+                showToast('Login failed: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function validateSession() {
+            const savedSession = localStorage.getItem('infinixSession');
+            if (!savedSession) {
+                showLoginInterface();
+                return;
+            }
+            
+            try {
+                const session = JSON.parse(savedSession);
+                const now = Date.now();
+                const sessionAge = now - session.timestamp;
+                const sessionTimeout = 30 * 60 * 1000; // 30 minutes
+                
+                if (sessionAge > sessionTimeout) {
+                    localStorage.removeItem('infinixSession');
+                    showToast('Session expired. Please login again.', 'warning');
+                    showLoginInterface();
+                    return;
+                }
+                
+                // Session is valid, load user data
+                loadUserData(session.userId);
+                
+            } catch (error) {
+                localStorage.removeItem('infinixSession');
+                showLoginInterface();
+            }
+        }
+
+        async function loadUserData(userId) {
+            showLoading('Loading user data...');
+            
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                if (error || !user) {
+                    throw new Error('User not found');
+                }
+                
+                AppState.currentUser = {
+                    id: user.id,
+                    employeeId: user.employee_id,
+                    name: user.full_name,
+                    email: user.email,
+                    role: user.role,
+                    department: user.department,
+                    position: user.position
+                };
+                
+                AppState.isAdmin = user.role === 'admin' || user.role === 'super_admin';
+                AppState.isSuperAdmin = user.role === 'super_admin';
+                
+                showMainInterface();
+                
+            } catch (error) {
+                showToast('Failed to load user data: ' + error.message, 'error');
+                showLoginInterface();
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ============================================
+        // COURSE FUNCTIONS
+        // ============================================
+        async function loadCourses() {
+            if (!AppState.currentUser) return;
+            
+            showLoading('Loading courses...');
+            
+            try {
+                // Get all courses
+                const { data: courses, error } = await supabase
+                    .from('courses')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                // Get user progress for these courses
+                const { data: progress, error: progressError } = await supabase
+                    .from('user_progress')
+                    .select('*')
+                    .eq('user_id', AppState.currentUser.id);
+                
+                if (progressError) throw progressError;
+                
+                // Combine course data with progress
+                const coursesWithProgress = courses.map(course => {
+                    const userProgress = progress?.find(p => p.course_id === course.id) || {
+                        progress: 0,
+                        status: 'not-started',
+                        score: 0
+                    };
+                    
+                    return {
+                        ...course,
+                        progress: userProgress.progress,
+                        status: userProgress.status,
+                        score: userProgress.score,
+                        course_id: course.course_code // Use course_code for display
+                    };
+                });
+                
+                AppState.courses = coursesWithProgress;
+                renderCourses();
+                
+            } catch (error) {
+                showToast('Failed to load courses: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function updateCourseProgress(courseId, progress, status) {
+            if (!AppState.currentUser) return;
+            
+            try {
+                // Check if progress already exists
+                const { data: existingProgress, error: checkError } = await supabase
+                    .from('user_progress')
+                    .select('*')
+                    .eq('user_id', AppState.currentUser.id)
+                    .eq('course_id', courseId)
+                    .single();
+                
+                let result;
+                
+                if (checkError || !existingProgress) {
+                    // Create new progress record
+                    result = await supabase
+                        .from('user_progress')
+                        .insert({
+                            user_id: AppState.currentUser.id,
+                            course_id: courseId,
+                            progress: progress,
+                            status: status,
+                            score: status === 'completed' ? 100 : 0,
+                            completed_at: status === 'completed' ? new Date().toISOString() : null,
+                            last_accessed: new Date().toISOString()
+                        });
+                } else {
+                    // Update existing progress
+                    result = await supabase
+                        .from('user_progress')
+                        .update({
+                            progress: progress,
+                            status: status,
+                            score: status === 'completed' ? 100 : existingProgress.score,
+                            completed_at: status === 'completed' ? new Date().toISOString() : existingProgress.completed_at,
+                            last_accessed: new Date().toISOString()
+                        })
+                        .eq('id', existingProgress.id);
+                }
+                
+                if (result.error) throw result.error;
+                
+                showToast('Progress updated successfully', 'success');
+                
+                // Reload data
+                loadCourses();
+                if (AppState.currentPage === 'dashboard') loadDashboard();
+                if (AppState.currentPage === 'progress') loadProgress();
+                
+            } catch (error) {
+                showToast('Failed to update progress: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================
+        // ADMIN FUNCTIONS
+        // ============================================
+        async function loadAllUsers() {
+            if (!AppState.currentUser || (!AppState.isAdmin && !AppState.isSuperAdmin)) return;
+            
+            try {
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                renderUsersTable(users);
+                
+            } catch (error) {
+                showToast('Failed to load users: ' + error.message, 'error');
+            }
+        }
+
+        async function createUserAdmin(userData) {
+            if (!AppState.currentUser || !AppState.isSuperAdmin) {
+                showToast('Only Super Admin can create users', 'error');
+                return false;
+            }
+            
+            try {
+                const hashedPassword = hashPassword(userData.password);
+                
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert({
+                        employee_id: userData.employeeId,
+                        password_hash: hashedPassword,
+                        email: userData.email,
+                        full_name: userData.fullName,
+                        phone: userData.phone || '',
+                        department: userData.department || '',
+                        position: userData.position || '',
+                        role: userData.role || 'user',
+                        status: userData.status || 'active',
+                        security_question: userData.securityQuestion || 'What is your pet\'s name?',
+                        security_answer_hash: hashPassword(userData.securityAnswer || 'default')
+                    })
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                showToast('User created successfully', 'success');
+                return true;
+                
+            } catch (error) {
+                showToast('Failed to create user: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        async function deleteUserAdmin(employeeId) {
+            if (!AppState.currentUser || !AppState.isSuperAdmin) {
+                showToast('Only Super Admin can delete users', 'error');
+                return false;
+            }
+            
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .delete()
+                    .eq('employee_id', employeeId);
+                
+                if (error) throw error;
+                
+                showToast('User deleted successfully', 'success');
+                return true;
+                
+            } catch (error) {
+                showToast('Failed to delete user: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        // ============================================
+        // FILE MANAGEMENT FUNCTIONS
+        // ============================================
+        async function addCourseFile(courseId, fileData) {
+            if (!AppState.currentUser || (!AppState.isAdmin && !AppState.isSuperAdmin)) {
+                showToast('Admin privileges required', 'error');
+                return false;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('course_files')
+                    .insert({
+                        course_id: courseId,
+                        file_name: fileData.name,
+                        file_type: fileData.type,
+                        file_url: fileData.url,
+                        is_external: fileData.isExternal || false
+                    })
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                showToast('File added successfully', 'success');
+                return data;
+                
+            } catch (error) {
+                showToast('Failed to add file: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        async function getCourseFiles(courseId) {
+            if (!AppState.currentUser) return [];
+            
+            try {
+                const { data, error } = await supabase
+                    .from('course_files')
+                    .select('*')
+                    .eq('course_id', courseId)
+                    .order('uploaded_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                return data || [];
+                
+            } catch (error) {
+                showToast('Failed to load files: ' + error.message, 'error');
+                return [];
+            }
+        }
+
+        // ============================================
+        // EXAM MANAGEMENT FUNCTIONS
+        // ============================================
+        async function createExam(examData) {
+            if (!AppState.currentUser || (!AppState.isAdmin && !AppState.isSuperAdmin)) {
+                showToast('Admin privileges required', 'error');
+                return false;
+            }
+            
+            try {
+                // First get course ID from course_code
+                const { data: course, error: courseError } = await supabase
+                    .from('courses')
+                    .select('id')
+                    .eq('course_code', examData.courseId)
+                    .single();
+                
+                if (courseError) throw new Error('Course not found');
+                
+                const { data, error } = await supabase
+                    .from('exams')
+                    .insert({
+                        exam_code: 'EXAM_' + Date.now().toString().slice(-6),
+                        course_id: course.id,
+                        title: examData.title,
+                        description: examData.description,
+                        total_questions: examData.totalQuestions || 10,
+                        passing_score: examData.passingScore || 70,
+                        time_limit_minutes: examData.timeLimit || 30,
+                        attempts_allowed: examData.attemptsAllowed || 1
+                    })
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                // Update course to indicate it has exam
+                await supabase
+                    .from('courses')
+                    .update({
+                        has_exam: true,
+                        exam_questions: examData.totalQuestions || 10
+                    })
+                    .eq('id', course.id);
+                
+                showToast('Exam created successfully', 'success');
+                return data;
+                
+            } catch (error) {
+                showToast('Failed to create exam: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        // ============================================
+        // REGISTRATION FUNCTION
+        // ============================================
+        async function handleRegistration(userData) {
+            showLoading('Creating account...');
+            
+            try {
+                // Check if employee ID already exists
+                const { data: existingUser, error: checkError } = await supabase
+                    .from('users')
+                    .select('employee_id')
+                    .eq('employee_id', userData.employeeId)
+                    .single();
+                
+                if (existingUser) {
+                    showToast('Employee ID already registered', 'error');
+                    return;
+                }
+                
+                // Hash password and security answer
+                const hashedPassword = hashPassword(userData.password);
+                const hashedSecurityAnswer = hashPassword(userData.securityAnswer);
+                
+                // Create new user
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert({
+                        employee_id: userData.employeeId,
+                        password_hash: hashedPassword,
+                        email: userData.email,
+                        full_name: userData.fullName,
+                        phone: userData.phone || '',
+                        department: userData.department || '',
+                        position: userData.position || '',
+                        role: userData.position?.toLowerCase() === 'admin' ? 'admin' : 'user',
+                        security_question: userData.securityQuestion,
+                        security_answer_hash: hashedSecurityAnswer
+                    })
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                showToast('Registration successful! You can now login.', 'success');
+                
+                // Switch to login tab
+                switchLoginTab('login');
+                document.getElementById('loginEmployeeId').value = userData.employeeId;
+                document.getElementById('loginPassword').value = userData.password;
+                
+            } catch (error) {
+                showToast('Registration failed: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ============================================
+        // INTERFACE FUNCTIONS (SAME AS BEFORE)
+        // ============================================
+        function showLoginInterface() {
+            document.getElementById('mainHeader').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('mainFooter').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function showMainInterface() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('mainHeader').style.display = 'block';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('mainFooter').style.display = 'block';
+            
+            updateUserUI();
+            
+            if (AppState.isAdmin || AppState.isSuperAdmin) {
+                document.getElementById('adminNavItem').style.display = 'flex';
+                document.getElementById('mobileAdminNavItem').style.display = 'block';
+                document.getElementById('adminCourseButton').style.display = 'inline-flex';
+                document.getElementById('adminCertificateButton').style.display = 'inline-flex';
+            }
+            
+            loadDashboard();
+        }
+
+        function updateUserUI() {
+            if (!AppState.currentUser) return;
+            
+            document.getElementById('dashboardUserName').textContent = AppState.currentUser.name;
+            document.getElementById('dropdownUserName').textContent = AppState.currentUser.name;
+            document.getElementById('dropdownUserRole').textContent = AppState.currentUser.role.toUpperCase();
+            
+            const initials = AppState.currentUser.name.split(' ')
+                .map(n => n[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+            document.getElementById('userAvatar').textContent = initials;
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup event listeners
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleLogin();
+            });
+            
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const userData = {
+                    employeeId: document.getElementById('regEmployeeId').value.trim(),
+                    password: document.getElementById('regPassword').value,
+                    fullName: document.getElementById('regFullName').value.trim(),
+                    email: document.getElementById('regEmail').value.trim(),
+                    phone: document.getElementById('regPhone').value.trim(),
+                    department: document.getElementById('regDepartment').value,
+                    position: document.getElementById('regPosition').value,
+                    securityQuestion: document.getElementById('regSecurityQuestion').value,
+                    securityAnswer: document.getElementById('regSecurityAnswer').value.trim()
+                };
+                handleRegistration(userData);
+            });
+            
+            // Check for saved session
+            validateSession();
+        });
+
+        // ============================================
+        // EXPORT FUNCTIONS TO WINDOW
+        // ============================================
+        window.handleLogin = handleLogin;
+        window.handleRegistration = handleRegistration;
+        window.updateCourseProgress = updateCourseProgress;
+        window.createUserAdmin = createUserAdmin;
+        window.deleteUserAdmin = deleteUserAdmin;
+        window.addCourseFile = addCourseFile;
+        window.getCourseFiles = getCourseFiles;
+        window.createExam = createExam;
+        
+        // Keep all your existing UI functions
+        window.navigateTo = navigateTo;
+        window.startCourse = startCourse;
+        window.continueCourse = continueCourse;
+        window.restartCourse = restartCourse;
+        window.reviewCourse = reviewCourse;
+        window.previewCourse = previewCourse;
+        window.viewCertificateForCourse = viewCertificateForCourse;
+        window.viewCertificate = viewCertificate;
+        window.downloadCertificate = downloadCertificate;
+        window.filterCourses = filterCourses;
+        window.showProfileModal = showProfileModal;
+        window.showSettingsModal = showSettingsModal;
+        window.showChangePasswordModal = showChangePasswordModal;
+        window.showForgotPassword = showForgotPassword;
+        window.toggleTheme = toggleTheme;
+        window.handleLogout = handleLogout;
+        window.refreshDashboard = refreshDashboard;
+        window.refreshCertificates = refreshCertificates;
+        window.exportProgressReport = exportProgressReport;
+        window.markAllNotificationsAsRead = markAllNotificationsAsRead;
+        window.loadAllNotifications = loadAllNotifications;
+        window.closeModal = closeModal;
+        window.closeDropdowns = closeDropdowns;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.closeMobileMenu = closeMobileMenu;
+        window.toggleNotificationsPanel = toggleNotificationsPanel;
+        window.filterUsers = filterUsers;
+        window.showSystemSettings = showSystemSettings;
+        window.downloadCourseTemplate = downloadCourseTemplate;
+        window.showAdminCourseModal = showAdminCourseModal;
+        window.showAdminCertificateModal = showAdminCertificateModal;
+        window.showAdminUserModal = showAdminUserModal;
+        window.editCourseAdmin = editCourseAdmin;
+        window.deleteCourseAdmin = deleteCourseAdmin;
+        window.editUserAdmin = editUserAdmin;
+        window.deleteUserAdmin = deleteUserAdmin;
+        window.deleteCertificateAdmin = deleteCertificateAdmin;
+        window.showCourseFilesModal = showCourseFilesModal;
+        window.showAddFileModal = showAddFileModal;
+        window.openFileLink = openFileLink;
+        window.showExamManagementModal = showExamManagementModal;
+        window.showCreateExamModal = showCreateExamModal;
+        window.startExam = startExam;
+        window.editExam = editExam;
+    </script>
+    
+    <!-- Include CryptoJS for hashing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</body>
+</html>
