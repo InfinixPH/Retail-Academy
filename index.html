@@ -2203,6 +2203,27 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         
         // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ===== DEBUG: show JS errors clearly =====
+        window.addEventListener('error', (ev) => {
+            console.error('Global error:', ev.error || ev.message);
+            try { alert('JS Error: ' + (ev.message || ev.error?.message || 'Unknown')); } catch(_) {}
+        });
+        window.addEventListener('unhandledrejection', (ev) => {
+            console.error('Unhandled promise rejection:', ev.reason);
+            try { alert('Promise Error: ' + (ev.reason?.message || String(ev.reason))); } catch(_) {}
+        });
+
+        // Quick connectivity check
+        (async () => {
+            try {
+                const r = await fetch(SUPABASE_URL + '/auth/v1/health', { headers: { apikey: SUPABASE_ANON_KEY } });
+                console.log('Supabase health:', r.status);
+            } catch (e) {
+                console.error('Supabase health fetch failed:', e);
+            }
+        })();
+
         
         // ============================================
         // GLOBAL STATE
@@ -2363,16 +2384,28 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         // UTILITY FUNCTIONS - UPDATED
         // ============================================
         function showToast(message, type = 'success', duration = 3000) {
-            Toastify({
-                text: message,
-                duration: duration,
-                gravity: "bottom",
-                position: "right",
-                backgroundColor: type === 'success' ? '#059669' : 
-                                type === 'error' ? '#DC2626' : 
-                                type === 'warning' ? '#D97706' : '#3B82F6',
-                stopOnFocus: true
-            }).showToast();
+            try {
+                if (typeof Toastify === 'function') {
+                    Toastify({
+                        text: message,
+                        duration: duration,
+                        gravity: "bottom",
+                        position: "right",
+                        backgroundColor: type === 'success' ? '#059669' :
+                                        type === 'error' ? '#DC2626' :
+                                        type === 'warning' ? '#D97706' : '#2563EB',
+                        stopOnFocus: true
+                    }).showToast();
+                } else {
+                    // Fallback if Toastify didn't load
+                    console[type === 'error' ? 'error' : 'log']('[Toast]', message);
+                    alert(message);
+                }
+            } catch (e) {
+                console.error('showToast failed:', e);
+                alert(message);
+            }
+        }).showToast();
         }
 
         function showLoading(message = 'Loading...') {
