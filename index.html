@@ -1338,7 +1338,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-user-circle"></i> My Profile</h3>
-                <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('profileModal')">&times;</button>
             </div>
             <div class="modal-body" id="profileModalContent">
                 <!-- Profile content loaded dynamically -->
@@ -1350,7 +1350,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-cog"></i> Settings</h3>
-                <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
             </div>
             <div class="modal-body" id="settingsModalContent">
                 <!-- Settings content loaded dynamically -->
@@ -1362,7 +1362,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-key"></i> Change Password</h3>
-                <button class="modal-close" onclick="closeModal('changePasswordModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('changePasswordModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="changePasswordForm">
@@ -1391,7 +1391,7 @@
         <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-graduation-cap"></i> Course Management</h3>
-                <button class="modal-close" onclick="closeModal('adminCourseModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('adminCourseModal')">&times;</button>
             </div>
             <div class="modal-body" id="adminCourseModalContent">
                 <!-- Course management content loaded dynamically -->
@@ -1403,7 +1403,7 @@
         <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-award"></i> Certificate Management</h3>
-                <button class="modal-close" onclick="closeModal('adminCertificateModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('adminCertificateModal')">&times;</button>
             </div>
             <div class="modal-body" id="adminCertificateModalContent">
                 <!-- Certificate management content loaded dynamically -->
@@ -1415,7 +1415,7 @@
         <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-user-edit"></i> User Management</h3>
-                <button class="modal-close" onclick="closeModal('adminUserModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('adminUserModal')">&times;</button>
             </div>
             <div class="modal-body" id="adminUserModalContent">
                 <!-- User management content loaded dynamically -->
@@ -1427,7 +1427,7 @@
         <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-cogs"></i> System Settings</h3>
-                <button class="modal-close" onclick="closeModal('adminSystemSettingsModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('adminSystemSettingsModal')">&times;</button>
             </div>
             <div class="modal-body" id="adminSystemSettingsModalContent">
                 <!-- System settings content loaded dynamically -->
@@ -1439,7 +1439,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-key"></i> Forgot Password</h3>
-                <button class="modal-close" onclick="closeModal('forgotPasswordModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('forgotPasswordModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="forgotPasswordForm">
@@ -1475,7 +1475,7 @@
         <div class="modal" style="max-width: 800px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-file-upload"></i> Course Files/Links</h3>
-                <button class="modal-close" onclick="closeModal('courseFilesModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('courseFilesModal')">&times;</button>
             </div>
             <div class="modal-body" id="courseFilesModalContent">
                 <!-- Course files content loaded dynamically -->
@@ -1487,7 +1487,7 @@
         <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-plus"></i> Add File/Link</h3>
-                <button class="modal-close" onclick="closeModal('addFileModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('addFileModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="addFileForm">
@@ -1537,7 +1537,7 @@
         <div class="modal" style="max-width: 700px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-file-alt"></i> Exam Management</h3>
-                <button class="modal-close" onclick="closeModal('examManagementModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('examManagementModal')">&times;</button>
             </div>
             <div class="modal-body" id="examManagementModalContent">
                 <!-- Exam management content loaded dynamically -->
@@ -1549,7 +1549,7 @@
         <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-plus-circle"></i> Create Exam</h3>
-                <button class="modal-close" onclick="closeModal('createExamModal')">&times;</button>
+                <button type="button" class="modal-close" onclick="closeModal('createExamModal')">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="createExamForm">
@@ -1606,7 +1606,7 @@
     <div class="notifications-panel" id="notificationsPanel">
         <div class="notifications-header">
             <h3><i class="fas fa-bell"></i> Notifications</h3>
-            <button class="btn btn-sm btn-outline" onclick="markAllNotificationsAsRead()">Mark All Read</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="markAllNotificationsAsRead()">Mark All Read</button>
         </div>
         <div class="notifications-body" id="notificationsList">
             <!-- Notifications loaded dynamically -->
@@ -1657,8 +1657,8 @@
             <!-- Registration Form -->
             <form id="registerForm" class="login-form">
                 <div class="form-group">
-                    <label class="form-label">Email *</label>
-                    <input type="text" class="form-control" id="regEmployeeId" placeholder="Enter Email" required>
+                    <label class="form-label">Employee ID (optional)</label>
+                    <input type="text" class="form-control" id="regEmployeeId" placeholder="Enter employee ID (optional)">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Full Name *</label>
@@ -1697,22 +1697,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Security Question *</label>
-                    <select class="form-control" id="regSecurityQuestion" required>
-                        <option value="">Select a security question</option>
-                        <option value="What is your pet's name?">What is your pet's name?</option>
-                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                        <option value="What was your first school?">What was your first school?</option>
-                        <option value="What is your favorite book?">What is your favorite book?</option>
-                        <option value="What city were you born in?">What city were you born in?</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Security Answer *</label>
-                    <input type="text" class="form-control" id="regSecurityAnswer" placeholder="Enter your answer" required>
-                </div>
-                <div class="form-group">
+<div class="form-group">
                     <label class="form-label">Password *</label>
                     <input type="password" class="form-control" id="regPassword" placeholder="Create password (min. 6 characters)" required>
                 </div>
@@ -1744,7 +1729,7 @@
                 <span>Infinix Academy</span>
             </a>
             
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+            <button type="button" class="mobile-menu-btn" onclick="toggleMobileMenu()">
                 <i class="fas fa-bars"></i>
             </button>
             
@@ -1772,7 +1757,7 @@
                     <span class="notification-count" id="notificationCount">0</span>
                 </div>
                 
-                <button class="theme-toggle" onclick="toggleTheme()">
+                <button type="button" class="theme-toggle" onclick="toggleTheme()">
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
                 
@@ -1832,7 +1817,7 @@
                     <p class="text-muted">Welcome back, <span id="dashboardUserName">User</span>! Here's your learning progress.</p>
                 </div>
                 <div class="page-actions">
-                    <button class="btn btn-primary" onclick="refreshDashboard()">
+                    <button type="button" class="btn btn-primary" onclick="refreshDashboard()">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
                 </div>
@@ -1913,7 +1898,7 @@
                         </div>
                         <h3 class="empty-state-title">No Courses in Progress</h3>
                         <p class="text-muted">Start a new course to continue your learning journey.</p>
-                        <button class="btn btn-primary mt-2" onclick="navigateTo('courses')">
+                        <button type="button" class="btn btn-primary mt-2" onclick="navigateTo('courses')">
                             <i class="fas fa-search"></i> Find Courses
                         </button>
                     </div>
@@ -1925,7 +1910,7 @@
                     <h3 class="card-title">
                         <i class="fas fa-bell"></i> Recent Notifications
                     </h3>
-                    <button class="btn btn-sm btn-outline" onclick="loadAllNotifications()">
+                    <button type="button" class="btn btn-sm btn-outline" onclick="loadAllNotifications()">
                         <i class="fas fa-list"></i> View All
                     </button>
                 </div>
@@ -1949,7 +1934,7 @@
                         <i class="fas fa-search search-icon"></i>
                         <input type="text" class="search-input" id="courseSearch" placeholder="Search courses..." onkeyup="filterCourses()">
                     </div>
-                    <button class="btn btn-success" id="adminCourseButton" style="display: none;" onclick="showAdminCourseModal()">
+                    <button type="button" class="btn btn-success" id="adminCourseButton" style="display: none;" onclick="showAdminCourseModal()">
                         <i class="fas fa-plus"></i> Manage Courses
                     </button>
                 </div>
@@ -2002,7 +1987,7 @@
                     <p class="text-muted">Track your course completion and performance</p>
                 </div>
                 <div class="page-actions">
-                    <button class="btn btn-primary" onclick="exportProgressReport()">
+                    <button type="button" class="btn btn-primary" onclick="exportProgressReport()">
                         <i class="fas fa-download"></i> Export Report
                     </button>
                 </div>
@@ -2064,10 +2049,10 @@
                     <p class="text-muted">Your earned certificates and achievements</p>
                 </div>
                 <div class="page-actions">
-                    <button class="btn btn-primary" onclick="refreshCertificates()">
+                    <button type="button" class="btn btn-primary" onclick="refreshCertificates()">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
-                    <button class="btn btn-success" id="adminCertificateButton" style="display: none;" onclick="showAdminCertificateModal()">
+                    <button type="button" class="btn btn-success" id="adminCertificateButton" style="display: none;" onclick="showAdminCertificateModal()">
                         <i class="fas fa-plus"></i> Manage Certificates
                     </button>
                 </div>
@@ -2080,7 +2065,7 @@
                     </div>
                     <h3 class="empty-state-title">No Certificates Yet</h3>
                     <p class="text-muted">Complete courses to earn certificates!</p>
-                    <button class="btn btn-primary mt-2" onclick="navigateTo('courses')">
+                    <button type="button" class="btn btn-primary mt-2" onclick="navigateTo('courses')">
                         <i class="fas fa-graduation-cap"></i> Browse Courses
                     </button>
                 </div>
@@ -2097,10 +2082,10 @@
                     <p class="text-muted">System administration and management</p>
                 </div>
                 <div class="page-actions">
-                    <button class="btn btn-danger" onclick="showSystemSettings()">
+                    <button type="button" class="btn btn-danger" onclick="showSystemSettings()">
                         <i class="fas fa-cog"></i> System Settings
                     </button>
-                    <button class="btn btn-warning" onclick="downloadCourseTemplate()">
+                    <button type="button" class="btn btn-warning" onclick="downloadCourseTemplate()">
                         <i class="fas fa-download"></i> Course Template
                     </button>
                 </div>
@@ -2134,7 +2119,7 @@
                         <i class="fas fa-search search-icon"></i>
                         <input type="text" class="search-input" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()">
                     </div>
-                    <button class="btn btn-success" onclick="showAdminUserModal('create')">
+                    <button type="button" class="btn btn-success" onclick="showAdminUserModal('create')">
                         <i class="fas fa-plus"></i> Add User
                     </button>
                 </div>
@@ -2163,7 +2148,7 @@
                     <h3 class="card-title">
                         <i class="fas fa-graduation-cap"></i> Course Management
                     </h3>
-                    <button class="btn btn-success" onclick="showAdminCourseModal('create')">
+                    <button type="button" class="btn btn-success" onclick="showAdminCourseModal('create')">
                         <i class="fas fa-plus"></i> Add Course
                     </button>
                 </div>
@@ -2202,9 +2187,9 @@ const SUPABASE_URL = 'https://udqjsmmvpopkzuyzwtah.supabase.co'; // ⬅️ YOUR 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkcWpzbW12cG9wa3p1eXp3dGFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMzc5NjQsImV4cCI6MjA4NDcxMzk2NH0.lizXdiaH3tIRYe_25eiL7RZVayq7xT3JqBWxb0wdGJQ'; // ⬅️ YOUR NEW ANON KEY
         
         // Initialize Supabase client
-        const supabase = (window.supabase?.createClient)
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+        const supabase = (window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+                  : (window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+                  : (window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null)));
 // Fallback for CDN global naming
 const _sbGlobal = window.supabase || window.Supabase || null;
 const _createClient = _sbGlobal?.createClient;
@@ -2275,12 +2260,12 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
         });
 
         async function checkSavedSession() {
-            const savedSession = localStorage.getItem('currentUser');
+            const savedSession = localStorage.getItem('infinixSession');
             if (savedSession) {
                 try {
                     const session = JSON.parse(savedSession);
-                    AppState.sessionToken = data.session.access_token;
-                    AppState.currentUser = JSON.parse(savedSession);
+                    AppState.sessionToken = session.token;
+                    AppState.currentUser = session.user;
                     console.log('Found saved session for user:', session.user?.email);
                     
                     // Validate session with Supabase
@@ -2294,7 +2279,7 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
                     const { data: userData, error: userError } = await supabase
                         .from('users')
                         .select('*')
-                        .eq('id', data.session.user.id)
+                        .eq('auth_id', data.session.user.id)
                         .eq('status', 'active')
                         .single();
                     
@@ -2305,7 +2290,8 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
                     // Update AppState with user data
                     AppState.currentUser = {
                         id: userData.id,
-                                                employee_id: userData.employee_id,
+                        auth_id: userData.auth_id,
+                        employee_id: userData.employee_id,
                         name: userData.full_name,
                         email: userData.email,
                         role: userData.role,
@@ -2589,8 +2575,8 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
         // AUTHENTICATION FUNCTIONS - UPDATED
         // ============================================
         async function handleLogin() {
-  const email = document.getElementById('loginEmail')?.value.trim().toLowerCase();
-  const password = document.getElementById('loginPassword')?.value || '';
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
 
   if (!email || !password) {
     showToast('Please enter Email and Password', 'error');
@@ -2601,55 +2587,51 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
     return;
   }
 
-  showLoading('Signing in...');
+  showLoading('Loading...');
 
   try {
     const { data: authRes, error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) throw authError;
     if (!authRes?.user) throw new Error('Login failed. Please try again.');
 
-    // Fetch profile (public.users.id == auth.uid())
+    // Fetch profile (your schema: public.users.id == auth.uid())
     const { data: userRow, error: userErr } = await supabase
       .from('users')
       .select('*')
       .eq('id', authRes.user.id)
       .maybeSingle();
 
-    if (userErr) throw userErr;
-    if (!userRow) throw new Error('Profile not found. Please contact admin.');
+    if (userErr) {
+      console.warn('Profile fetch error:', userErr);
+    }
 
-    // Update AppState
-    AppState.sessionToken = authRes.session?.access_token || null;
-    AppState.currentUser = {
-      id: userRow.id,
-      employee_id: userRow.employee_id || null,
-      full_name: userRow.full_name || authRes.user.user_metadata?.full_name || '',
-      name: userRow.full_name || authRes.user.user_metadata?.full_name || '',
-      email: userRow.email || authRes.user.email,
-      phone: userRow.phone || null,
-      department: userRow.department || null,
-      position: userRow.position || null,
-      role: userRow.role || 'user',
-      status: userRow.status || 'active'
+    // Build currentUser (use profile if exists, else fallback to auth)
+    currentUser = {
+      id: userRow?.id || authRes.user.id,
+      employee_id: userRow?.employee_id || null,
+      name: userRow?.full_name || authRes.user.user_metadata?.full_name || authRes.user.email,
+      full_name: userRow?.full_name || authRes.user.user_metadata?.full_name || '',
+      email: userRow?.email || authRes.user.email,
+      role: userRow?.role || 'user',
+      department: userRow?.department || null,
+      position: userRow?.position || null,
+      status: userRow?.status || 'active'
     };
 
-    AppState.isAdmin = ['admin','super_admin'].includes(AppState.currentUser.role);
-    AppState.isSuperAdmin = AppState.currentUser.role === 'super_admin';
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-    localStorage.setItem('currentUser', JSON.stringify(AppState.currentUser));
-
-    // Update last_login (RLS: own row)
+    // Update last_login (safe: only own row passes RLS)
     await supabase
       .from('users')
       .update({ last_login: new Date().toISOString() })
-      .eq('id', AppState.currentUser.id);
+      .eq('id', authRes.user.id);
 
-    showToast('Welcome back!', 'success');
+    showToast('Login successful!', 'success');
     showMainApp();
 
   } catch (error) {
     console.error('Login error:', error);
-    showToast(error?.message || 'Login failed', 'error');
+    showToast(error?.message || 'Login failed. Please try again.', 'error');
   } finally {
     hideLoading();
   }
@@ -2742,7 +2724,14 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
                 });
                 
                 if (error) throw error;
-hideLoading();
+                
+                // Update password_updated_at in users table
+                await supabase
+                    .from('users')
+                    .update({ password_updated_at: new Date().toISOString() })
+                    .eq('id', AppState.currentUser.id);
+                
+                hideLoading();
                 showToast('Password changed successfully!', 'success');
                 closeModal('changePasswordModal');
                 document.getElementById('changePasswordForm').reset();
@@ -2772,7 +2761,7 @@ hideLoading();
     return;
   }
 
-  showLoading('Sending reset email...');
+  showLoading('Loading...');
 
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -2781,7 +2770,7 @@ hideLoading();
     if (error) throw error;
 
     showToast('Password reset email sent! Check your inbox.', 'success');
-    closeModal('forgotPasswordModal');
+    closeModal('forgotPasswordModal'); document.getElementById('forgotPasswordForm')?.reset();
   } catch (error) {
     console.error('Forgot password error:', error);
     showToast(error?.message || 'Failed to send reset email', 'error');
@@ -2820,14 +2809,20 @@ hideLoading();
     return;
   }
 
-  showLoading('Creating account...');
+  showLoading('Loading...');
 
   try {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName } // used by your DB trigger
+        data: {
+          full_name: fullName,
+          employee_id: employeeId || null,
+          phone: phone || null,
+          department: department || null,
+          position: position || null
+        }
       }
     });
 
@@ -2836,48 +2831,32 @@ hideLoading();
     // If email confirmation is enabled, session will be null until confirmed
     if (!authData.session) {
       showToast('Registration successful! Please check your email to confirm, then log in.', 'success');
-      showLoginForm();
+      switchLoginTab('login');
       return;
     }
 
-    // Update profile extras (safe: only own row passes RLS)
-    await supabase
-      .from('users')
-      .update({
-        employee_id: employeeId || null,
-        full_name: fullName,
-        phone: phone || null,
-        department: department || null,
-        position: position || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', authData.user.id);
-
-    // Re-read profile
-    const { data: userRow } = await supabase
+    // If immediately logged in, try read profile row
+    const { data: userRow, error: userErr } = await supabase
       .from('users')
       .select('*')
       .eq('id', authData.user.id)
       .maybeSingle();
 
-    AppState.sessionToken = authData.session?.access_token || null;
-    AppState.currentUser = {
-      id: userRow?.id || authData.user.id,
+    if (userErr) console.warn('Profile read after signup error:', userErr);
+
+    currentUser = {
+      id: authData.user.id,
       employee_id: userRow?.employee_id || employeeId || null,
-      full_name: userRow?.full_name || fullName,
       name: userRow?.full_name || fullName,
+      full_name: userRow?.full_name || fullName,
       email: userRow?.email || email,
-      phone: userRow?.phone || phone || null,
+      role: userRow?.role || 'user',
       department: userRow?.department || department || null,
       position: userRow?.position || position || null,
-      role: userRow?.role || 'user',
       status: userRow?.status || 'active'
     };
 
-    AppState.isAdmin = ['admin','super_admin'].includes(AppState.currentUser.role);
-    AppState.isSuperAdmin = AppState.currentUser.role === 'super_admin';
-
-    localStorage.setItem('currentUser', JSON.stringify(AppState.currentUser));
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
     showToast('Registration successful!', 'success');
     showMainApp();
 
@@ -3054,7 +3033,7 @@ hideLoading();
                             </div>
                             <h3 class="empty-state-title">No Courses in Progress</h3>
                             <p class="text-muted">Start a new course to continue your learning journey.</p>
-                            <button class="btn btn-primary mt-2" onclick="navigateTo('courses')">
+                            <button type="button" class="btn btn-primary mt-2" onclick="navigateTo('courses')">
                                 <i class="fas fa-search"></i> Find Courses
                             </button>
                         </div>
@@ -3284,33 +3263,33 @@ hideLoading();
                     
                     <div class="course-actions">
                         ${course.status === 'completed' ? `
-                            <button class="btn btn-success" onclick="reviewCourse('${course.id}')">
+                            <button type="button" class="btn btn-success" onclick="reviewCourse('${course.id}')">
                                 <i class="fas fa-redo"></i> Review
                             </button>
-                            <button class="btn btn-outline" onclick="viewCertificateForCourse('${course.id}')">
+                            <button type="button" class="btn btn-outline" onclick="viewCertificateForCourse('${course.id}')">
                                 <i class="fas fa-award"></i> Certificate
                             </button>
                         ` : course.status === 'in-progress' ? `
-                            <button class="btn btn-primary" onclick="continueCourse('${course.id}')">
+                            <button type="button" class="btn btn-primary" onclick="continueCourse('${course.id}')">
                                 <i class="fas fa-play"></i> Continue
                             </button>
-                            <button class="btn btn-warning" onclick="restartCourse('${course.id}')">
+                            <button type="button" class="btn btn-warning" onclick="restartCourse('${course.id}')">
                                 <i class="fas fa-redo"></i> Restart
                             </button>
                         ` : `
-                            <button class="btn btn-primary" onclick="startCourse('${course.id}')">
+                            <button type="button" class="btn btn-primary" onclick="startCourse('${course.id}')">
                                 <i class="fas fa-play"></i> Start Course
                             </button>
-                            <button class="btn btn-outline" onclick="previewCourse('${course.id}')">
+                            <button type="button" class="btn btn-outline" onclick="previewCourse('${course.id}')">
                                 <i class="fas fa-eye"></i> Preview
                             </button>
                         `}
                         ${(AppState.isAdmin || AppState.isSuperAdmin) ? `
                         <div style="grid-column: span 2; margin-top: 0.5rem; display: flex; gap: 0.5rem;">
-                            <button class="btn btn-sm btn-info w-50" onclick="showCourseFilesModal('${course.id}')">
+                            <button type="button" class="btn btn-sm btn-info w-50" onclick="showCourseFilesModal('${course.id}')">
                                 <i class="fas fa-file-upload"></i> Files/Links
                             </button>
-                            <button class="btn btn-sm btn-warning w-50" onclick="showExamManagementModal('${course.id}')">
+                            <button type="button" class="btn btn-sm btn-warning w-50" onclick="showExamManagementModal('${course.id}')">
                                 <i class="fas fa-file-alt"></i> Exam
                             </button>
                         </div>
@@ -3478,7 +3457,7 @@ hideLoading();
                     </div>
                     
                     <div class="mb-4">
-                        <button class="btn btn-success" onclick="showAddFileModal('${courseId}')">
+                        <button type="button" class="btn btn-success" onclick="showAddFileModal('${courseId}')">
                             <i class="fas fa-plus"></i> Add File/Link
                         </button>
                     </div>
@@ -3522,7 +3501,7 @@ hideLoading();
                                 <td>${file.is_external ? 'Yes' : 'No'}</td>
                                 <td>${new Date(file.created_at).toLocaleDateString()}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-primary" onclick="openFileLink('${file.file_url}', ${file.is_external})">
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="openFileLink('${file.file_url}', ${file.is_external})">
                                         <i class="fas fa-external-link-alt"></i> Open
                                     </button>
                                 </td>
@@ -3684,10 +3663,10 @@ hideLoading();
                                 </div>
                                 
                                 <div class="form-actions">
-                                    <button class="btn btn-primary" onclick="startExam('${courseId}', '${exam.id}')">
+                                    <button type="button" class="btn btn-primary" onclick="startExam('${courseId}', '${exam.id}')">
                                         <i class="fas fa-play"></i> Start Exam
                                     </button>
-                                    <button class="btn btn-warning" onclick="editExam('${exam.id}')">
+                                    <button type="button" class="btn btn-warning" onclick="editExam('${exam.id}')">
                                         <i class="fas fa-edit"></i> Edit Exam
                                     </button>
                                 </div>
@@ -3717,7 +3696,7 @@ hideLoading();
                             </div>
                             <h4>No Exam Created</h4>
                             <p class="text-muted mb-4">This course doesn't have an exam yet.</p>
-                            <button class="btn btn-primary" onclick="showCreateExamModal('${courseId}')">
+                            <button type="button" class="btn btn-primary" onclick="showCreateExamModal('${courseId}')">
                                 <i class="fas fa-plus"></i> Create Exam
                             </button>
                         </div>
@@ -3884,7 +3863,7 @@ hideLoading();
                     <td><strong>${item.score || 0}%</strong></td>
                     <td>${item.last_accessed ? new Date(item.last_accessed).toLocaleDateString() : 'Never'}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="navigateTo('courses'); setTimeout(() => { const courseCard = document.querySelector('.course-card[data-status]'); if(courseCard) courseCard.scrollIntoView(); }, 100);">
+                        <button type="button" class="btn btn-sm btn-outline" onclick="navigateTo('courses'); setTimeout(() => { const courseCard = document.querySelector('.course-card[data-status]'); if(courseCard) courseCard.scrollIntoView(); }, 100);">
                             <i class="fas fa-eye"></i> View
                         </button>
                     </td>
@@ -3986,7 +3965,7 @@ hideLoading();
                         </div>
                         <h3 class="empty-state-title">No Certificates Yet</h3>
                         <p class="text-muted">Complete courses to earn certificates!</p>
-                        <button class="btn btn-primary mt-2" onclick="navigateTo('courses')">
+                        <button type="button" class="btn btn-primary mt-2" onclick="navigateTo('courses')">
                             <i class="fas fa-graduation-cap"></i> Browse Courses
                         </button>
                     </div>
@@ -4010,14 +3989,14 @@ hideLoading();
                                 <p>Certificate: ${cert.certificate_number}</p>
                                 <p>Issued on: ${new Date(cert.issue_date).toLocaleDateString()}</p>
                                 <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
-                                    <button class="btn btn-sm btn-primary" onclick="viewCertificate('${cert.id}')">
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="viewCertificate('${cert.id}')">
                                         <i class="fas fa-eye"></i> View
                                     </button>
-                                    <button class="btn btn-sm btn-success" onclick="downloadCertificate('${cert.id}')">
+                                    <button type="button" class="btn btn-sm btn-success" onclick="downloadCertificate('${cert.id}')">
                                         <i class="fas fa-download"></i> Download
                                     </button>
                                     ${(AppState.isAdmin || AppState.isSuperAdmin) ? `
-                                    <button class="btn btn-sm btn-danger" onclick="deleteCertificateAdmin('${cert.id}')">
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteCertificateAdmin('${cert.id}')">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
                                     ` : ''}
@@ -4498,11 +4477,11 @@ hideLoading();
                     <td>${roleBadge}</td>
                     <td>${statusBadge}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="editUserAdmin('${user.employee_id}')">
+                        <button type="button" class="btn btn-sm btn-outline" onclick="editUserAdmin('${user.employee_id}')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         ${AppState.isSuperAdmin ? `
-                        <button class="btn btn-sm btn-danger" onclick="deleteUserAdmin('${user.employee_id}')">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteUserAdmin('${user.employee_id}')">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                         ` : ''}
@@ -4545,10 +4524,10 @@ hideLoading();
                     <td>${course.difficulty}</td>
                     <td>${course.has_exam ? 'Yes' : 'No'}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="editCourseAdmin('${course.id}')">
+                        <button type="button" class="btn btn-sm btn-outline" onclick="editCourseAdmin('${course.id}')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCourseAdmin('${course.id}')">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteCourseAdmin('${course.id}')">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </td>
@@ -4844,13 +4823,13 @@ hideLoading();
                         <p class="text-muted mb-4">Choose an action to perform</p>
                         
                         <div class="d-flex flex-column gap-2">
-                            <button class="btn btn-primary" onclick="showAdminCourseModal('create')">
+                            <button type="button" class="btn btn-primary" onclick="showAdminCourseModal('create')">
                                 <i class="fas fa-plus"></i> Create New Course
                             </button>
-                            <button class="btn btn-success" onclick="downloadCourseTemplate()">
+                            <button type="button" class="btn btn-success" onclick="downloadCourseTemplate()">
                                 <i class="fas fa-download"></i> Download Course Template
                             </button>
-                            <button class="btn btn-warning" onclick="showBulkUploadCourse()">
+                            <button type="button" class="btn btn-warning" onclick="showBulkUploadCourse()">
                                 <i class="fas fa-upload"></i> Bulk Upload Courses
                             </button>
                         </div>
@@ -5233,8 +5212,109 @@ hideLoading();
         }
 
         async function createUserAdmin() {
-  showToast('Admin user creation is disabled in this front-end for security. Ask the user to register via Sign Up, then promote role in the database.', 'warning');
-}
+            if (!AppState.sessionToken || !AppState.isSuperAdmin) {
+                showToast('Only Super Admin can create users', 'error');
+                return;
+            }
+            
+            const employeeId = document.getElementById('adminEmployeeId').value;
+            const fullName = document.getElementById('adminFullName').value;
+            const email = document.getElementById('adminEmail').value;
+            const department = document.getElementById('adminDepartment').value;
+            const position = document.getElementById('adminPosition').value;
+            const role = document.getElementById('adminRole').value;
+            const status = document.getElementById('adminStatus').value;
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('adminConfirmPassword').value;
+            
+            if (!employeeId || !fullName || !email || !password) {
+                showToast('Please fill required fields', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            
+            showLoading('Creating user...');
+            
+            try {
+                // Check if employee ID already exists
+                const { data: existingEmployee, error: checkError } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('employee_id', employeeId)
+                    .single();
+                
+                if (existingEmployee) {
+                    throw new Error('Email already registered');
+                }
+                
+                // Check if email already exists
+                const { data: existingEmail, error: emailCheckError } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('email', email)
+                    .single();
+                
+                if (existingEmail) {
+                    throw new Error('Email already registered');
+                }
+                
+                // Create user in Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            employee_id: employeeId
+                        }
+                    }
+                });
+                
+                if (authError) throw authError;
+                
+                // Create user in users table
+                const userData = {
+                    auth_id: authData.user.id,
+                    employee_id: employeeId,
+                    full_name: fullName,
+                    email: email,
+                    department: department,
+                    position: position,
+                    role: role,
+                    status: status,
+                    security_question: 'What is your pet\'s name?',
+                    security_answer: 'default',
+                    join_date: new Date().toISOString().split('T')[0],
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                const { error: dbError } = await supabase
+                    .from('users')
+                    .insert([userData]);
+                
+                if (dbError) throw dbError;
+                
+                hideLoading();
+                showToast('User created successfully!', 'success');
+                closeModal('adminUserModal');
+                loadAllUsers();
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Create user error:', error);
+                showToast('Failed to create user: ' + error.message, 'error');
+            }
+        }
 
         function editUserAdmin(employeeId) {
             showAdminUserModal('edit', employeeId);
@@ -5385,5 +5465,24 @@ hideLoading();
         window.startExam = startExam;
         window.editExam = editExam;
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Ensure register/login buttons are clickable
+  document.querySelectorAll('button').forEach(b => b.disabled = false);
+
+  // Fallback handlers if originals didn't bind
+  const reg = document.getElementById('btnRegister') || document.querySelector('[data-action="register"]');
+  const log = document.getElementById('btnLogin') || document.querySelector('[data-action="login"]');
+
+  if (reg && !reg.onclick) {
+    reg.onclick = () => alert('Register click works. Connect to Supabase signup.');
+  }
+  if (log && !log.onclick) {
+    log.onclick = () => alert('Login click works. Connect to Supabase login.');
+  }
+});
+</script>
+
 </body>
 </html>
