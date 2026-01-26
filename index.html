@@ -1,0 +1,3427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinix Retail Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-dark: #1e429f;
+            --primary-light: #ebf5ff;
+            --secondary: #7c3aed;
+            --secondary-light: #f5f3ff;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --info: #0891b2;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-md: 0.625rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.1;
+        }
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .auth-logo-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .auth-subtitle {
+            opacity: 0.9;
+            font-weight: 400;
+            font-size: 1rem;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1.25rem;
+            text-align: center;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .auth-tab:hover {
+            color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+        }
+
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 3px 3px 0 0;
+        }
+
+        .auth-body {
+            padding: 2.5rem 2rem;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.9375rem;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
+        }
+
+        .form-input.success {
+            border-color: var(--success);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-help {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .form-help.error {
+            color: var(--danger);
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .auth-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            margin-bottom: 0.25rem;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0;
+            background: var(--danger);
+            transition: width 0.3s, background 0.3s;
+        }
+
+        .strength-text {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        /* Main App */
+        .main-app {
+            display: none;
+            flex: 1;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            letter-spacing: -0.5px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9375rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 1px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--gray-900);
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: var(--gray-200);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            width: 100%;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .page-subtitle {
+            color: var(--gray-600);
+            font-size: 1.125rem;
+            max-width: 600px;
+        }
+
+        /* Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.courses {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: var(--primary);
+        }
+
+        .stat-icon.completed {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: var(--success);
+        }
+
+        .stat-icon.score {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: var(--warning);
+        }
+
+        .stat-icon.progress {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            color: var(--secondary);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-trend.positive {
+            color: var(--success);
+        }
+
+        .stat-trend.negative {
+            color: var(--danger);
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .course-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .course-badge.with-exam {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .course-badge.read-only {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .course-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            position: relative;
+            flex: 1;
+        }
+
+        .course-category {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-bottom: 0.75rem;
+        }
+
+        .course-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .course-description {
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .course-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+
+        .course-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .course-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .course-actions {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .course-action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .course-action-btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .course-action-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .course-action-btn.secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .course-action-btn.secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .course-action-btn.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .course-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Reader */
+        .reader-header {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reader-info h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .reader-info p {
+            color: var(--gray-600);
+        }
+
+        .time-tracker {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+
+        .course-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            line-height: 1.7;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .course-content h3 {
+            color: var(--gray-900);
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        .course-content p {
+            margin-bottom: 1rem;
+            color: var(--gray-700);
+        }
+
+        .course-content ul, .course-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .course-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .completion-message {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border: 2px solid var(--success);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .completion-message.show {
+            display: flex;
+        }
+
+        .completion-message-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .reader-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Exam */
+        .exam-header {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            text-align: center;
+        }
+
+        .exam-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .exam-subtitle {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+
+        .exam-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .exam-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .exam-meta-item i {
+            color: var(--primary);
+        }
+
+        .exam-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .question-counter {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .option {
+            padding: 1.25rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+            transform: translateX(4px);
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .option-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .option.selected .option-marker {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            color: var(--gray-700);
+        }
+
+        .exam-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Results */
+        .results-container {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 3rem;
+            box-shadow: var(--shadow-xl);
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+        }
+
+        .results-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-icon.pass {
+            color: var(--success);
+        }
+
+        .results-icon.fail {
+            color: var(--danger);
+        }
+
+        .results-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 1rem;
+        }
+
+        .results-score {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .results-details {
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+            font-size: 1.125rem;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Admin */
+        .admin-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            min-height: 600px;
+        }
+
+        .admin-sidebar {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            height: fit-content;
+        }
+
+        .admin-sidebar-header {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 1rem;
+        }
+
+        .admin-sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .admin-nav-item {
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius);
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .admin-nav-item:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .admin-nav-item.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .admin-nav-item.active i {
+            color: white;
+        }
+
+        .admin-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .admin-section-header {
+            margin-bottom: 2rem;
+        }
+
+        .admin-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-section-subtitle {
+            color: var(--gray-600);
+        }
+
+        /* Upload Course */
+        .upload-form {
+            max-width: 800px;
+        }
+
+        .upload-card {
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .upload-card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-card-content {
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        .upload-card-content ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .upload-card-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        .questions-container {
+            margin-top: 2rem;
+        }
+
+        .question-card {
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .remove-question {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .remove-question:hover {
+            background: #b91c1c;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow-xl);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-sidebar {
+                height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                height: auto;
+                padding: 1rem 0;
+                gap: 1rem;
+            }
+            
+            .nav {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-menu {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .reader-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .exam-meta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .results-actions {
+                flex-direction: column;
+            }
+            
+            .btn, .course-action-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-body {
+                padding: 2rem 1.5rem;
+            }
+            
+            .auth-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .main-content {
+                padding: 1.5rem 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--gray-500);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .empty-state-description {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Position Badges */
+        .position-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .position-super-admin {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .position-admin {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
+
+        .position-trainer {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+        }
+
+        .position-gaming-expert {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+        }
+
+        .position-supervisor {
+            background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+            color: white;
+        }
+
+        .position-rss {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: white;
+        }
+
+        .position-rsh {
+            background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+            color: white;
+        }
+
+        .position-promoter {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i id="notification-icon"></i>
+        <span id="notification-text"></span>
+    </div>
+
+    <!-- Auth Interface -->
+    <div id="auth-interface" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="auth-logo-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="auth-logo-text">Infinix Retail Academy</div>
+                </div>
+                <p class="auth-subtitle">Employee Training & Development Platform</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-form="login">Login</div>
+                <div class="auth-tab" data-form="register">Register</div>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form active">
+                    <div class="form-group">
+                        <label class="form-label" for="login-employee-id">Employee ID</label>
+                        <input type="text" 
+                               id="login-employee-id" 
+                               class="form-input" 
+                               placeholder="1700xxxx"
+                               pattern="1700\d{4}"
+                               title="Employee ID must be in format 1700xxxx"
+                               required>
+                        <div class="form-help">Format: 1700 followed by 4 digits</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="login-password">Password</label>
+                        <input type="password" 
+                               id="login-password" 
+                               class="form-input" 
+                               placeholder="Enter your password"
+                               required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    
+                    <div class="auth-footer">
+                        <p>Don't have an account? <a href="#" class="auth-link" id="switch-to-register">Register here</a></p>
+                    </div>
+                </form>
+                
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="register-first-name">First Name</label>
+                            <input type="text" 
+                                   id="register-first-name" 
+                                   class="form-input" 
+                                   placeholder="John"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="register-last-name">Last Name</label>
+                            <input type="text" 
+                                   id="register-last-name" 
+                                   class="form-input" 
+                                   placeholder="Doe"
+                                   required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-employee-id">Employee ID</label>
+                        <input type="text" 
+                               id="register-employee-id" 
+                               class="form-input" 
+                               placeholder="1700xxxx"
+                               pattern="1700\d{4}"
+                               title="Employee ID must be in format 1700xxxx"
+                               required>
+                        <div class="form-help">Format: 1700 followed by 4 digits</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-email">Email Address</label>
+                        <input type="email" 
+                               id="register-email" 
+                               class="form-input" 
+                               placeholder="employee@infinix.com"
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-position">Position</label>
+                        <select id="register-position" class="form-input" required>
+                            <option value="">Select Position</option>
+                            <option value="trainer">Trainer</option>
+                            <option value="gaming-expert">Gaming Expert</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="rss">RSS</option>
+                            <option value="rsh">RSH</option>
+                            <option value="promoter">Promoter</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-password">Password</label>
+                        <input type="password" 
+                               id="register-password" 
+                               class="form-input" 
+                               placeholder="Create a strong password"
+                               required>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="password-strength-bar"></div>
+                            </div>
+                            <div class="strength-text" id="password-strength-text">Password strength</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="register-confirm-password">Confirm Password</label>
+                        <input type="password" 
+                               id="register-confirm-password" 
+                               class="form-input" 
+                               placeholder="Confirm your password"
+                               required>
+                        <div class="form-help" id="password-match-text"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                    
+                    <div class="auth-footer">
+                        <p>Already have an account? <a href="#" class="auth-link" id="switch-to-login">Login here</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (Initially Hidden) -->
+    <div id="main-app" class="main-app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <div class="header-content">
+                    <a href="#" class="logo" data-page="dashboard">
+                        <div class="logo-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="logo-text">Infinix Retail Academy</div>
+                    </a>
+                    
+                    <nav class="nav">
+                        <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+                        <a href="#" class="nav-link" data-page="courses">Courses</a>
+                        <a href="#" class="nav-link" data-page="admin" id="admin-nav-link" style="display: none;">Admin</a>
+                        <a href="#" class="nav-link" data-page="profile">Profile</a>
+                    </nav>
+                    
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <div class="user-avatar" id="user-avatar">JD</div>
+                            <div class="user-details">
+                                <div class="user-name" id="user-name">John Doe</div>
+                                <div class="user-role" id="user-role">Trainer</div>
+                            </div>
+                        </div>
+                        <button class="logout-btn" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard-page">
+                <div class="page-header">
+                    <h1 class="page-title">Welcome back, <span id="dashboard-user-name">John</span>!</h1>
+                    <p class="page-subtitle">Track your progress and continue your learning journey.</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon courses">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="stat-value" id="total-courses">0</div>
+                        <div class="stat-label">Total Courses</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>2 new this week</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon completed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-value" id="completed-courses">0</div>
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>25% increase</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon score">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-value" id="average-score">0%</div>
+                        <div class="stat-label">Average Score</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>5% improvement</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon progress">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="stat-value" id="in-progress">0</div>
+                        <div class="stat-label">In Progress</div>
+                        <div class="stat-trend negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>Complete to improve</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="page-header">
+                    <h2 class="page-title">Continue Learning</h2>
+                    <p class="page-subtitle">Pick up where you left off</p>
+                </div>
+                
+                <div class="courses-grid" id="dashboard-courses">
+                    <!-- Courses will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Courses Page -->
+            <div class="page" id="courses-page">
+                <div class="page-header">
+                    <h1 class="page-title">All Courses</h1>
+                    <p class="page-subtitle">Browse and enroll in available training programs</p>
+                </div>
+                
+                <div class="courses-grid" id="courses-container">
+                    <!-- Courses will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Course Reader Page -->
+            <div class="page" id="reader-page">
+                <div class="reader-header">
+                    <div class="reader-info">
+                        <h2 id="reader-course-title">Course Title</h2>
+                        <p id="reader-course-description">Course description will appear here</p>
+                    </div>
+                    <div class="time-tracker">
+                        <i class="fas fa-clock"></i>
+                        <span id="time-tracker-text">Time: 0:00 / 5:00</span>
+                    </div>
+                </div>
+                
+                <div class="course-content" id="course-content">
+                    <!-- Course content will be loaded here -->
+                </div>
+                
+                <div class="completion-message" id="completion-message">
+                    <div class="completion-message-content">
+                        <i class="fas fa-check-circle"></i>
+                        <span>You have completed the required reading time. You can now proceed to the exam.</span>
+                    </div>
+                    <button class="btn btn-primary" id="proceed-exam-btn">Proceed to Exam</button>
+                </div>
+                
+                <div class="reader-actions">
+                    <button class="btn btn-outline" id="back-to-courses-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Courses
+                    </button>
+                    <button class="btn btn-primary" id="start-exam-btn" disabled>
+                        <i class="fas fa-play-circle"></i> Start Exam
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exam Page -->
+            <div class="page" id="exam-page">
+                <div class="exam-header">
+                    <h1 class="exam-title" id="exam-course-title">Course Exam</h1>
+                    <p class="exam-subtitle">Answer all questions to complete the exam</p>
+                    <div class="exam-meta">
+                        <div class="exam-meta-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Questions: <span id="total-questions">0</span></span>
+                        </div>
+                        <div class="exam-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Time: <span id="exam-time">15:00</span></span>
+                        </div>
+                        <div class="exam-meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span>Attempts: <span id="attempts-left">2</span> left</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="exam-container">
+                    <div class="question-counter">
+                        Question <span id="current-question">1</span> of <span id="total-exam-questions">5</span>
+                    </div>
+                    
+                    <div class="question-text" id="question-text">
+                        Question text will appear here
+                    </div>
+                    
+                    <div class="options-grid" id="options-container">
+                        <!-- Options will be loaded here -->
+                    </div>
+                    
+                    <div class="exam-navigation">
+                        <button class="btn btn-outline" id="prev-question-btn" disabled>
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <div>
+                            <button class="btn btn-outline" id="exit-exam-btn">Exit Exam</button>
+                            <button class="btn btn-primary" id="next-question-btn">Next Question</button>
+                            <button class="btn btn-success" id="submit-exam-btn" style="display: none;">Submit Exam</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Page -->
+            <div class="page" id="results-page">
+                <div class="results-container">
+                    <div class="results-icon pass" id="results-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h1 class="results-title" id="results-title">Congratulations!</h1>
+                    <div class="results-score" id="results-score">85%</div>
+                    <p class="results-details" id="results-details">
+                        You answered 17 out of 20 questions correctly.
+                    </p>
+                    
+                    <div class="results-actions">
+                        <button class="btn btn-outline" id="review-course-btn">
+                            <i class="fas fa-book"></i> Review Course
+                        </button>
+                        <button class="btn btn-primary" id="retry-exam-btn">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                        <button class="btn btn-success" id="back-to-dashboard-btn">
+                            <i class="fas fa-home"></i> Back to Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Page -->
+            <div class="page" id="admin-page">
+                <div class="page-header">
+                    <h1 class="page-title">Admin Panel</h1>
+                    <p class="page-subtitle">Manage courses, users, and platform settings</p>
+                </div>
+                
+                <div class="admin-container">
+                    <div class="admin-sidebar">
+                        <div class="admin-sidebar-header">
+                            <h2 class="admin-sidebar-title">Admin Menu</h2>
+                        </div>
+                        <nav class="admin-nav">
+                            <a href="#" class="admin-nav-item active" data-section="dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                            <a href="#" class="admin-nav-item" data-section="upload-course">
+                                <i class="fas fa-upload"></i> Upload Course
+                            </a>
+                            <a href="#" class="admin-nav-item" data-section="manage-courses">
+                                <i class="fas fa-book"></i> Manage Courses
+                            </a>
+                            <a href="#" class="admin-nav-item" data-section="manage-users">
+                                <i class="fas fa-users"></i> Manage Users
+                            </a>
+                            <a href="#" class="admin-nav-item" data-section="reports">
+                                <i class="fas fa-chart-bar"></i> Reports
+                            </a>
+                            <a href="#" class="admin-nav-item" data-section="settings">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                        </nav>
+                    </div>
+                    
+                    <div class="admin-content">
+                        <!-- Admin Dashboard -->
+                        <div class="admin-section active" id="admin-dashboard-section">
+                            <div class="admin-section-header">
+                                <h2 class="admin-section-title">Admin Dashboard</h2>
+                                <p class="admin-section-subtitle">Platform overview and statistics</p>
+                            </div>
+                            <!-- Admin dashboard content will be loaded here -->
+                        </div>
+                        
+                        <!-- Upload Course -->
+                        <div class="admin-section" id="upload-course-section">
+                            <div class="admin-section-header">
+                                <h2 class="admin-section-title">Upload New Course</h2>
+                                <p class="admin-section-subtitle">Add new training content to the academy</p>
+                            </div>
+                            <!-- Upload course form will be loaded here -->
+                        </div>
+                        
+                        <!-- Manage Courses -->
+                        <div class="admin-section" id="manage-courses-section">
+                            <div class="admin-section-header">
+                                <h2 class="admin-section-title">Manage Courses</h2>
+                                <p class="admin-section-subtitle">Edit, delete, or view existing courses</p>
+                            </div>
+                            <!-- Courses list will be loaded here -->
+                        </div>
+                        
+                        <!-- Manage Users -->
+                        <div class="admin-section" id="manage-users-section">
+                            <div class="admin-section-header">
+                                <h2 class="admin-section-title">Manage Users</h2>
+                                <p class="admin-section-subtitle">View and manage user accounts and permissions</p>
+                            </div>
+                            <!-- Users list will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div class="page" id="profile-page">
+                <div class="page-header">
+                    <h1 class="page-title">My Profile</h1>
+                    <p class="page-subtitle">Manage your account information and preferences</p>
+                </div>
+                
+                <div class="admin-container">
+                    <div class="admin-sidebar">
+                        <div class="admin-sidebar-header">
+                            <h2 class="admin-sidebar-title">Profile Settings</h2>
+                        </div>
+                        <nav class="admin-nav">
+                            <a href="#" class="admin-nav-item active" data-profile-section="personal">
+                                <i class="fas fa-user"></i> Personal Info
+                            </a>
+                            <a href="#" class="admin-nav-item" data-profile-section="progress">
+                                <i class="fas fa-chart-line"></i> Learning Progress
+                            </a>
+                            <a href="#" class="admin-nav-item" data-profile-section="certificates">
+                                <i class="fas fa-award"></i> Certificates
+                            </a>
+                            <a href="#" class="admin-nav-item" data-profile-section="security">
+                                <i class="fas fa-shield-alt"></i> Security
+                            </a>
+                        </nav>
+                    </div>
+                    
+                    <div class="admin-content">
+                        <!-- Profile content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="create-course-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Course</h2>
+                <button class="modal-close" id="close-course-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Course creation form will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://imgjctwmpebmgjxeiaeo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltZ2pjdHdtcGVibWdqeGVpYWVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MjAwNTcsImV4cCI6MjA4NDk5NjA1N30.cNQYnhsla1ybneBkCuhUBvULBGOnEKS3JRFEh8AwPus';
+
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Application State
+        let currentUser = null;
+        let currentCourse = null;
+        let courses = [];
+        let userProgress = {};
+        let examAttempts = {};
+        let readingTimer = null;
+        let examTimer = null;
+        let timeSpentReading = 0;
+        let examTimeRemaining = 900; // 15 minutes
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let questions = [];
+
+        // Sample data for demo
+        const sampleCourses = [
+            {
+                id: 1,
+                title: 'Retail Customer Service Excellence',
+                description: 'Master the art of exceptional customer service in retail environments',
+                category: 'Customer Service',
+                duration: 15,
+                has_exam: true,
+                content: `
+                    <h3>Introduction to Customer Service Excellence</h3>
+                    <p>Welcome to the Customer Service Excellence course. In today's competitive retail landscape, providing exceptional customer service is not just important—it's essential for business success.</p>
+                    
+                    <h3>Key Principles of Service Excellence</h3>
+                    <ul>
+                        <li><strong>First Impressions Matter:</strong> Customers form opinions within the first 30 seconds of interaction</li>
+                        <li><strong>Active Listening:</strong> Pay full attention to understand customer needs completely</li>
+                        <li><strong>Empathy and Understanding:</strong> Put yourself in the customer's shoes</li>
+                        <li><strong>Product Knowledge:</strong> Be an expert on what you're selling</li>
+                        <li><strong>Problem Resolution:</strong> Turn complaints into opportunities</li>
+                    </ul>
+                    
+                    <h3>Communication Techniques</h3>
+                    <p>Effective communication involves both verbal and non-verbal cues. Maintain appropriate eye contact, use positive language, and ensure your body language conveys openness and willingness to help.</p>
+                    
+                    <h3>Handling Difficult Situations</h3>
+                    <p>When dealing with upset customers:</p>
+                    <ol>
+                        <li><strong>Stay Calm:</strong> Don't take complaints personally</li>
+                        <li><strong>Listen Completely:</strong> Let them vent without interruption</li>
+                        <li><strong>Empathize:</strong> "I understand why you're upset..."</li>
+                        <li><strong>Apologize Sincerely:</strong> Even if it's not your fault</li>
+                        <li><strong>Take Action:</strong> Offer specific solutions</li>
+                        <li><strong>Follow Up:</strong> Ensure satisfaction after resolution</li>
+                    </ol>
+                    
+                    <h3>Service Recovery Strategies</h3>
+                    <p>When things go wrong, service recovery can actually strengthen customer relationships. The key is to respond quickly, take responsibility, and go above expectations in making things right.</p>
+                `,
+                questions: [
+                    {
+                        question: "What is the most critical factor in creating a positive first impression?",
+                        options: [
+                            "Store appearance",
+                            "Employee greeting within 30 seconds",
+                            "Product availability",
+                            "Pricing"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "Which technique is most effective for understanding customer needs?",
+                        options: [
+                            "Asking many questions",
+                            "Active listening without interruption",
+                            "Recommending products immediately",
+                            "Checking customer purchase history"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "When a customer is visibly upset, what should you do first?",
+                        options: [
+                            "Call a manager immediately",
+                            "Offer a discount",
+                            "Listen completely without interrupting",
+                            "Explain company policy"
+                        ],
+                        correct: 2
+                    },
+                    {
+                        question: "What does 'service recovery' mean in retail?",
+                        options: [
+                            "Returning unsold merchandise",
+                            "Fixing problems to create loyal customers",
+                            "Recovering stolen goods",
+                            "Restocking shelves"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "Why is product knowledge important for customer service?",
+                        options: [
+                            "It helps you earn more commission",
+                            "It allows you to answer questions accurately",
+                            "It impresses your manager",
+                            "It reduces training time"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: 'Advanced Sales Techniques',
+                description: 'Learn proven strategies to increase sales and customer satisfaction',
+                category: 'Sales',
+                duration: 20,
+                has_exam: true,
+                content: '<h3>Sales Fundamentals</h3><p>Advanced sales techniques content...</p>'
+            },
+            {
+                id: 3,
+                title: 'Product Knowledge: Mobile Devices',
+                description: 'Complete guide to Infinix mobile products and features',
+                category: 'Product Knowledge',
+                duration: 25,
+                has_exam: true,
+                content: '<h3>Mobile Product Guide</h3><p>Product knowledge content...</p>'
+            },
+            {
+                id: 4,
+                title: 'Store Safety Protocols',
+                description: 'Essential safety procedures for retail store operations',
+                category: 'Compliance',
+                duration: 10,
+                has_exam: false,
+                content: '<h3>Safety First</h3><p>Safety protocols content...</p>'
+            }
+        ];
+
+        const sampleUsers = [
+            {
+                id: '17000001',
+                email: 'owner@infinix.com',
+                firstName: 'Super',
+                lastName: 'Admin',
+                position: 'super-admin',
+                password: 'admin123'
+            }
+        ];
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notification-icon');
+            const text = document.getElementById('notification-text');
+            
+            notification.className = `notification ${type}`;
+            text.textContent = message;
+            
+            switch(type) {
+                case 'success':
+                    icon.className = 'fas fa-check-circle';
+                    break;
+                case 'error':
+                    icon.className = 'fas fa-exclamation-circle';
+                    break;
+                default:
+                    icon.className = 'fas fa-info-circle';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Authentication Functions
+        function showAuth() {
+            document.getElementById('auth-interface').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+        }
+
+        function showApp() {
+            document.getElementById('auth-interface').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+        }
+
+        function validateEmployeeId(employeeId) {
+            const pattern = /^1700\d{4}$/;
+            return pattern.test(employeeId);
+        }
+
+        function getPositionLabel(position) {
+            const labels = {
+                'super-admin': 'Super Admin',
+                'admin': 'Admin',
+                'trainer': 'Trainer',
+                'gaming-expert': 'Gaming Expert',
+                'supervisor': 'Supervisor',
+                'rss': 'RSS',
+                'rsh': 'RSH',
+                'promoter': 'Promoter'
+            };
+            return labels[position] || position;
+        }
+
+        function getPositionBadge(position) {
+            return `<span class="position-badge position-${position.replace(' ', '-')}">
+                ${getPositionLabel(position)}
+            </span>`;
+        }
+
+        function updateUserUI(user) {
+            document.getElementById('user-name').textContent = `${user.firstName} ${user.lastName}`;
+            document.getElementById('user-role').textContent = getPositionLabel(user.position);
+            document.getElementById('dashboard-user-name').textContent = user.firstName;
+            
+            // Update avatar
+            const avatar = document.getElementById('user-avatar');
+            avatar.textContent = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+            
+            // Show/hide admin link based on position
+            const adminLink = document.getElementById('admin-nav-link');
+            if (user.position === 'super-admin' || user.position === 'admin') {
+                adminLink.style.display = 'block';
+            } else {
+                adminLink.style.display = 'none';
+            }
+        }
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const bar = document.getElementById('password-strength-bar');
+            const text = document.getElementById('password-strength-text');
+            
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            const colors = ['#dc2626', '#f59e0b', '#3b82f6', '#10b981'];
+            const messages = ['Very Weak', 'Weak', 'Good', 'Strong'];
+            
+            bar.style.width = `${(strength / 4) * 100}%`;
+            bar.style.background = colors[strength - 1] || colors[0];
+            text.textContent = messages[strength - 1] || 'Very Weak';
+            text.style.color = colors[strength - 1] || colors[0];
+            
+            return strength >= 3; // Minimum "Good" strength
+        }
+
+        // Course Functions
+        function renderCourses(containerId, filterFn = null) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            let coursesToShow = courses;
+            if (filterFn) {
+                coursesToShow = courses.filter(filterFn);
+            }
+            
+            if (coursesToShow.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3 class="empty-state-title">No courses found</h3>
+                        <p class="empty-state-description">
+                            ${containerId === 'dashboard-courses' 
+                                ? 'Start your learning journey by enrolling in a course.' 
+                                : 'No courses are available at the moment.'}
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = coursesToShow.map(course => {
+                const progress = userProgress[course.id] || { read: false, exam_taken: false, score: null };
+                const progressPercent = progress.read ? (course.has_exam && progress.exam_taken ? 100 : 50) : 0;
+                
+                return `
+                    <div class="course-card" data-course-id="${course.id}">
+                        <div class="course-badge ${course.has_exam ? 'with-exam' : 'read-only'}">
+                            ${course.has_exam ? 'With Exam' : 'Read Only'}
+                        </div>
+                        <div class="course-header">
+                            <span class="course-category">${course.category}</span>
+                            <h3 class="course-title">${course.title}</h3>
+                            <p class="course-description">${course.description}</p>
+                            <div class="course-meta">
+                                <div class="course-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${course.duration} min</span>
+                                </div>
+                                <div class="course-meta-item">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <span>${course.has_exam ? '5 Questions' : 'No Exam'}</span>
+                                </div>
+                            </div>
+                            ${progressPercent > 0 ? `
+                                <div class="course-progress">
+                                    <div class="progress-label">
+                                        <span>Progress</span>
+                                        <span>${progressPercent}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="course-actions">
+                            ${progress.read ? 
+                                `<button class="course-action-btn secondary review-course-btn" data-course-id="${course.id}">
+                                    <i class="fas fa-book"></i> Review
+                                </button>` : 
+                                `<button class="course-action-btn primary start-course-btn" data-course-id="${course.id}">
+                                    <i class="fas fa-play"></i> Start Course
+                                </button>`
+                            }
+                            ${course.has_exam && progress.read && !progress.exam_taken ? 
+                                `<button class="course-action-btn primary take-exam-btn" data-course-id="${course.id}">
+                                    <i class="fas fa-pencil-alt"></i> Take Exam
+                                </button>` : 
+                                ''
+                            }
+                            ${progress.exam_taken ? 
+                                `<button class="course-action-btn success" disabled>
+                                    <i class="fas fa-check"></i> ${progress.score}%
+                                </button>` : 
+                                ''
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add event listeners
+            container.querySelectorAll('.start-course-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const courseId = parseInt(btn.dataset.courseId);
+                    openCourseReader(courseId);
+                });
+            });
+            
+            container.querySelectorAll('.review-course-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const courseId = parseInt(btn.dataset.courseId);
+                    openCourseReader(courseId, true);
+                });
+            });
+            
+            container.querySelectorAll('.take-exam-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const courseId = parseInt(btn.dataset.courseId);
+                    openCourseReader(courseId, true, true);
+                });
+            });
+        }
+
+        function openCourseReader(courseId, alreadyRead = false, skipToExam = false) {
+            const course = courses.find(c => c.id === courseId);
+            if (!course) return;
+            
+            currentCourse = course;
+            
+            // Update UI
+            document.getElementById('reader-course-title').textContent = course.title;
+            document.getElementById('reader-course-description').textContent = course.description;
+            document.getElementById('course-content').innerHTML = course.content;
+            
+            // Reset reading timer
+            timeSpentReading = 0;
+            const requiredTime = course.duration * 60;
+            
+            // Check progress
+            const progress = userProgress[courseId] || { read: false };
+            
+            if (progress.read || alreadyRead) {
+                // Already read
+                document.getElementById('completion-message').classList.add('show');
+                document.getElementById('start-exam-btn').disabled = !course.has_exam;
+                document.getElementById('time-tracker-text').textContent = 'Already completed';
+            } else {
+                // Start reading timer
+                document.getElementById('completion-message').classList.remove('show');
+                document.getElementById('start-exam-btn').disabled = true;
+                
+                if (readingTimer) clearInterval(readingTimer);
+                
+                readingTimer = setInterval(() => {
+                    timeSpentReading++;
+                    
+                    const minutes = Math.floor(timeSpentReading / 60);
+                    const seconds = timeSpentReading % 60;
+                    const reqMinutes = Math.floor(requiredTime / 60);
+                    
+                    document.getElementById('time-tracker-text').textContent = 
+                        `Time: ${minutes}:${seconds.toString().padStart(2, '0')} / ${reqMinutes}:00`;
+                    
+                    // Check if required time reached
+                    if (timeSpentReading >= requiredTime) {
+                        clearInterval(readingTimer);
+                        document.getElementById('completion-message').classList.add('show');
+                        document.getElementById('start-exam-btn').disabled = false;
+                        
+                        // Update progress
+                        if (!userProgress[courseId]) {
+                            userProgress[courseId] = { read: true, exam_taken: false, score: null };
+                        } else {
+                            userProgress[courseId].read = true;
+                        }
+                        
+                        updateDashboardStats();
+                    }
+                }, 1000);
+            }
+            
+            // Navigate to reader
+            navigateTo('reader');
+            
+            // Skip to exam if requested
+            if (skipToExam && course.has_exam) {
+                setTimeout(() => startExam(), 500);
+            }
+        }
+
+        function startExam() {
+            if (!currentCourse || !currentCourse.has_exam) return;
+            
+            // Reset exam state
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            questions = currentCourse.questions || [];
+            examTimeRemaining = 900;
+            
+            // Update UI
+            document.getElementById('exam-course-title').textContent = `${currentCourse.title} - Exam`;
+            document.getElementById('total-questions').textContent = questions.length;
+            document.getElementById('total-exam-questions').textContent = questions.length;
+            
+            // Check attempts
+            const progress = userProgress[currentCourse.id] || { attempts: 0 };
+            const attemptsLeft = Math.max(0, 3 - (progress.attempts || 0));
+            document.getElementById('attempts-left').textContent = attemptsLeft;
+            
+            if (attemptsLeft <= 0) {
+                showNotification('No attempts left for this exam', 'error');
+                return;
+            }
+            
+            // Start timer
+            if (examTimer) clearInterval(examTimer);
+            
+            examTimer = setInterval(() => {
+                examTimeRemaining--;
+                
+                const minutes = Math.floor(examTimeRemaining / 60);
+                const seconds = examTimeRemaining % 60;
+                
+                document.getElementById('exam-time').textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (examTimeRemaining <= 0) {
+                    clearInterval(examTimer);
+                    submitExam();
+                }
+            }, 1000);
+            
+            // Load first question
+            loadQuestion();
+            
+            // Navigate to exam
+            navigateTo('exam');
+        }
+
+        function loadQuestion() {
+            if (!questions.length) return;
+            
+            const question = questions[currentQuestionIndex];
+            
+            // Update question text
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            
+            // Update options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const isSelected = userAnswers[currentQuestionIndex] === index;
+                
+                const optionDiv = document.createElement('div');
+                optionDiv.className = `option ${isSelected ? 'selected' : ''}`;
+                optionDiv.dataset.index = index;
+                optionDiv.innerHTML = `
+                    <div class="option-content">
+                        <div class="option-marker">
+                            ${isSelected ? '<i class="fas fa-check"></i>' : ''}
+                        </div>
+                        <div class="option-text">${option}</div>
+                    </div>
+                `;
+                
+                optionDiv.addEventListener('click', () => {
+                    // Deselect all
+                    container.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Select this one
+                    optionDiv.classList.add('selected');
+                    userAnswers[currentQuestionIndex] = index;
+                    
+                    updateExamNavigation();
+                });
+                
+                container.appendChild(optionDiv);
+            });
+            
+            updateExamNavigation();
+        }
+
+        function updateExamNavigation() {
+            const prevBtn = document.getElementById('prev-question-btn');
+            const nextBtn = document.getElementById('next-question-btn');
+            const submitBtn = document.getElementById('submit-exam-btn');
+            
+            // Previous button
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            // Next/Submit button
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-block';
+                
+                // Check if all questions answered
+                const allAnswered = userAnswers.length === questions.length && 
+                                   userAnswers.every(a => a !== undefined);
+                submitBtn.disabled = !allAnswered;
+            } else {
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+                
+                // Check if current question answered
+                nextBtn.disabled = userAnswers[currentQuestionIndex] === undefined;
+            }
+        }
+
+        function submitExam() {
+            if (examTimer) clearInterval(examTimer);
+            
+            // Calculate score
+            let correct = 0;
+            questions.forEach((q, i) => {
+                if (userAnswers[i] === q.correct) correct++;
+            });
+            
+            const score = Math.round((correct / questions.length) * 100);
+            const passed = score >= 70;
+            
+            // Update progress
+            if (!userProgress[currentCourse.id]) {
+                userProgress[currentCourse.id] = { 
+                    read: true, 
+                    exam_taken: true, 
+                    score: score,
+                    attempts: 1 
+                };
+            } else {
+                userProgress[currentCourse.id].exam_taken = true;
+                userProgress[currentCourse.id].score = score;
+                userProgress[currentCourse.id].attempts = (userProgress[currentCourse.id].attempts || 0) + 1;
+            }
+            
+            // Store attempt
+            if (!examAttempts[currentCourse.id]) {
+                examAttempts[currentCourse.id] = [];
+            }
+            examAttempts[currentCourse.id].push({
+                score: score,
+                passed: passed,
+                date: new Date().toISOString(),
+                answers: userAnswers
+            });
+            
+            // Show results
+            showExamResults(score, passed, correct, questions.length);
+        }
+
+        function showExamResults(score, passed, correct, total) {
+            const icon = document.getElementById('results-icon');
+            const title = document.getElementById('results-title');
+            const scoreEl = document.getElementById('results-score');
+            const details = document.getElementById('results-details');
+            
+            if (passed) {
+                icon.className = 'results-icon pass';
+                icon.innerHTML = '<i class="fas fa-trophy"></i>';
+                title.textContent = 'Congratulations!';
+                scoreEl.textContent = `${score}%`;
+                details.textContent = `You answered ${correct} out of ${total} questions correctly.`;
+            } else {
+                icon.className = 'results-icon fail';
+                icon.innerHTML = '<i class="fas fa-redo"></i>';
+                title.textContent = 'Try Again';
+                scoreEl.textContent = `${score}%`;
+                details.textContent = `You answered ${correct} out of ${total} questions correctly. Minimum passing score is 70%.`;
+                
+                // Check attempts left
+                const progress = userProgress[currentCourse.id] || { attempts: 0 };
+                const attemptsLeft = Math.max(0, 3 - progress.attempts);
+                
+                if (attemptsLeft <= 0) {
+                    document.getElementById('retry-exam-btn').style.display = 'none';
+                }
+            }
+            
+            navigateTo('results');
+            updateDashboardStats();
+        }
+
+        function updateDashboardStats() {
+            const total = courses.length;
+            const completed = Object.values(userProgress).filter(p => p.read && (!p.exam_taken || p.exam_taken)).length;
+            const inProgress = Object.values(userProgress).filter(p => p.read && !p.exam_taken).length;
+            
+            const scores = Object.values(userProgress)
+                .filter(p => p.score !== null && p.score !== undefined)
+                .map(p => p.score);
+            const average = scores.length ? Math.round(scores.reduce((a, b) => a + b) / scores.length) : 0;
+            
+            document.getElementById('total-courses').textContent = total;
+            document.getElementById('completed-courses').textContent = completed;
+            document.getElementById('in-progress').textContent = inProgress;
+            document.getElementById('average-score').textContent = `${average}%`;
+        }
+
+        // Navigation
+        function navigateTo(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.page === pageId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Show target page
+            const page = document.getElementById(`${pageId}-page`);
+            if (page) {
+                page.classList.add('active');
+                
+                // Load page-specific data
+                switch(pageId) {
+                    case 'dashboard':
+                        updateDashboardStats();
+                        renderCourses('dashboard-courses', course => {
+                            const progress = userProgress[course.id] || { read: false, exam_taken: false };
+                            return !progress.exam_taken;
+                        });
+                        break;
+                    case 'courses':
+                        renderCourses('courses-container');
+                        break;
+                    case 'admin':
+                        loadAdminData();
+                        break;
+                }
+            }
+        }
+
+        // Admin Functions
+        function loadAdminData() {
+            // Load admin sections
+            document.querySelectorAll('.admin-nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = item.dataset.section;
+                    
+                    // Update active nav
+                    document.querySelectorAll('.admin-nav-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    item.classList.add('active');
+                    
+                    // Show section
+                    document.querySelectorAll('.admin-section').forEach(s => {
+                        s.classList.remove('active');
+                    });
+                    document.getElementById(`${section}-section`).classList.add('active');
+                    
+                    // Load section content
+                    loadAdminSection(section);
+                });
+            });
+            
+            // Load default section
+            loadAdminSection('dashboard');
+        }
+
+        function loadAdminSection(section) {
+            const container = document.getElementById(`${section}-section`);
+            if (!container) return;
+            
+            switch(section) {
+                case 'dashboard':
+                    container.innerHTML = `
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon courses">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-value">24</div>
+                                <div class="stat-label">Total Users</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="stat-value">${courses.length}</div>
+                                <div class="stat-label">Total Courses</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon score">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="stat-value">76%</div>
+                                <div class="stat-label">Avg. Completion</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon progress">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div class="stat-value">89%</div>
+                                <div class="stat-label">Avg. Satisfaction</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2.5rem;">
+                            <h3 style="margin-bottom: 1rem;">Recent Activity</h3>
+                            <div style="background: var(--gray-50); border-radius: var(--radius); padding: 1.5rem;">
+                                <p>Recent user activities will appear here.</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'upload-course':
+                    container.innerHTML = `
+                        <div class="upload-card">
+                            <h3 class="upload-card-title">
+                                <i class="fas fa-info-circle"></i> Course Upload Guidelines
+                            </h3>
+                            <div class="upload-card-content">
+                                <p>Follow these guidelines when creating new courses:</p>
+                                <ul>
+                                    <li>Courses with exams must be at least 5 minutes long</li>
+                                    <li>Include clear learning objectives</li>
+                                    <li>Use proper HTML formatting for content</li>
+                                    <li>Add at least 5 questions for exams</li>
+                                    <li>Specify correct answers for all questions</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="upload-form">
+                            <form id="course-upload-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Course Title</label>
+                                        <input type="text" class="form-input" id="course-title" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Category</label>
+                                        <select class="form-input" id="course-category" required>
+                                            <option value="">Select Category</option>
+                                            <option value="Customer Service">Customer Service</option>
+                                            <option value="Sales">Sales</option>
+                                            <option value="Product Knowledge">Product Knowledge</option>
+                                            <option value="Compliance">Compliance</option>
+                                            <option value="Leadership">Leadership</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-input" id="course-description" rows="3" required></textarea>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Duration (minutes)</label>
+                                        <input type="number" class="form-input" id="course-duration" min="1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Include Exam?</label>
+                                        <select class="form-input" id="course-has-exam">
+                                            <option value="true">Yes</option>
+                                            <option value="false">No (Reading only)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Course Content (HTML)</label>
+                                    <textarea class="form-input" id="course-content-input" rows="6" required></textarea>
+                                </div>
+                                
+                                <div id="exam-questions-section" style="display: none;">
+                                    <h3 style="margin-bottom: 1rem;">Exam Questions</h3>
+                                    <div id="questions-container"></div>
+                                    <button type="button" class="btn btn-outline" id="add-question-btn" style="margin-top: 1rem;">
+                                        <i class="fas fa-plus"></i> Add Question
+                                    </button>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Upload Course
+                                    </button>
+                                    <button type="button" class="btn btn-outline" id="preview-course-btn">
+                                        <i class="fas fa-eye"></i> Preview
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                    
+                    // Show/hide exam questions section
+                    document.getElementById('course-has-exam').addEventListener('change', function() {
+                        const section = document.getElementById('exam-questions-section');
+                        section.style.display = this.value === 'true' ? 'block' : 'none';
+                    });
+                    
+                    // Add question button
+                    document.getElementById('add-question-btn')?.addEventListener('click', addQuestionForm);
+                    
+                    // Form submission
+                    document.getElementById('course-upload-form')?.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        uploadCourse();
+                    });
+                    break;
+                    
+                case 'manage-courses':
+                    container.innerHTML = `
+                        <div class="courses-grid" id="admin-courses-list">
+                            ${courses.map(course => `
+                                <div class="course-card">
+                                    <div class="course-header">
+                                        <span class="course-category">${course.category}</span>
+                                        <h3 class="course-title">${course.title}</h3>
+                                        <p class="course-description">${course.description}</p>
+                                        <div class="course-meta">
+                                            <div class="course-meta-item">
+                                                <i class="fas fa-clock"></i>
+                                                <span>${course.duration} min</span>
+                                            </div>
+                                            <div class="course-meta-item">
+                                                <i class="fas fa-chart-bar"></i>
+                                                <span>${course.has_exam ? 'With Exam' : 'Read Only'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="course-actions">
+                                        <button class="course-action-btn secondary edit-course-btn" data-course-id="${course.id}">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="course-action-btn danger delete-course-btn" data-course-id="${course.id}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    // Add event listeners for admin course actions
+                    container.querySelectorAll('.delete-course-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const courseId = parseInt(this.dataset.courseId);
+                            if (confirm('Are you sure you want to delete this course?')) {
+                                deleteCourse(courseId);
+                            }
+                        });
+                    });
+                    break;
+                    
+                case 'manage-users':
+                    container.innerHTML = `
+                        <div style="margin-bottom: 1.5rem;">
+                            <button class="btn btn-primary" id="add-user-btn">
+                                <i class="fas fa-user-plus"></i> Add User
+                            </button>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: var(--gray-100);">
+                                        <th style="padding: 1rem; text-align: left;">Employee ID</th>
+                                        <th style="padding: 1rem; text-align: left;">Name</th>
+                                        <th style="padding: 1rem; text-align: left;">Position</th>
+                                        <th style="padding: 1rem; text-align: left;">Email</th>
+                                        <th style="padding: 1rem; text-align: left;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    ${sampleUsers.map(user => `
+                                        <tr style="border-bottom: 1px solid var(--gray-200);">
+                                            <td style="padding: 1rem;">${user.id}</td>
+                                            <td style="padding: 1rem;">${user.firstName} ${user.lastName}</td>
+                                            <td style="padding: 1rem;">${getPositionBadge(user.position)}</td>
+                                            <td style="padding: 1rem;">${user.email}</td>
+                                            <td style="padding: 1rem;">
+                                                <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        function addQuestionForm() {
+            const container = document.getElementById('questions-container');
+            const count = container.children.length + 1;
+            
+            const html = `
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">Question ${count}</div>
+                        <button type="button" class="remove-question">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Question Text</label>
+                        <input type="text" class="form-input question-text" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Option 1</label>
+                            <input type="text" class="form-input option-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Option 2</label>
+                            <input type="text" class="form-input option-input" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Option 3</label>
+                            <input type="text" class="form-input option-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Option 4</label>
+                            <input type="text" class="form-input option-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Correct Answer</label>
+                        <select class="form-input correct-answer" required>
+                            <option value="0">Option 1</option>
+                            <option value="1">Option 2</option>
+                            <option value="2">Option 3</option>
+                            <option value="3">Option 4</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', html);
+            
+            // Add remove event listener
+            const newCard = container.lastElementChild;
+            newCard.querySelector('.remove-question').addEventListener('click', function() {
+                container.removeChild(newCard);
+                updateQuestionNumbers();
+            });
+        }
+
+        function updateQuestionNumbers() {
+            const container = document.getElementById('questions-container');
+            const cards = container.querySelectorAll('.question-card');
+            cards.forEach((card, index) => {
+                card.querySelector('.question-number').textContent = `Question ${index + 1}`;
+            });
+        }
+
+        function uploadCourse() {
+            const title = document.getElementById('course-title').value;
+            const description = document.getElementById('course-description').value;
+            const category = document.getElementById('course-category').value;
+            const duration = parseInt(document.getElementById('course-duration').value);
+            const hasExam = document.getElementById('course-has-exam').value === 'true';
+            const content = document.getElementById('course-content-input').value;
+            
+            if (!title || !description || !category || !duration || !content) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (hasExam && duration < 5) {
+                showNotification('Courses with exam must be at least 5 minutes long', 'error');
+                return;
+            }
+            
+            // Collect questions
+            const questions = [];
+            if (hasExam) {
+                const questionCards = document.querySelectorAll('.question-card');
+                if (questionCards.length === 0) {
+                    showNotification('Please add at least one question for the exam', 'error');
+                    return;
+                }
+                
+                questionCards.forEach(card => {
+                    const questionText = card.querySelector('.question-text').value;
+                    const options = Array.from(card.querySelectorAll('.option-input')).map(input => input.value);
+                    const correctAnswer = parseInt(card.querySelector('.correct-answer').value);
+                    
+                    if (!questionText || options.some(opt => !opt)) {
+                        showNotification('Please fill in all question fields', 'error');
+                        return;
+                    }
+                    
+                    questions.push({
+                        question: questionText,
+                        options: options,
+                        correct: correctAnswer
+                    });
+                });
+            }
+            
+            // Create new course
+            const newCourse = {
+                id: courses.length + 1,
+                title,
+                description,
+                category,
+                duration,
+                has_exam: hasExam,
+                content,
+                questions: hasExam ? questions : []
+            };
+            
+            courses.push(newCourse);
+            
+            // Reset form
+            document.getElementById('course-title').value = '';
+            document.getElementById('course-description').value = '';
+            document.getElementById('course-content-input').value = '';
+            document.getElementById('questions-container').innerHTML = '';
+            
+            showNotification('Course uploaded successfully!', 'success');
+            
+            // Switch to manage courses
+            document.querySelector('.admin-nav-item[data-section="manage-courses"]').click();
+        }
+
+        function deleteCourse(courseId) {
+            const index = courses.findIndex(c => c.id === courseId);
+            if (index !== -1) {
+                courses.splice(index, 1);
+                loadAdminSection('manage-courses');
+                showNotification('Course deleted successfully', 'success');
+            }
+        }
+
+        // Initialize
+        function init() {
+            // Initialize sample data
+            courses = [...sampleCourses];
+            
+            // Initialize user progress
+            userProgress = {
+                1: { read: true, exam_taken: true, score: 85, attempts: 1 },
+                2: { read: true, exam_taken: false, score: null, attempts: 0 },
+                3: { read: false, exam_taken: false, score: null, attempts: 0 },
+                4: { read: true, exam_taken: false, score: null, attempts: 0 }
+            };
+            
+            // Setup auth tabs
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const formId = tab.dataset.form;
+                    
+                    // Update active tab
+                    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show active form
+                    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                    document.getElementById(`${formId}-form`).classList.add('active');
+                });
+            });
+            
+            // Switch between login/register
+            document.getElementById('switch-to-register').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelector('.auth-tab[data-form="register"]').click();
+            });
+            
+            document.getElementById('switch-to-login').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelector('.auth-tab[data-form="login"]').click();
+            });
+            
+            // Password strength checker
+            const passwordInput = document.getElementById('register-password');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    checkPasswordStrength(this.value);
+                    
+                    // Check password match
+                    const confirmInput = document.getElementById('register-confirm-password');
+                    const matchText = document.getElementById('password-match-text');
+                    
+                    if (confirmInput.value) {
+                        if (this.value === confirmInput.value) {
+                            matchText.textContent = 'Passwords match';
+                            matchText.className = 'form-help';
+                        } else {
+                            matchText.textContent = 'Passwords do not match';
+                            matchText.className = 'form-help error';
+                        }
+                    }
+                });
+            }
+            
+            // Password confirmation checker
+            const confirmInput = document.getElementById('register-confirm-password');
+            if (confirmInput) {
+                confirmInput.addEventListener('input', function() {
+                    const password = document.getElementById('register-password').value;
+                    const matchText = document.getElementById('password-match-text');
+                    
+                    if (password && this.value) {
+                        if (password === this.value) {
+                            matchText.textContent = 'Passwords match';
+                            matchText.className = 'form-help';
+                        } else {
+                            matchText.textContent = 'Passwords do not match';
+                            matchText.className = 'form-help error';
+                        }
+                    }
+                });
+            }
+            
+            // Login form submission
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const employeeId = document.getElementById('login-employee-id').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!validateEmployeeId(employeeId)) {
+                    showNotification('Invalid Employee ID format. Must be 1700 followed by 4 digits.', 'error');
+                    return;
+                }
+                
+                if (!password) {
+                    showNotification('Please enter your password', 'error');
+                    return;
+                }
+                
+                // Demo login - in production, verify against Supabase
+                const user = sampleUsers.find(u => u.id === employeeId && u.password === password);
+                
+                if (user) {
+                    currentUser = {
+                        id: user.id,
+                        email: user.email,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        position: user.position
+                    };
+                    
+                    updateUserUI(currentUser);
+                    showApp();
+                    navigateTo('dashboard');
+                    showNotification('Login successful!', 'success');
+                    
+                    // Clear form
+                    this.reset();
+                } else {
+                    showNotification('Invalid Employee ID or password', 'error');
+                }
+            });
+            
+            // Register form submission
+            document.getElementById('register-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const firstName = document.getElementById('register-first-name').value;
+                const lastName = document.getElementById('register-last-name').value;
+                const employeeId = document.getElementById('register-employee-id').value;
+                const email = document.getElementById('register-email').value;
+                const position = document.getElementById('register-position').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
+                
+                // Validation
+                if (!firstName || !lastName) {
+                    showNotification('Please enter your name', 'error');
+                    return;
+                }
+                
+                if (!validateEmployeeId(employeeId)) {
+                    showNotification('Invalid Employee ID format. Must be 1700 followed by 4 digits.', 'error');
+                    return;
+                }
+                
+                if (!email || !email.includes('@')) {
+                    showNotification('Please enter a valid email address', 'error');
+                    return;
+                }
+                
+                if (!position) {
+                    showNotification('Please select your position', 'error');
+                    return;
+                }
+                
+                if (!checkPasswordStrength(password)) {
+                    showNotification('Password is too weak. Use at least 8 characters with uppercase, lowercase, numbers, and symbols.', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    showNotification('Passwords do not match', 'error');
+                    return;
+                }
+                
+                // Check if employee ID already exists
+                if (sampleUsers.find(u => u.id === employeeId)) {
+                    showNotification('Employee ID already registered', 'error');
+                    return;
+                }
+                
+                // In production, register with Supabase
+                // For demo, add to sample users
+                const newUser = {
+                    id: employeeId,
+                    email: email,
+                    firstName: firstName,
+                    lastName: lastName,
+                    position: position,
+                    password: password
+                };
+                
+                sampleUsers.push(newUser);
+                
+                // Auto login
+                currentUser = {
+                    id: newUser.id,
+                    email: newUser.email,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    position: newUser.position
+                };
+                
+                updateUserUI(currentUser);
+                showApp();
+                navigateTo('dashboard');
+                showNotification('Registration successful! Welcome to Infinix Retail Academy.', 'success');
+                
+                // Clear form
+                this.reset();
+            });
+            
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                currentUser = null;
+                showAuth();
+                showNotification('Logged out successfully', 'info');
+            });
+            
+            // Navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = link.dataset.page;
+                    navigateTo(page);
+                });
+            });
+            
+            // Logo navigation
+            document.querySelector('.logo').addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateTo('dashboard');
+            });
+            
+            // Course reader navigation
+            document.getElementById('back-to-courses-btn').addEventListener('click', () => {
+                navigateTo('courses');
+            });
+            
+            document.getElementById('proceed-exam-btn').addEventListener('click', () => {
+                if (currentCourse && currentCourse.has_exam) {
+                    startExam();
+                }
+            });
+            
+            document.getElementById('start-exam-btn').addEventListener('click', () => {
+                if (currentCourse && currentCourse.has_exam) {
+                    startExam();
+                }
+            });
+            
+            // Exam navigation
+            document.getElementById('prev-question-btn').addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    loadQuestion();
+                }
+            });
+            
+            document.getElementById('next-question-btn').addEventListener('click', () => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }
+            });
+            
+            document.getElementById('submit-exam-btn').addEventListener('click', submitExam);
+            
+            document.getElementById('exit-exam-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to exit the exam? Your progress will be lost.')) {
+                    navigateTo('courses');
+                }
+            });
+            
+            // Results navigation
+            document.getElementById('review-course-btn').addEventListener('click', () => {
+                navigateTo('reader');
+            });
+            
+            document.getElementById('retry-exam-btn').addEventListener('click', () => {
+                startExam();
+            });
+            
+            document.getElementById('back-to-dashboard-btn').addEventListener('click', () => {
+                navigateTo('dashboard');
+            });
+            
+            // Start with auth interface
+            showAuth();
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
