@@ -2202,9 +2202,9 @@ const SUPABASE_URL = 'https://udqjsmmvpopkzuyzwtah.supabase.co'; // ⬅️ YOUR 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkcWpzbW12cG9wa3p1eXp3dGFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMzc5NjQsImV4cCI6MjA4NDcxMzk2NH0.lizXdiaH3tIRYe_25eiL7RZVayq7xT3JqBWxb0wdGJQ'; // ⬅️ YOUR NEW ANON KEY
         
         // Initialize Supabase client
-        const supabase = (window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-                  : (window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-                  : (window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null)));
+        const supabase = (window.supabase?.createClient)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 // Fallback for CDN global naming
 const _sbGlobal = window.supabase || window.Supabase || null;
 const _createClient = _sbGlobal?.createClient;
@@ -2275,12 +2275,12 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
         });
 
         async function checkSavedSession() {
-            const savedSession = localStorage.getItem('infinixSession');
+            const savedSession = localStorage.getItem('currentUser');
             if (savedSession) {
                 try {
                     const session = JSON.parse(savedSession);
-                    AppState.sessionToken = session.token;
-                    AppState.currentUser = session.user;
+                    AppState.sessionToken = data.session.access_token;
+                    AppState.currentUser = JSON.parse(savedSession);
                     console.log('Found saved session for user:', session.user?.email);
                     
                     // Validate session with Supabase
@@ -2294,7 +2294,7 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
                     const { data: userData, error: userError } = await supabase
                         .from('users')
                         .select('*')
-                        .eq('auth_id', data.session.user.id)
+                        .eq('id', data.session.user.id)
                         .eq('status', 'active')
                         .single();
                     
@@ -2305,8 +2305,7 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
                     // Update AppState with user data
                     AppState.currentUser = {
                         id: userData.id,
-                        auth_id: userData.auth_id,
-                        employee_id: userData.employee_id,
+                                                employee_id: userData.employee_id,
                         name: userData.full_name,
                         email: userData.email,
                         role: userData.role,
@@ -2590,8 +2589,8 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
         // AUTHENTICATION FUNCTIONS - UPDATED
         // ============================================
         async function handleLogin() {
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const password = document.getElementById('loginPassword').value;
+  const email = document.getElementById('loginEmail')?.value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword')?.value || '';
 
   if (!email || !password) {
     showToast('Please enter Email and Password', 'error');
@@ -2602,53 +2601,57 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
     return;
   }
 
-  showLoading(true);
+  showLoading('Signing in...');
 
   try {
     const { data: authRes, error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) throw authError;
     if (!authRes?.user) throw new Error('Login failed. Please try again.');
 
-    // Fetch profile (your schema: public.users.id == auth.uid())
+    // Fetch profile (public.users.id == auth.uid())
     const { data: userRow, error: userErr } = await supabase
       .from('users')
       .select('*')
       .eq('id', authRes.user.id)
       .maybeSingle();
 
-    if (userErr) {
-      console.warn('Profile fetch error:', userErr);
-    }
+    if (userErr) throw userErr;
+    if (!userRow) throw new Error('Profile not found. Please contact admin.');
 
-    // Build currentUser (use profile if exists, else fallback to auth)
-    currentUser = {
-      id: userRow?.id || authRes.user.id,
-      employee_id: userRow?.employee_id || null,
-      name: userRow?.full_name || authRes.user.user_metadata?.full_name || authRes.user.email,
-      full_name: userRow?.full_name || authRes.user.user_metadata?.full_name || '',
-      email: userRow?.email || authRes.user.email,
-      role: userRow?.role || 'user',
-      department: userRow?.department || null,
-      position: userRow?.position || null,
-      status: userRow?.status || 'active'
+    // Update AppState
+    AppState.sessionToken = authRes.session?.access_token || null;
+    AppState.currentUser = {
+      id: userRow.id,
+      employee_id: userRow.employee_id || null,
+      full_name: userRow.full_name || authRes.user.user_metadata?.full_name || '',
+      name: userRow.full_name || authRes.user.user_metadata?.full_name || '',
+      email: userRow.email || authRes.user.email,
+      phone: userRow.phone || null,
+      department: userRow.department || null,
+      position: userRow.position || null,
+      role: userRow.role || 'user',
+      status: userRow.status || 'active'
     };
 
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    AppState.isAdmin = ['admin','super_admin'].includes(AppState.currentUser.role);
+    AppState.isSuperAdmin = AppState.currentUser.role === 'super_admin';
 
-    // Update last_login (safe: only own row passes RLS)
+    localStorage.setItem('currentUser', JSON.stringify(AppState.currentUser));
+
+    // Update last_login (RLS: own row)
     await supabase
       .from('users')
       .update({ last_login: new Date().toISOString() })
-      .eq('id', authRes.user.id);
+      .eq('id', AppState.currentUser.id);
 
-    showToast('Login successful!', 'success');
+    showToast('Welcome back!', 'success');
     showMainApp();
 
   } catch (error) {
     console.error('Login error:', error);
-    showToast(error?.message || 'Login failed. Please try again.', 'error');
+    showToast(error?.message || 'Login failed', 'error');
   } finally {
-    showLoading(false);
+    hideLoading();
   }
 }
 
@@ -2739,14 +2742,7 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
                 });
                 
                 if (error) throw error;
-                
-                // Update password_updated_at in users table
-                await supabase
-                    .from('users')
-                    .update({ password_updated_at: new Date().toISOString() })
-                    .eq('id', AppState.currentUser.id);
-                
-                hideLoading();
+hideLoading();
                 showToast('Password changed successfully!', 'success');
                 closeModal('changePasswordModal');
                 document.getElementById('changePasswordForm').reset();
@@ -2776,7 +2772,7 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
     return;
   }
 
-  showLoading(true);
+  showLoading('Sending reset email...');
 
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -2785,12 +2781,12 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
     if (error) throw error;
 
     showToast('Password reset email sent! Check your inbox.', 'success');
-    closeForgotPasswordModal();
+    closeModal('forgotPasswordModal');
   } catch (error) {
     console.error('Forgot password error:', error);
     showToast(error?.message || 'Failed to send reset email', 'error');
   } finally {
-    showLoading(false);
+    hideLoading();
   }
 }
 
@@ -2824,20 +2820,14 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
     return;
   }
 
-  showLoading(true);
+  showLoading('Creating account...');
 
   try {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          full_name: fullName,
-          employee_id: employeeId || null,
-          phone: phone || null,
-          department: department || null,
-          position: position || null
-        }
+        data: { full_name: fullName } // used by your DB trigger
       }
     });
 
@@ -2850,28 +2840,44 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
       return;
     }
 
-    // If immediately logged in, try read profile row
-    const { data: userRow, error: userErr } = await supabase
+    // Update profile extras (safe: only own row passes RLS)
+    await supabase
+      .from('users')
+      .update({
+        employee_id: employeeId || null,
+        full_name: fullName,
+        phone: phone || null,
+        department: department || null,
+        position: position || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', authData.user.id);
+
+    // Re-read profile
+    const { data: userRow } = await supabase
       .from('users')
       .select('*')
       .eq('id', authData.user.id)
       .maybeSingle();
 
-    if (userErr) console.warn('Profile read after signup error:', userErr);
-
-    currentUser = {
-      id: authData.user.id,
+    AppState.sessionToken = authData.session?.access_token || null;
+    AppState.currentUser = {
+      id: userRow?.id || authData.user.id,
       employee_id: userRow?.employee_id || employeeId || null,
-      name: userRow?.full_name || fullName,
       full_name: userRow?.full_name || fullName,
+      name: userRow?.full_name || fullName,
       email: userRow?.email || email,
-      role: userRow?.role || 'user',
+      phone: userRow?.phone || phone || null,
       department: userRow?.department || department || null,
       position: userRow?.position || position || null,
+      role: userRow?.role || 'user',
       status: userRow?.status || 'active'
     };
 
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    AppState.isAdmin = ['admin','super_admin'].includes(AppState.currentUser.role);
+    AppState.isSuperAdmin = AppState.currentUser.role === 'super_admin';
+
+    localStorage.setItem('currentUser', JSON.stringify(AppState.currentUser));
     showToast('Registration successful!', 'success');
     showMainApp();
 
@@ -2879,7 +2885,7 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
     console.error('Registration error:', error);
     showToast(error?.message || 'Registration failed', 'error');
   } finally {
-    showLoading(false);
+    hideLoading();
   }
 }
 
@@ -5227,109 +5233,8 @@ if (!supabaseClient) { console.error('Supabase client not initialized. Check sup
         }
 
         async function createUserAdmin() {
-            if (!AppState.sessionToken || !AppState.isSuperAdmin) {
-                showToast('Only Super Admin can create users', 'error');
-                return;
-            }
-            
-            const employeeId = document.getElementById('adminEmployeeId').value;
-            const fullName = document.getElementById('adminFullName').value;
-            const email = document.getElementById('adminEmail').value;
-            const department = document.getElementById('adminDepartment').value;
-            const position = document.getElementById('adminPosition').value;
-            const role = document.getElementById('adminRole').value;
-            const status = document.getElementById('adminStatus').value;
-            const password = document.getElementById('adminPassword').value;
-            const confirmPassword = document.getElementById('adminConfirmPassword').value;
-            
-            if (!employeeId || !fullName || !email || !password) {
-                showToast('Please fill required fields', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showToast('Password must be at least 6 characters', 'error');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showToast('Passwords do not match', 'error');
-                return;
-            }
-            
-            showLoading('Creating user...');
-            
-            try {
-                // Check if employee ID already exists
-                const { data: existingEmployee, error: checkError } = await supabase
-                    .from('users')
-                    .select('id')
-                    .eq('employee_id', employeeId)
-                    .single();
-                
-                if (existingEmployee) {
-                    throw new Error('Email already registered');
-                }
-                
-                // Check if email already exists
-                const { data: existingEmail, error: emailCheckError } = await supabase
-                    .from('users')
-                    .select('id')
-                    .eq('email', email)
-                    .single();
-                
-                if (existingEmail) {
-                    throw new Error('Email already registered');
-                }
-                
-                // Create user in Supabase Auth
-                const { data: authData, error: authError } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: fullName,
-                            employee_id: employeeId
-                        }
-                    }
-                });
-                
-                if (authError) throw authError;
-                
-                // Create user in users table
-                const userData = {
-                    auth_id: authData.user.id,
-                    employee_id: employeeId,
-                    full_name: fullName,
-                    email: email,
-                    department: department,
-                    position: position,
-                    role: role,
-                    status: status,
-                    security_question: 'What is your pet\'s name?',
-                    security_answer: 'default',
-                    join_date: new Date().toISOString().split('T')[0],
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                };
-                
-                const { error: dbError } = await supabase
-                    .from('users')
-                    .insert([userData]);
-                
-                if (dbError) throw dbError;
-                
-                hideLoading();
-                showToast('User created successfully!', 'success');
-                closeModal('adminUserModal');
-                loadAllUsers();
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Create user error:', error);
-                showToast('Failed to create user: ' + error.message, 'error');
-            }
-        }
+  showToast('Admin user creation is disabled in this front-end for security. Ask the user to register via Sign Up, then promote role in the database.', 'warning');
+}
 
         function editUserAdmin(employeeId) {
             showAdminUserModal('edit', employeeId);
