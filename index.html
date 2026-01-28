@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Infinix Retail Academy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.09);
+      --border:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --brand:#3B82F6;
+      --good:#10B981;
+      --warn:#F59E0B;
+      --bad:#EF4444;
+      --radius:16px;
+      --shadow:0 20px 60px rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 15% 10%, #1e2a4a 0%, var(--bg) 55%, #000 100%);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1200px; margin:0 auto; padding:18px}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      box-shadow:var(--shadow);
+      position:sticky; top:12px; z-index:10;
+      backdrop-filter: blur(10px);
+    }
+    .brand{display:flex; gap:10px; align-items:center; cursor:pointer}
+    .logo{width:40px; height:40px; border-radius:12px; display:grid; place-items:center;
+      background:linear-gradient(135deg, rgba(59,130,246,.9), rgba(16,185,129,.65));
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow:0 12px 30px rgba(0,0,0,.4);
+    }
+    .brand h1{font-size:16px; margin:0; line-height:1.1}
+    .brand .sub{font-size:12px; color:var(--muted)}
+    .right{display:flex; align-items:center; gap:10px}
+    .pill{font-size:12px; padding:7px 10px; border-radius:999px; border:1px solid var(--border); background:var(--panel)}
+    .btn{border:1px solid var(--border); background:var(--panel); color:var(--text);
+      padding:10px 12px; border-radius:12px; cursor:pointer}
+    .btn:hover{background:var(--panel2)}
+    .btn.primary{background:rgba(59,130,246,.22); border-color:rgba(59,130,246,.5)}
+    .btn.danger{background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.5)}
+    .grid{display:grid; grid-template-columns: 320px 1fr; gap:16px; margin-top:16px}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    .card{border:1px solid var(--border); background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+    .card .hd{padding:14px 14px 10px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.08)}
+    .card .hd h2{margin:0; font-size:14px}
+    .card .bd{padding:14px}
+    .muted{color:var(--muted)}
+    .input{width:100%; padding:12px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.18); color:var(--text); outline:none}
+    label{font-size:12px; color:var(--muted); display:block; margin:10px 0 6px}
+    .row{display:flex; gap:10px}
+    .row>*{flex:1}
+    .list{display:flex; flex-direction:column; gap:10px}
+    .item{padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04);
+      cursor:pointer}
+    .item:hover{background:rgba(255,255,255,.07)}
+    .tag{font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.12)}
+    .hr{height:1px; background:rgba(255,255,255,.10); margin:12px 0}
+    .viewer{height:62vh; overflow:auto; padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.16)}
+    .toast{position:fixed; right:18px; bottom:18px; max-width:360px; display:flex; flex-direction:column; gap:10px; z-index:50}
+    .t{padding:12px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.16); background:rgba(0,0,0,.55); backdrop-filter: blur(8px)}
+    .t.ok{border-color:rgba(16,185,129,.6)}
+    .t.warn{border-color:rgba(245,158,11,.6)}
+    .t.bad{border-color:rgba(239,68,68,.6)}
+    .hidden{display:none !important}
+    .qcard{border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); border-radius:14px; padding:12px}
+    .opt{display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.12); margin-top:8px; cursor:pointer}
+    .opt:hover{background:rgba(255,255,255,.06)}
+    .opt input{margin-top:3px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand" id="homeBtn">
+        <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div>
+          <h1>Infinix Retail Academy</h1>
+          <div class="sub" id="envLine">Supabase (Auth + DB)</div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="pill" id="mePill">Not signed in</div>
+        <button class="btn" id="adminBtn" class="hidden"><i class="fa-solid fa-shield-halved"></i>&nbsp;Admin</button>
+        <button class="btn primary" id="signOutBtn"><i class="fa-solid fa-right-from-bracket"></i>&nbsp;Logout</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="authCard">
+        <div class="hd"><h2>Login / Register</h2><span class="tag">Employee ID</span></div>
+        <div class="bd">
+          <div class="row" style="gap:8px; margin-bottom:10px">
+            <button class="btn" id="tabLogin" style="flex:1">Login</button>
+            <button class="btn" id="tabReg" style="flex:1">Register</button>
+          </div>
+
+          <div id="loginBox">
+            <label>Employee ID</label>
+            <input class="input" id="loginEmp" placeholder="1700xxxx"/>
+            <label>Password</label>
+            <input class="input" id="loginPw" type="password" placeholder="••••••••"/>
+            <div style="margin-top:12px">
+              <button class="btn primary" id="loginBtn" style="width:100%"><i class="fa-solid fa-right-to-bracket"></i>&nbsp;Login</button>
+            </div>
+          </div>
+
+          <div id="regBox" class="hidden">
+            <label>Employee ID</label>
+            <input class="input" id="regEmp" placeholder="1700xxxx"/>
+            <div class="row">
+              <div>
+                <label>First name</label>
+                <input class="input" id="regFn" placeholder="First"/>
+              </div>
+              <div>
+                <label>Last name</label>
+                <input class="input" id="regLn" placeholder="Last"/>
+              </div>
+            </div>
+            <label>Email</label>
+            <input class="input" id="regEmail" placeholder="name@email.com"/>
+            <label>Password</label>
+            <input class="input" id="regPw" type="password" placeholder="Create password"/>
+            <div style="margin-top:12px">
+              <button class="btn primary" id="regBtn" style="width:100%"><i class="fa-solid fa-user-plus"></i>&nbsp;Create account</button>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <div class="muted" style="font-size:12px">
+            Notes: Login uses Employee ID but authenticates through Supabase Auth (email+password) behind the scenes.
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="mainCard">
+        <div class="hd">
+          <h2 id="mainTitle">Courses</h2>
+          <div class="muted" id="mainSub" style="font-size:12px"></div>
+        </div>
+        <div class="bd">
+          <div id="coursesView">
+            <div class="list" id="courseList"></div>
+          </div>
+
+          <div id="courseView" class="hidden">
+            <div class="row" style="margin-bottom:10px">
+              <button class="btn" id="backToCourses"><i class="fa-solid fa-arrow-left"></i>&nbsp;Back</button>
+              <div class="pill" id="readTimerPill">Reading: 0s</div>
+              <div class="pill" id="reqPill">Required: --</div>
+            </div>
+            <div class="viewer" id="courseContent"></div>
+            <div class="hr"></div>
+            <div class="row">
+              <button class="btn" id="markReadBtn"><i class="fa-solid fa-book-open"></i>&nbsp;Mark as read</button>
+              <button class="btn primary" id="startExamBtn"><i class="fa-solid fa-file-pen"></i>&nbsp;Start Exam</button>
+              <button class="btn" id="certBtn"><i class="fa-solid fa-certificate"></i>&nbsp;Certificate</button>
+            </div>
+            <div class="muted" style="font-size:12px; margin-top:10px" id="progressLine"></div>
+          </div>
+
+          <div id="adminView" class="hidden">
+            <div class="row">
+              <button class="btn" id="adminTabCourses" style="flex:1">Courses</button>
+              <button class="btn" id="adminTabQuestions" style="flex:1">Questions</button>
+              <button class="btn" id="adminTabUsers" style="flex:1">Users</button>
+            </div>
+            <div class="hr"></div>
+
+            <div id="adminCourses">
+              <div class="row" style="margin-bottom:10px">
+                <button class="btn primary" id="newCourseBtn"><i class="fa-solid fa-plus"></i>&nbsp;New Course</button>
+                <button class="btn" id="refreshAdminCourses"><i class="fa-solid fa-rotate"></i>&nbsp;Refresh</button>
+              </div>
+              <div class="list" id="adminCourseList"></div>
+            </div>
+
+            <div id="adminQuestions" class="hidden">
+              <div class="row" style="margin-bottom:10px">
+                <select class="input" id="qCourseSelect"></select>
+                <button class="btn primary" id="newQBtn"><i class="fa-solid fa-plus"></i>&nbsp;New Question</button>
+                <button class="btn" id="refreshQs"><i class="fa-solid fa-rotate"></i>&nbsp;Refresh</button>
+              </div>
+              <div class="list" id="qList"></div>
+            </div>
+
+            <div id="adminUsers" class="hidden">
+              <div class="row" style="margin-bottom:10px">
+                <button class="btn" id="refreshUsers"><i class="fa-solid fa-rotate"></i>&nbsp;Refresh</button>
+              </div>
+              <div class="list" id="userList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exam Modal -->
+    <div class="card hidden" id="examModal" style="position:fixed; inset:0; margin:0; border-radius:0; z-index:40; background:rgba(0,0,0,.55); border:none; box-shadow:none">
+      <div style="max-width:900px; margin:24px auto; padding:18px">
+        <div class="card">
+          <div class="hd">
+            <h2 id="examTitle">Exam</h2>
+            <div class="right">
+              <div class="pill" id="examTimer">--:--</div>
+              <button class="btn danger" id="closeExam"><i class="fa-solid fa-xmark"></i>&nbsp;Exit</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="muted" id="examMeta" style="font-size:12px; margin-bottom:10px"></div>
+            <div class="qcard" id="qCard"></div>
+            <div class="hr"></div>
+            <div class="row">
+              <button class="btn" id="prevQ"><i class="fa-solid fa-chevron-left"></i>&nbsp;Prev</button>
+              <button class="btn" id="nextQ">Next&nbsp;<i class="fa-solid fa-chevron-right"></i></button>
+              <button class="btn primary" id="submitExam"><i class="fa-solid fa-paper-plane"></i>&nbsp;Submit</button>
+            </div>
+            <div class="muted" style="font-size:12px; margin-top:10px">
+              Submit is enabled only on the <b>LAST</b> question when <b>ALL</b> questions are answered.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple Editor Modal -->
+    <div class="card hidden" id="editModal" style="position:fixed; inset:0; margin:0; border-radius:0; z-index:45; background:rgba(0,0,0,.55); border:none; box-shadow:none">
+      <div style="max-width:900px; margin:24px auto; padding:18px">
+        <div class="card">
+          <div class="hd">
+            <h2 id="editTitle">Edit</h2>
+            <button class="btn danger" id="closeEdit"><i class="fa-solid fa-xmark"></i>&nbsp;Close</button>
+          </div>
+          <div class="bd" id="editBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toasts"></div>
+  </div>
+
+<script>
+(() => {
+  const supabaseUrl = "https://dktalhqqqulciyaiftrf.supabase.co";
+  const supabaseAnon = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrdGFsaHFxcXVsY2l5YWlmdHJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MDYyODQsImV4cCI6MjA4NTA4MjI4NH0.8wZ8sSfByCY6Fip5yu-ZNVA8alNwHsBMjGEtPgvbB-0";
+  const sb = supabase.createClient(supabaseUrl, supabaseAnon);
+
+  const $ = (id)=>document.getElementById(id);
+  const toasts = $("toasts");
+  function toast(msg, type="ok") {
+    const el = document.createElement("div");
+    el.className = "t " + (type||"");
+    el.textContent = msg;
+    toasts.appendChild(el);
+    setTimeout(()=>{ el.style.opacity="0"; el.style.transform="translateY(6px)"; }, 2600);
+    setTimeout(()=>el.remove(), 3200);
+  }
+
+  let session = null;
+  let meProfile = null;
+  let courses = [];
+  let myProgress = new Map(); // course_id -> row
+  let currentCourse = null;
+  let readTimer = null;
+  let readSeconds = 0;
+
+  // exam state
+  let examQs = [];
+  let examIndex = 0;
+  let examAnswers = [];
+  let examTimer = null;
+  let examEndsAt = 0;
+  let examMinutes = 10;
+  let passingScore = 7;
+
+  function showTab(which){
+    $("tabLogin").classList.toggle("primary", which==="login");
+    $("tabReg").classList.toggle("primary", which==="reg");
+    $("loginBox").classList.toggle("hidden", which!=="login");
+    $("regBox").classList.toggle("hidden", which!=="reg");
+  }
+
+  function setSignedOutUI(){
+    $("mePill").textContent = "Not signed in";
+    $("signOutBtn").classList.add("hidden");
+    $("adminBtn").classList.add("hidden");
+    $("authCard").classList.remove("hidden");
+    $("coursesView").classList.remove("hidden");
+    $("courseView").classList.add("hidden");
+    $("adminView").classList.add("hidden");
+    $("courseList").innerHTML = "";
+    $("mainTitle").textContent = "Courses";
+    $("mainSub").textContent = "Sign in to track progress and take exams.";
+  }
+
+  function setSignedInUI(){
+    const nm = meProfile ? `${meProfile.first_name} ${meProfile.last_name}` : "Signed in";
+    $("mePill").textContent = nm + (meProfile?.role ? ` • ${meProfile.role}` : "");
+    $("signOutBtn").classList.remove("hidden");
+    $("authCard").classList.add("hidden");
+    $("adminBtn").classList.toggle("hidden", !(meProfile && (meProfile.role==="admin" || meProfile.role==="super_admin")));
+  }
+
+  async function getProfile(){
+    const user = (await sb.auth.getUser()).data.user;
+    if(!user) return null;
+    const { data, error } = await sb.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+    if(error) return null;
+    return data;
+  }
+
+  async function loadCourses(){
+    const { data, error } = await sb.from("courses").select("*").eq("is_active", true).order("id");
+    if(error){ toast("Failed to load courses", "bad"); return; }
+    courses = data || [];
+  }
+
+  async function loadMyProgress(){
+    myProgress.clear();
+    const user = (await sb.auth.getUser()).data.user;
+    if(!user) return;
+    const { data, error } = await sb.from("user_progress").select("*").eq("user_id", user.id);
+    if(error) return;
+    (data||[]).forEach(r => myProgress.set(r.course_id, r));
+  }
+
+  function renderCourses(){
+    const list = $("courseList");
+    list.innerHTML = "";
+    if(!courses.length){
+      list.innerHTML = `<div class="muted">No courses found.</div>`;
+      return;
+    }
+    courses.forEach(c => {
+      const pr = myProgress.get(c.id);
+      const passed = pr?.passed;
+      const readOk = pr?.read_complete;
+      const score = pr?.score;
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px">
+          <div>
+            <div style="font-weight:700">${c.title}</div>
+            <div class="muted" style="font-size:12px; margin-top:4px">${c.description||""}</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end">
+            <span class="tag">${c.category||"Course"}</span>
+            <span class="tag">${c.reading_minutes||20} min read</span>
+            ${c.has_exam ? `<span class="tag">Exam</span>` : `<span class="tag">No exam</span>`}
+          </div>
+        </div>
+        <div class="muted" style="font-size:12px; margin-top:10px">
+          Read: <b>${readOk ? "Yes" : "No"}</b> · Exam: <b>${pr?.exam_taken ? "Taken" : "Not yet"}</b>${score!=null? ` · Score: <b>${score}</b>`:""}${passed?` · <b style="color:var(--good)">PASSED</b>`:""}
+        </div>
+      `;
+      el.addEventListener("click", ()=>openCourse(c.id));
+      list.appendChild(el);
+    });
+    $("mainSub").textContent = `${courses.length} course(s) available.`;
+  }
+
+  async function openCourse(courseId){
+    currentCourse = courses.find(x=>x.id===courseId);
+    if(!currentCourse) return;
+    $("coursesView").classList.add("hidden");
+    $("courseView").classList.remove("hidden");
+    $("mainTitle").textContent = currentCourse.title;
+    $("courseContent").innerHTML = currentCourse.content || "<p class='muted'>No content</p>";
+    const pr = myProgress.get(courseId);
+    const req = (currentCourse.reading_minutes||20) * 60;
+    $("reqPill").textContent = "Required: " + (currentCourse.reading_minutes||20) + " min";
+    readSeconds = pr?.read_seconds || 0;
+    $("readTimerPill").textContent = "Reading: " + readSeconds + "s";
+    $("progressLine").textContent = pr ? `Attempts: ${pr.attempts||0} · Passed: ${pr.passed?"Yes":"No"} · Score: ${pr.score??"-"}` : "No progress yet.";
+    $("startExamBtn").disabled = !(currentCourse.has_exam);
+    $("certBtn").disabled = !(pr?.passed);
+    if(readTimer) clearInterval(readTimer);
+    readTimer = setInterval(async ()=>{
+      readSeconds += 1;
+      $("readTimerPill").textContent = "Reading: " + readSeconds + "s";
+      const complete = readSeconds >= req;
+      $("markReadBtn").disabled = !complete;
+    }, 1000);
+    $("markReadBtn").disabled = readSeconds < req;
+  }
+
+  async function markRead(){
+    if(!currentCourse) return;
+    const user = (await sb.auth.getUser()).data.user;
+    const req = (currentCourse.reading_minutes||20) * 60;
+    const read_complete = readSeconds >= req;
+    const payload = {
+      user_id: user.id,
+      course_id: currentCourse.id,
+      read_seconds: readSeconds,
+      read_complete
+    };
+    const { data, error } = await sb.from("user_progress").upsert(payload, { onConflict:"user_id,course_id" }).select("*").maybeSingle();
+    if(error){ toast("Failed to save reading progress", "bad"); return; }
+    myProgress.set(currentCourse.id, data);
+    toast(read_complete ? "Reading marked complete." : "Saved reading time.", "ok");
+    $("progressLine").textContent = `Attempts: ${data.attempts||0} · Passed: ${data.passed?"Yes":"No"} · Score: ${data.score??"-"}`;
+  }
+
+  function closeCourse(){
+    if(readTimer) clearInterval(readTimer);
+    currentCourse=null;
+    $("courseView").classList.add("hidden");
+    $("coursesView").classList.remove("hidden");
+    $("mainTitle").textContent = "Courses";
+  }
+
+  async function loadQuestions(courseId){
+    const { data, error } = await sb.from("exam_questions").select("*").eq("course_id", courseId).order("sort_order", { ascending:true });
+    if(error){ toast("Failed to load questions", "bad"); return []; }
+    return data || [];
+  }
+
+  function openExam(qs){
+    examQs = qs;
+    if(!examQs.length){ toast("No questions found for this course.", "warn"); return; }
+    examIndex = 0;
+    examAnswers = new Array(examQs.length).fill(null);
+    examMinutes = currentCourse.exam_minutes || 10;
+    passingScore = currentCourse.passing_score || 7;
+
+    $("examModal").classList.remove("hidden");
+    $("examTitle").textContent = "Exam — " + currentCourse.title;
+    $("examMeta").textContent = `${examQs.length} question(s) · ${examMinutes} minutes · Passing: ${passingScore} / ${examQs.length}`;
+
+    examEndsAt = Date.now() + examMinutes*60*1000;
+    if(examTimer) clearInterval(examTimer);
+    examTimer = setInterval(()=>{
+      const left = Math.max(0, examEndsAt - Date.now());
+      const s = Math.floor(left/1000);
+      const mm = String(Math.floor(s/60)).padStart(2,"0");
+      const ss = String(s%60).padStart(2,"0");
+      $("examTimer").textContent = `${mm}:${ss}`;
+      if(left<=0){
+        clearInterval(examTimer);
+        submitExam(true);
+      }
+    }, 250);
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    const q = examQs[examIndex];
+    const total = examQs.length;
+    const answered = examAnswers.filter(a=>a!==null).length;
+    const onLast = examIndex === total-1;
+
+    $("prevQ").disabled = examIndex===0;
+    $("nextQ").disabled = examIndex>=total-1;
+    $("submitExam").disabled = !(onLast && answered===total);
+
+    const box = $("qCard");
+    const opts = Array.isArray(q.options) ? q.options : (q.options||[]);
+    const type = q.type || "mcq";
+    box.innerHTML = `
+      <div class="muted" style="font-size:12px; margin-bottom:6px">Question ${examIndex+1} / ${total} · Answered: ${answered} / ${total}</div>
+      <div style="font-weight:800; font-size:16px">${q.question}</div>
+      <div id="optBox"></div>
+    `;
+    const optBox = document.getElementById("optBox");
+    if(type==="tf"){
+      ["True","False"].forEach((label, i)=>{
+        const val = (label==="True");
+        const sel = examAnswers[examIndex]===val;
+        const el = document.createElement("div");
+        el.className = "opt";
+        el.innerHTML = `<input type="radio" name="q" ${sel?"checked":""}/><div>${label}</div>`;
+        el.addEventListener("click", ()=>{ examAnswers[examIndex]=val; renderQuestion(); });
+        optBox.appendChild(el);
+      });
+    } else {
+      (opts||[]).forEach((label, i)=>{
+        const sel = examAnswers[examIndex]===i;
+        const el = document.createElement("div");
+        el.className = "opt";
+        el.innerHTML = `<input type="radio" name="q" ${sel?"checked":""}/><div>${label}</div>`;
+        el.addEventListener("click", ()=>{ examAnswers[examIndex]=i; renderQuestion(); });
+        optBox.appendChild(el);
+      });
+    }
+  }
+
+  async function submitExam(timeout=false){
+    const total = examQs.length;
+    const answered = examAnswers.filter(a=>a!==null).length;
+    const onLast = examIndex === total-1;
+
+    if(!timeout){
+      if(!onLast){ toast("Go to the LAST question to submit.", "warn"); return; }
+      if(answered !== total){ toast("Answer ALL questions before submitting.", "warn"); return; }
+    }
+
+    // score
+    let score = 0;
+    for(let i=0;i<examQs.length;i++){
+      const q = examQs[i];
+      const type = q.type || "mcq";
+      const correct = q.correct_answer;
+      const ans = examAnswers[i];
+      if(type==="tf"){
+        if(ans === correct) score++;
+      } else {
+        if(ans === correct) score++;
+      }
+    }
+    const passed = score >= passingScore;
+
+    const user = (await sb.auth.getUser()).data.user;
+    // upsert progress
+    const prev = myProgress.get(currentCourse.id);
+    const attempts = (prev?.attempts || 0) + 1;
+
+    const payload = {
+      user_id: user.id,
+      course_id: currentCourse.id,
+      exam_taken: true,
+      score,
+      attempts,
+      passed,
+      completed_at: passed ? new Date().toISOString() : null
+    };
+    const { data, error } = await sb.from("user_progress").upsert(payload, { onConflict:"user_id,course_id" }).select("*").maybeSingle();
+    if(error){ toast("Failed to save exam result", "bad"); return; }
+    myProgress.set(currentCourse.id, data);
+
+    // certificate
+    if(passed){
+      await sb.from("certificates").upsert({ user_id:user.id, course_id: currentCourse.id, score }, { onConflict:"user_id,course_id" });
+    }
+
+    toast(passed ? `PASSED! Score ${score}/${total}` : `FAILED. Score ${score}/${total}`, passed?"ok":"warn");
+    closeExam();
+    $("certBtn").disabled = !passed;
+    $("progressLine").textContent = `Attempts: ${data.attempts||0} · Passed: ${data.passed?"Yes":"No"} · Score: ${data.score??"-"}`;
+  }
+
+  function closeExam(){
+    $("examModal").classList.add("hidden");
+    if(examTimer) clearInterval(examTimer);
+    examTimer=null;
+  }
+
+  // ADMIN
+  async function adminLoadCourses(){
+    const { data, error } = await sb.from("courses").select("*").order("id");
+    if(error){ toast("Admin: failed to load courses", "bad"); return; }
+    const list = $("adminCourseList");
+    list.innerHTML = "";
+    (data||[]).forEach(c=>{
+      const el = document.createElement("div");
+      el.className="item";
+      el.innerHTML = `<div style="display:flex; justify-content:space-between; gap:10px">
+        <div><div style="font-weight:800">${c.title}</div><div class="muted" style="font-size:12px">${c.category||""}</div></div>
+        <div style="display:flex; gap:8px">
+          <button class="btn" data-edit="${c.id}"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn danger" data-del="${c.id}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>`;
+      el.querySelector("[data-edit]")?.addEventListener("click", ()=>editCourse(c));
+      el.querySelector("[data-del]")?.addEventListener("click", ()=>delCourse(c.id));
+      list.appendChild(el);
+    });
+  }
+
+  function openEdit(title, bodyHtml){
+    $("editTitle").textContent = title;
+    $("editBody").innerHTML = bodyHtml;
+    $("editModal").classList.remove("hidden");
+  }
+  function closeEdit(){ $("editModal").classList.add("hidden"); }
+
+  function editCourse(c=null){
+    const isNew = !c;
+    const data = c || { title:"", description:"", category:"", reading_minutes:20, exam_minutes:10, passing_score:7, has_exam:true, content:"", is_active:true };
+    openEdit(isNew?"New Course":"Edit Course", `
+      <label>Title</label><input class="input" id="ec_title" value="${(data.title||"").replaceAll('"','&quot;')}"/>
+      <label>Description</label><input class="input" id="ec_desc" value="${(data.description||"").replaceAll('"','&quot;')}"/>
+      <label>Category</label><input class="input" id="ec_cat" value="${(data.category||"").replaceAll('"','&quot;')}"/>
+      <div class="row">
+        <div><label>Reading minutes</label><input class="input" id="ec_rm" type="number" value="${data.reading_minutes||20}"/></div>
+        <div><label>Exam minutes</label><input class="input" id="ec_em" type="number" value="${data.exam_minutes||10}"/></div>
+        <div><label>Passing score</label><input class="input" id="ec_ps" type="number" value="${data.passing_score||7}"/></div>
+      </div>
+      <div class="row">
+        <div><label>Has exam</label><select class="input" id="ec_has"><option value="true">true</option><option value="false">false</option></select></div>
+        <div><label>Active</label><select class="input" id="ec_act"><option value="true">true</option><option value="false">false</option></select></div>
+      </div>
+      <label>HTML Content</label><textarea class="input" id="ec_content" style="height:220px">${data.content||""}</textarea>
+      <div class="hr"></div>
+      <button class="btn primary" id="ec_save"><i class="fa-solid fa-floppy-disk"></i>&nbsp;Save</button>
+    `);
+    $("ec_has").value = String(!!data.has_exam);
+    $("ec_act").value = String(!!data.is_active);
+    $("ec_save").addEventListener("click", async ()=>{
+      const payload = {
+        title: $("ec_title").value.trim(),
+        description: $("ec_desc").value.trim(),
+        category: $("ec_cat").value.trim(),
+        reading_minutes: parseInt($("ec_rm").value||"20",10),
+        exam_minutes: parseInt($("ec_em").value||"10",10),
+        passing_score: parseInt($("ec_ps").value||"7",10),
+        has_exam: $("ec_has").value==="true",
+        is_active: $("ec_act").value==="true",
+        content: $("ec_content").value
+      };
+      let res;
+      if(isNew) res = await sb.from("courses").insert(payload);
+      else res = await sb.from("courses").update(payload).eq("id", c.id);
+      if(res.error){ toast("Save failed (check admin policy)", "bad"); return; }
+      toast("Saved.", "ok");
+      closeEdit();
+      await refreshAll();
+      await adminLoadCourses();
+    });
+  }
+
+  async function delCourse(id){
+    if(!confirm("Delete this course? This also deletes its questions.")) return;
+    const res = await sb.from("courses").delete().eq("id", id);
+    if(res.error){ toast("Delete failed (check admin policy)", "bad"); return; }
+    toast("Deleted.", "ok");
+    await refreshAll();
+    await adminLoadCourses();
+  }
+
+  async function adminLoadUsers(){
+    const { data, error } = await sb.from("profiles").select("*").order("created_at", {ascending:false});
+    if(error){ toast("Admin: failed to load users", "bad"); return; }
+    const list = $("userList");
+    list.innerHTML = "";
+    (data||[]).forEach(u=>{
+      const el = document.createElement("div");
+      el.className="item";
+      el.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px">
+          <div>
+            <div style="font-weight:800">${u.employee_id} — ${u.first_name} ${u.last_name}</div>
+            <div class="muted" style="font-size:12px">${u.email} · position: ${u.position} · role: ${u.role} · status: ${u.status}</div>
+          </div>
+          <div><button class="btn" data-edit="${u.user_id}"><i class="fa-solid fa-pen"></i></button></div>
+        </div>`;
+      el.querySelector("[data-edit]")?.addEventListener("click", ()=>editUser(u));
+      list.appendChild(el);
+    });
+  }
+
+  function editUser(u){
+    openEdit("Edit User", `
+      <div class="muted" style="font-size:12px">You can edit profile fields. Accounts are created by user self-registration (Supabase Auth).</div>
+      <label>Employee ID</label><input class="input" id="eu_emp" value="${u.employee_id}"/>
+      <div class="row">
+        <div><label>First name</label><input class="input" id="eu_fn" value="${u.first_name}"/></div>
+        <div><label>Last name</label><input class="input" id="eu_ln" value="${u.last_name}"/></div>
+      </div>
+      <label>Email</label><input class="input" id="eu_em" value="${u.email}"/>
+      <div class="row">
+        <div><label>Position</label><input class="input" id="eu_pos" value="${u.position}"/></div>
+        <div><label>Status</label><select class="input" id="eu_status"><option value="active">active</option><option value="inactive">inactive</option></select></div>
+        <div><label>Role</label><select class="input" id="eu_role"><option value="user">user</option><option value="admin">admin</option><option value="super_admin">super_admin</option></select></div>
+      </div>
+      <div class="hr"></div>
+      <button class="btn primary" id="eu_save"><i class="fa-solid fa-floppy-disk"></i>&nbsp;Save</button>
+    `);
+    $("eu_status").value = u.status || "active";
+    $("eu_role").value = u.role || "user";
+    $("eu_save").addEventListener("click", async ()=>{
+      const payload = {
+        employee_id: $("eu_emp").value.trim(),
+        first_name: $("eu_fn").value.trim(),
+        last_name: $("eu_ln").value.trim(),
+        email: $("eu_em").value.trim(),
+        position: $("eu_pos").value.trim(),
+        status: $("eu_status").value,
+        role: $("eu_role").value
+      };
+      const res = await sb.from("profiles").update(payload).eq("user_id", u.user_id);
+      if(res.error){ toast("Save failed (check admin policy)", "bad"); return; }
+      toast("Saved.", "ok");
+      closeEdit();
+      await adminLoadUsers();
+      meProfile = await getProfile();
+      setSignedInUI();
+    });
+  }
+
+  async function adminLoadQuestions(){
+    // fill select
+    const { data: cd } = await sb.from("courses").select("id,title").order("id");
+    $("qCourseSelect").innerHTML = (cd||[]).map(c=>`<option value="${c.id}">${c.id} — ${c.title}</option>`).join("");
+    const courseId = parseInt($("qCourseSelect").value||"0",10);
+    if(!courseId) return;
+    const { data, error } = await sb.from("exam_questions").select("*").eq("course_id", courseId).order("sort_order");
+    if(error){ toast("Admin: failed to load questions", "bad"); return; }
+    const list = $("qList");
+    list.innerHTML = "";
+    (data||[]).forEach(q=>{
+      const el = document.createElement("div");
+      el.className="item";
+      el.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px">
+          <div>
+            <div style="font-weight:800">#${q.sort_order ?? q.id} — ${q.question}</div>
+            <div class="muted" style="font-size:12px">type: ${q.type} · correct: ${JSON.stringify(q.correct_answer)}</div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="btn" data-edit="${q.id}"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn danger" data-del="${q.id}"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>`;
+      el.querySelector("[data-edit]")?.addEventListener("click", ()=>editQ(q));
+      el.querySelector("[data-del]")?.addEventListener("click", ()=>delQ(q.id));
+      list.appendChild(el);
+    });
+  }
+
+  function editQ(q=null){
+    const isNew = !q;
+    const course_id = parseInt($("qCourseSelect").value||"0",10);
+    const data = q || { course_id, question:"", type:"mcq", options:["A","B","C","D"], correct_answer:0, sort_order: 1 };
+    openEdit(isNew?"New Question":"Edit Question", `
+      <label>Course</label><div class="pill">${data.course_id}</div>
+      <label>Question</label><input class="input" id="eq_q" value="${(data.question||"").replaceAll('"','&quot;')}"/>
+      <label>Type</label>
+      <select class="input" id="eq_type">
+        <option value="mcq">mcq</option>
+        <option value="tf">tf</option>
+      </select>
+      <label>Options (JSON array, for mcq)</label>
+      <textarea class="input" id="eq_opts" style="height:120px">${JSON.stringify(data.options||[])}</textarea>
+      <label>Correct Answer (number for mcq, true/false for tf)</label>
+      <input class="input" id="eq_ca" value="${String(data.correct_answer)}"/>
+      <label>Sort Order</label>
+      <input class="input" id="eq_so" type="number" value="${data.sort_order||1}"/>
+      <div class="hr"></div>
+      <button class="btn primary" id="eq_save"><i class="fa-solid fa-floppy-disk"></i>&nbsp;Save</button>
+    `);
+    $("eq_type").value = data.type || "mcq";
+    $("eq_save").addEventListener("click", async ()=>{
+      let opts = [];
+      try{ opts = JSON.parse($("eq_opts").value||"[]"); }catch(e){ toast("Options must be valid JSON array", "warn"); return; }
+      let ca = $("eq_ca").value.trim();
+      let correct_answer;
+      if($("eq_type").value==="tf") correct_answer = (ca.toLowerCase()==="true");
+      else correct_answer = parseInt(ca,10);
+      const payload = {
+        course_id: data.course_id,
+        question: $("eq_q").value.trim(),
+        type: $("eq_type").value,
+        options: opts,
+        correct_answer,
+        sort_order: parseInt($("eq_so").value||"1",10)
+      };
+      let res;
+      if(isNew) res = await sb.from("exam_questions").insert(payload);
+      else res = await sb.from("exam_questions").update(payload).eq("id", q.id);
+      if(res.error){ toast("Save failed (check admin policy)", "bad"); return; }
+      toast("Saved.", "ok");
+      closeEdit();
+      await adminLoadQuestions();
+    });
+  }
+
+  async function delQ(id){
+    if(!confirm("Delete this question?")) return;
+    const res = await sb.from("exam_questions").delete().eq("id", id);
+    if(res.error){ toast("Delete failed (check admin policy)", "bad"); return; }
+    toast("Deleted.", "ok");
+    await adminLoadQuestions();
+  }
+
+  async function refreshAll(){
+    await loadCourses();
+    if(session) await loadMyProgress();
+    renderCourses();
+  }
+
+  // AUTH using employee_id lookup in profiles
+  async function loginByEmployeeId(empId, password){
+    const { data, error } = await sb.from("profiles").select("email,status").eq("employee_id", empId).maybeSingle();
+    if(error || !data) throw new Error("Employee ID not found.");
+    if((data.status||"active")!=="active") throw new Error("Account is inactive.");
+    const res = await sb.auth.signInWithPassword({ email: data.email, password });
+    if(res.error) throw res.error;
+    return res.data.session;
+  }
+
+  async function register(empId, email, password, first, last){
+    // sign up to auth
+    const res = await sb.auth.signUp({ email, password });
+    if(res.error) throw res.error;
+    const user = res.data.user;
+    if(!user) throw new Error("Sign up failed.");
+    // create profile
+    const prof = {
+      user_id: user.id,
+      employee_id: empId,
+      first_name: first,
+      last_name: last,
+      email,
+      position: "promoter",
+      role: "user",
+      status: "active"
+    };
+    const ins = await sb.from("profiles").insert(prof);
+    if(ins.error) throw ins.error;
+    return true;
+  }
+
+  // NAV
+  function showAdmin(show){
+    $("adminView").classList.toggle("hidden", !show);
+    $("coursesView").classList.toggle("hidden", show);
+    $("courseView").classList.add("hidden");
+    $("mainTitle").textContent = show ? "Admin Panel" : "Courses";
+  }
+
+  function setAdminTab(tab){
+    $("adminCourses").classList.toggle("hidden", tab!=="courses");
+    $("adminQuestions").classList.toggle("hidden", tab!=="questions");
+    $("adminUsers").classList.toggle("hidden", tab!=="users");
+  }
+
+  // wires
+  function wire(){
+    $("homeBtn").addEventListener("click", ()=>{ showAdmin(false); closeCourse(); renderCourses(); });
+    $("tabLogin").addEventListener("click", ()=>showTab("login"));
+    $("tabReg").addEventListener("click", ()=>showTab("reg"));
+    showTab("login");
+
+    $("loginBtn").addEventListener("click", async ()=>{
+      try{
+        const emp = $("loginEmp").value.trim();
+        const pw = $("loginPw").value;
+        if(!emp || !pw) return toast("Enter employee id + password", "warn");
+        await loginByEmployeeId(emp, pw);
+        toast("Logged in.", "ok");
+      }catch(e){ toast(e.message || "Login failed", "bad"); }
+    });
+
+    $("regBtn").addEventListener("click", async ()=>{
+      try{
+        const emp = $("regEmp").value.trim();
+        const fn = $("regFn").value.trim();
+        const ln = $("regLn").value.trim();
+        const email = $("regEmail").value.trim();
+        const pw = $("regPw").value;
+        if(!emp||!fn||!ln||!email||!pw) return toast("Please fill all fields.", "warn");
+        await register(emp, email, pw, fn, ln);
+        toast("Account created. Please login.", "ok");
+        showTab("login");
+      }catch(e){ toast(e.message || "Registration failed", "bad"); }
+    });
+
+    $("signOutBtn").addEventListener("click", async ()=>{
+      await sb.auth.signOut();
+      toast("Logged out.", "ok");
+    });
+
+    $("backToCourses").addEventListener("click", ()=>closeCourse());
+    $("markReadBtn").addEventListener("click", ()=>markRead());
+    $("startExamBtn").addEventListener("click", async ()=>{
+      if(!currentCourse) return;
+      const qs = await loadQuestions(currentCourse.id);
+      openExam(qs);
+    });
+    $("certBtn").addEventListener("click", async ()=>{
+      if(!currentCourse) return;
+      const user = (await sb.auth.getUser()).data.user;
+      const { data } = await sb.from("certificates").select("*").eq("user_id", user.id).eq("course_id", currentCourse.id).maybeSingle();
+      if(!data) return toast("No certificate yet. Pass the exam first.", "warn");
+      const certId = data.id;
+      toast("Certificate issued (id: " + certId + ")", "ok");
+      alert("CERTIFICATE\n\nCourse: " + currentCourse.title + "\nScore: " + data.score + "\nIssued: " + new Date(data.issued_at).toLocaleString() + "\n\nCertificate ID: " + certId);
+    });
+
+    // exam nav
+    $("prevQ").addEventListener("click", ()=>{ if(examIndex>0){ examIndex--; renderQuestion(); } });
+    $("nextQ").addEventListener("click", ()=>{ if(examIndex<examQs.length-1){ examIndex++; renderQuestion(); } });
+    $("submitExam").addEventListener("click", ()=>submitExam(false));
+    $("closeExam").addEventListener("click", ()=>closeExam());
+
+    // admin
+    $("adminBtn").addEventListener("click", async ()=>{
+      showAdmin(true);
+      setAdminTab("courses");
+      await adminLoadCourses();
+      await adminLoadQuestions();
+      await adminLoadUsers();
+    });
+    $("adminTabCourses").addEventListener("click", async ()=>{ setAdminTab("courses"); await adminLoadCourses(); });
+    $("adminTabQuestions").addEventListener("click", async ()=>{ setAdminTab("questions"); await adminLoadQuestions(); });
+    $("adminTabUsers").addEventListener("click", async ()=>{ setAdminTab("users"); await adminLoadUsers(); });
+    $("newCourseBtn").addEventListener("click", ()=>editCourse(null));
+    $("refreshAdminCourses").addEventListener("click", ()=>adminLoadCourses());
+    $("qCourseSelect").addEventListener("change", ()=>adminLoadQuestions());
+    $("newQBtn").addEventListener("click", ()=>editQ(null));
+    $("refreshQs").addEventListener("click", ()=>adminLoadQuestions());
+    $("refreshUsers").addEventListener("click", ()=>adminLoadUsers());
+
+    $("closeEdit").addEventListener("click", ()=>closeEdit());
+  }
+
+  async function boot(){
+    wire();
+    // listen auth
+    sb.auth.onAuthStateChange(async (_event, _session)=>{
+      session = _session;
+      if(!session){
+        meProfile=null;
+        setSignedOutUI();
+        await refreshAll();
+        return;
+      }
+      meProfile = await getProfile();
+      setSignedInUI();
+      await refreshAll();
+      // if first login and no profile, force signout
+      if(!meProfile){ toast("No profile found. Please register.", "bad"); await sb.auth.signOut(); }
+    });
+
+    // initial
+    const s = (await sb.auth.getSession()).data.session;
+    session = s;
+    if(!session){
+      setSignedOutUI();
+      await refreshAll();
+    } else {
+      meProfile = await getProfile();
+      setSignedInUI();
+      await refreshAll();
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
