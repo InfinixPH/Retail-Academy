@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Infinix Retail Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --brand-50:#ECFDF5; --brand-100:#D1FAE5; --brand-200:#A7F3D0; --brand-300:#6EE7B7;
+      --brand-400:#34D399; --brand-500:#10B981; --brand-600:#059669; --brand-700:#047857;
+      --bg:#F7FAF9; --card:#FFFFFF; --text:#0F172A; --muted:#64748B; --border:#E2E8F0;
+      --shadow: 0 10px 30px rgba(2, 6, 23, .08);
+      --danger:#EF4444; --warning:#F59E0B; --ok:#10B981;
+      --radius: 16px; --radius-sm: 12px;
+      --sidebar-w: 270px; --topbar-h: 64px;
+      --focus: 0 0 0 3px rgba(16,185,129,.25);
+    }
+    [data-theme="dark"] {
+      --bg:#0B1220; --card:#0F1A2E; --text:#E5E7EB; --muted:#9CA3AF; --border:#1F2A44;
+      --shadow: 0 16px 40px rgba(0,0,0,.45);
+      --focus: 0 0 0 3px rgba(16,185,129,.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font-family: inherit; }
+
+    .app { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; background: linear-gradient(180deg, rgba(16,185,129,.10), rgba(16,185,129,0)) , var(--card); border-right: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 14px; transition: width .2s ease, transform .2s ease; z-index: 10; }
+    .sidebar.collapsed { width: 78px; padding: 16px 10px; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 14px; cursor: pointer; }
+    .brand:hover { background: rgba(16,185,129,.10); }
+    .logo { width: 38px; height: 38px; border-radius: 12px; background: radial-gradient(circle at 30% 30%, var(--brand-300), var(--brand-700)); display: grid; place-items: center; color: white; box-shadow: 0 12px 20px rgba(16,185,129,.22); flex: 0 0 auto; }
+    .brand-text { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+    .brand-text .title { font-weight: 800; letter-spacing: .2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand-text .sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar.collapsed .brand-text { display: none; }
+
+    .nav { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+    .nav .item { display: flex; align-items: center; gap: 12px; padding: 12px 12px; border-radius: 14px; color: var(--muted); cursor: pointer; transition: background .12s ease, color .12s ease; }
+    .nav .item i { width: 18px; text-align: center; }
+    .nav .item:hover { background: rgba(16,185,129,.10); color: var(--text); }
+    .nav .item.active { background: rgba(16,185,129,.14); color: var(--text); border: 1px solid rgba(16,185,129,.22); }
+    .sidebar.collapsed .nav .label { display: none; }
+    .nav-sep { height: 1px; background: var(--border); margin: 10px 0; opacity: .9; }
+    .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+
+    .toggle-sidebar { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; box-shadow: none; }
+    .toggle-sidebar:hover { border-color: rgba(16,185,129,.35); box-shadow: 0 12px 24px rgba(2, 6, 23, .08); }
+    .sidebar.collapsed .toggle-sidebar span { display: none; }
+
+    .main { display: flex; flex-direction: column; min-width: 0; }
+    .topbar { height: var(--topbar-h); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,.65); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 5; }
+    [data-theme="dark"] .topbar { background: rgba(15,26,46,.65); }
+
+    .search { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 720px; padding: 10px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); }
+    .search input { border: none; outline: none; width: 100%; background: transparent; color: var(--text); font-size: 14px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+    .icon-btn { width: 40px; height: 40px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; position: relative; }
+    .icon-btn:hover { border-color: rgba(16,185,129,.35); }
+    .badge { position: absolute; top: 6px; right: 6px; min-width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center; background: var(--brand-600); color: white; font-size: 11px; padding: 0 6px; border: 2px solid var(--card); }
+
+    .profile-chip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); cursor: pointer; }
+    .avatar { width: 32px; height: 32px; border-radius: 999px; background: rgba(16,185,129,.18); display: grid; place-items: center; color: var(--brand-700); font-weight: 800; }
+    [data-theme="dark"] .avatar { color: var(--brand-200); background: rgba(16,185,129,.20); }
+    .profile-chip .meta { display: flex; flex-direction: column; line-height: 1.1; }
+    .profile-chip .meta .name { font-weight: 700; font-size: 13px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-chip .meta .role { font-size: 12px; color: var(--muted); }
+    .profile-chip .caret { color: var(--muted); }
+
+    .content { padding: 18px; display: grid; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1.3fr .7fr; gap: 16px; align-items: start; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+    .card h3 { margin: 0 0 10px 0; font-size: 16px; letter-spacing: .1px; }
+    .muted { color: var(--muted); }
+
+    .kpi { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border-radius: 16px; border: 1px solid var(--border); background: linear-gradient(180deg, rgba(16,185,129,.10), rgba(16,185,129,0)); }
+    .kpi .label { color: var(--muted); font-size: 12px; }
+    .kpi .value { font-size: 22px; font-weight: 900; }
+    .kpi i { width: 44px; height: 44px; border-radius: 16px; display: grid; place-items: center; background: rgba(16,185,129,.18); color: var(--brand-700); }
+    [data-theme="dark"] .kpi i { color: var(--brand-200); }
+
+    .table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 14px; border: 1px solid var(--border); }
+    .table th, .table td { padding: 10px 10px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
+    .table th { color: var(--muted); font-weight: 700; background: rgba(148,163,184,.10); }
+    .table tr:last-child td { border-bottom: none; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; border: 1px solid var(--border); color: var(--muted); background: rgba(148,163,184,.08); white-space: nowrap; }
+    .pill.ok { border-color: rgba(16,185,129,.35); background: rgba(16,185,129,.12); color: var(--text); }
+    .pill.warn { border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.12); color: var(--text); }
+
+    /* Calendar */
+    .calendar-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .cal-controls { display: flex; align-items: center; gap: 8px; }
+    .btn { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 10px 12px; border-radius: 14px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .btn:hover { border-color: rgba(16,185,129,.35); }
+    .btn.primary { background: linear-gradient(180deg, rgba(16,185,129,.22), rgba(16,185,129,.10)); border-color: rgba(16,185,129,.35); }
+    .btn.danger { border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); }
+    .btn:focus, input:focus, select:focus, textarea:focus { outline: none; box-shadow: var(--focus); }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .cal-dow { font-size: 12px; color: var(--muted); font-weight: 800; text-align: center; padding: 6px 0; }
+    .day { border: 1px solid var(--border); border-radius: 16px; background: var(--card); padding: 10px; min-height: 104px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: transform .08s ease, border-color .08s ease; }
+    .day:hover { transform: translateY(-1px); border-color: rgba(16,185,129,.35); }
+    .day.mutedday { opacity: .55; }
+    .day .dnum { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 900; }
+    .event { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: 12px; border: 1px solid rgba(16,185,129,.25); background: rgba(16,185,129,.10); font-size: 12px; line-height: 1.2; overflow: hidden; }
+    .event i { margin-top: 2px; color: var(--brand-700); }
+    [data-theme="dark"] .event i { color: var(--brand-200); }
+    .note-dot { width: 8px; height: 8px; border-radius: 999px; background: rgba(245,158,11,.85); display: inline-block; margin-left: 6px; }
+
+    /* Modal */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+    .overlay.show { display: flex; }
+    .modal { width: min(720px, 100%); background: var(--card); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .modal .mhead { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .modal .mhead .ttl { font-weight: 900; }
+    .modal .mbody { padding: 16px; display: grid; gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 800; }
+    .field input, .field select, .field textarea { padding: 12px 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 14px; }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* Auth */
+    .auth { min-height: 100vh; display: grid; place-items: center; padding: 18px; background: radial-gradient(900px 420px at 20% 10%, rgba(16,185,129,.16), transparent 60%), radial-gradient(800px 380px at 90% 20%, rgba(16,185,129,.12), transparent 55%), var(--bg); }
+    .auth-card { width: min(980px, 100%); display: grid; grid-template-columns: 1.05fr .95fr; gap: 16px; }
+    .auth-left { padding: 20px; border-radius: 22px; border: 1px solid var(--border); background: linear-gradient(180deg, rgba(16,185,129,.12), rgba(16,185,129,0)), var(--card); box-shadow: var(--shadow); }
+    .auth-right { padding: 20px; border-radius: 22px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); }
+    .auth-hero { display: grid; gap: 12px; }
+    .auth-hero h1 { margin: 0; font-size: 30px; letter-spacing: -.5px; }
+    .auth-hero p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 4px; gap: 4px; background: rgba(148,163,184,.08); width: fit-content; }
+    .tab { border: none; padding: 10px 14px; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-weight: 900; font-size: 13px; }
+    .tab.active { background: var(--card); color: var(--text); border: 1px solid rgba(16,185,129,.28); box-shadow: 0 10px 20px rgba(2, 6, 23, .08); }
+    .pw { position: relative; }
+    .pw .eye { position: absolute; right: 12px; top: 38px; width: 38px; height: 38px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; display: grid; place-items: center; }
+    .pw .eye:hover { border-color: rgba(16,185,129,.35); color: var(--text); }
+
+    .toast { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 10px; z-index: 999; }
+    .toast .t { padding: 12px 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); min-width: 280px; max-width: 360px; display: flex; align-items: flex-start; gap: 10px; }
+    .t i { margin-top: 2px; color: var(--brand-600); }
+    .t .msg { font-size: 13px; line-height: 1.4; }
+    .t .msg b { display: block; margin-bottom: 2px; }
+    .t.danger i { color: var(--danger); }
+    .t.warn i { color: var(--warning); }
+
+    @media (max-width: 980px) { .grid-2 { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr; } .auth-card { grid-template-columns: 1fr; } .topbar { padding: 10px 12px; } .content { padding: 12px; } }
+    @media (max-width: 860px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; left: 0; top: 0; height: 100vh; width: min(86vw, 320px); transform: translateX(-110%); }
+      .sidebar.show { transform: translateX(0); }
+      .topbar .search { display: none; }
+      .mobile-only { display: inline-flex !important; }
+    }
+    .mobile-only { display: none; }
+    .hidden { display: none !important; }
+    .right { text-align: right; }
+    .small { font-size: 12px; }
+  </style>
+</head>
+
+<body data-theme="light">
+  <section id="auth" class="auth">
+    <div class="auth-card">
+      <div class="auth-left">
+        <div class="brand" id="brandAuth">
+          <div class="logo"><i class="fa-solid fa-leaf"></i></div>
+          <div class="brand-text">
+            <div class="title">Infinix Retail Academy</div>
+            <div class="sub">Employee Training & Development Platform</div>
+          </div>
+        </div>
+
+        <div class="auth-hero">
+          <h1>Train smarter, sell better.</h1>
+          <p>Complete courses, track progress, take exams, and earn certificates — all in one silk-green dashboard.</p>
+          <div class="tabs" role="tablist" aria-label="Auth tabs">
+            <button class="tab active" id="tabLogin" type="button">Log In</button>
+            <button class="tab" id="tabSignup" type="button">Sign Up</button>
+          </div>
+          <p class="muted small">Tip: Your login uses Employee ID + Password. (No email needed.)</p>
+        </div>
+      </div>
+
+      <div class="auth-right">
+        <form id="loginForm">
+          <h2 style="margin:0 0 10px 0;">Welcome back</h2>
+          <div class="field">
+            <label>Employee ID</label>
+            <input id="loginEmployeeId" placeholder="1700xxxx" autocomplete="username" required />
+          </div>
+          <div class="field pw">
+            <label>Password</label>
+            <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" required />
+            <button class="eye" id="loginEye" type="button" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); font-weight:700;">
+              <input type="checkbox" id="rememberMe" style="accent-color: var(--brand-600);" />
+              Remember me
+            </label>
+            <button class="btn" type="button" id="forgotBtn">Forgot password</button>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:12px;">
+            <button class="btn primary" type="submit" style="flex:1;">Log In</button>
+            <button class="btn" type="button" id="switchToSignup">Sign Up</button>
+          </div>
+          <p class="muted small" style="margin:12px 0 0 0;">Super Admin Employee ID: <b>17000001</b></p>
+        </form>
+
+        <form id="signupForm" class="hidden">
+          <h2 style="margin:0 0 10px 0;">Create account</h2>
+          <div class="row">
+            <div class="field">
+              <label>Employee ID</label>
+              <input id="signupEmployeeId" placeholder="1700xxxx" required />
+            </div>
+            <div class="field pw">
+              <label>Password</label>
+              <input id="signupPassword" type="password" placeholder="Create a password" required />
+              <button class="eye" id="signupEye" type="button" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>First name</label>
+              <input id="signupFirstName" required />
+            </div>
+            <div class="field">
+              <label>Last name</label>
+              <input id="signupLastName" required />
+            </div>
+          </div>
+          <div class="field">
+            <label>Position</label>
+            <select id="signupPosition" required>
+              <option value="promoter">Promoter</option>
+              <option value="trainer">Trainer</option>
+              <option value="supervisor">Supervisor</option>
+              <option value="manager">Manager</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:12px;">
+            <button class="btn primary" type="submit" style="flex:1;">Create Account</button>
+            <button class="btn" type="button" id="switchToLogin">Back to Log In</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="app" class="app hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand" id="brandApp" title="Go to Dashboard">
+        <div class="logo"><i class="fa-solid fa-leaf"></i></div>
+        <div class="brand-text">
+          <div class="title">Infinix Retail Academy</div>
+          <div class="sub" id="envLabel">Supabase Live</div>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <div class="item active" data-page="dashboard"><i class="fa-solid fa-gauge"></i><span class="label">Dashboard</span></div>
+        <div class="item" data-page="calendar"><i class="fa-regular fa-calendar"></i><span class="label">Calendar</span></div>
+        <div class="item" data-page="progress"><i class="fa-solid fa-chart-line"></i><span class="label">Progress</span></div>
+        <div class="item" data-page="courses"><i class="fa-solid fa-graduation-cap"></i><span class="label">Course & Exam</span></div>
+        <div class="item admin-only hidden" data-page="admin"><i class="fa-solid fa-shield"></i><span class="label">Admin</span></div>
+
+        <div class="nav-sep"></div>
+
+        <div class="item" data-page="settings"><i class="fa-solid fa-gear"></i><span class="label">Settings</span></div>
+        <div class="item" data-page="profile"><i class="fa-regular fa-user"></i><span class="label">My Profile</span></div>
+        <div class="item" id="logoutItem"><i class="fa-solid fa-arrow-right-from-bracket"></i><span class="label">Log out</span></div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="toggle-sidebar" id="toggleSidebar" type="button">
+          <i class="fa-solid fa-angles-left" id="collapseIcon"></i>
+          <span>Collapse</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-only" id="openSidebar" type="button" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+
+        <div class="search" title="Quick search (local)">
+          <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
+          <input id="searchInput" placeholder="Search courses, categories..." />
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+
+          <button class="icon-btn" id="notifBtn" type="button" aria-label="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge hidden" id="notifBadge">0</span>
+          </button>
+
+          <div class="profile-chip" id="profileChip" title="Profile">
+            <div class="avatar" id="avatar">IA</div>
+            <div class="meta">
+              <div class="name" id="chipName">Loading…</div>
+              <div class="role" id="chipRole">user</div>
+            </div>
+            <i class="fa-solid fa-chevron-down caret"></i>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section id="page-dashboard" class="page">
+          <div class="grid-3">
+            <div class="kpi"><div><div class="label">Courses</div><div class="value" id="kpiCourses">—</div></div><i class="fa-solid fa-layer-group"></i></div>
+            <div class="kpi"><div><div class="label">Completed</div><div class="value" id="kpiCompleted">—</div></div><i class="fa-solid fa-circle-check"></i></div>
+            <div class="kpi"><div><div class="label">Avg Exam Score</div><div class="value" id="kpiAvgScore">—</div></div><i class="fa-solid fa-award"></i></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>Upcoming course schedule</h3>
+              <div class="muted small" style="margin-bottom:10px;">Based on course schedule date. Tap Calendar to see monthly view.</div>
+              <table class="table" id="upcomingTable">
+                <thead><tr><th>Date</th><th>Course</th><th class="right">Exam</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <h3>Top Learners</h3>
+              <div class="muted small" style="margin-bottom:10px;">Top 3 by completed courses, then exam score average.</div>
+              <table class="table" id="leaderTable">
+                <thead><tr><th>#</th><th>Name</th><th class="right">Completed</th></tr></thead>
+                <tbody></tbody>
+              </table>
+              <div class="muted small" style="margin-top:10px;">Uses a safe leaderboard function (no raw user list exposed).</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-calendar" class="page hidden">
+          <div class="card">
+            <div class="calendar-head">
+              <div>
+                <h3 style="margin:0;">Calendar</h3>
+                <div class="muted small">Courses show on their scheduled date. Click a day to add personal notes.</div>
+              </div>
+              <div class="cal-controls">
+                <button class="btn" id="calPrev" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="btn primary" id="calToday" type="button">Today</button>
+                <button class="btn" id="calNext" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+            <div class="muted" style="font-weight:900; margin: 4px 0 10px 0;" id="calTitle">—</div>
+            <div class="cal-grid" id="calDow"></div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+        </section>
+
+        <section id="page-progress" class="page hidden">
+          <div class="card">
+            <h3>Your Progress</h3>
+            <div class="muted small" style="margin-bottom:10px;">Progress updates as you read and take exams.</div>
+            <table class="table" id="progressTable">
+              <thead><tr><th>Course</th><th>Status</th><th class="right">Progress</th><th class="right">Score</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="page-courses" class="page hidden">
+          <div class="card">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+              <div>
+                <h3 style="margin:0;">Courses</h3>
+                <div class="muted small">Open a course, read, then take the exam if available.</div>
+              </div>
+              <button class="btn" id="refreshCourses" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+            <div id="courseList" style="display:grid; gap:12px; margin-top:12px;"></div>
+          </div>
+        </section>
+
+        <section id="page-admin" class="page hidden">
+          <div class="card">
+            <h3>Admin Panel</h3>
+            <div class="muted small" style="margin-bottom:12px;">Manage courses and questions (admin/super admin only).</div>
+
+            <div class="grid-2">
+              <div class="card" style="box-shadow:none;">
+                <h3 style="margin-top:0;">Create / Update Course</h3>
+                <div class="row">
+                  <div class="field"><label>Course ID (empty to create)</label><input id="adminCourseId" placeholder="e.g. 1" /></div>
+                  <div class="field"><label>Scheduled date</label><input id="adminCourseDate" type="date" /></div>
+                </div>
+                <div class="field"><label>Title</label><input id="adminCourseTitle" /></div>
+                <div class="row">
+                  <div class="field"><label>Category</label><input id="adminCourseCategory" placeholder="Sales / Product / Service" /></div>
+                  <div class="field"><label>Has exam?</label><select id="adminCourseHasExam"><option value="true">Yes</option><option value="false">No</option></select></div>
+                </div>
+                <div class="field"><label>Description</label><textarea id="adminCourseDesc"></textarea></div>
+                <div class="field"><label>Content (HTML allowed)</label><textarea id="adminCourseContent" placeholder="<h3>Module 1</h3><p>...</p>"></textarea></div>
+                <div class="actions">
+                  <button class="btn" id="adminDeleteCourse" type="button">Delete</button>
+                  <button class="btn primary" id="adminSaveCourse" type="button">Save</button>
+                </div>
+              </div>
+
+              <div class="card" style="box-shadow:none;">
+                <h3 style="margin-top:0;">Add Question</h3>
+                <div class="field"><label>Course ID</label><input id="qCourseId" placeholder="e.g. 1" /></div>
+                <div class="field"><label>Question</label><textarea id="qText"></textarea></div>
+                <div class="row">
+                  <div class="field"><label>Option A</label><input id="qA"></div>
+                  <div class="field"><label>Option B</label><input id="qB"></div>
+                </div>
+                <div class="row">
+                  <div class="field"><label>Option C</label><input id="qC"></div>
+                  <div class="field"><label>Option D</label><input id="qD"></div>
+                </div>
+                <div class="field"><label>Correct option</label><select id="qCorrect"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
+                <div class="actions"><button class="btn primary" id="adminAddQuestion" type="button">Add Question</button></div>
+
+                <div style="margin-top:14px;">
+                  <h3 style="margin:0 0 8px 0;">Questions (by Course)</h3>
+                  <div class="field">
+                    <label>Load questions for Course ID</label>
+                    <div style="display:flex; gap:10px;">
+                      <input id="qLoadCourseId" placeholder="e.g. 1" />
+                      <button class="btn" id="adminLoadQuestions" type="button">Load</button>
+                    </div>
+                  </div>
+                  <table class="table" id="questionsTable">
+                    <thead><tr><th>ID</th><th>Question</th><th class="right">Action</th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-settings" class="page hidden">
+          <div class="card">
+            <h3>Settings</h3>
+            <div class="row">
+              <div class="field"><label>Theme</label><select id="themeSelect"><option value="light">Light</option><option value="dark">Dark</option></select></div>
+              <div class="field"><label>Mobile layout</label><select id="mobileLayout"><option value="auto">Auto</option><option value="force_compact">Force compact</option></select></div>
+            </div>
+            <div class="actions"><button class="btn primary" id="saveSettings" type="button">Save</button></div>
+          </div>
+        </section>
+
+        <section id="page-profile" class="page hidden">
+          <div class="card">
+            <h3>My Profile</h3>
+            <div class="row">
+              <div class="field"><label>Employee ID</label><input id="pEmployeeId" disabled /></div>
+              <div class="field"><label>Status</label><input id="pStatus" disabled /></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>First name</label><input id="pFirstName" /></div>
+              <div class="field"><label>Last name</label><input id="pLastName" /></div>
+            </div>
+            <div class="field"><label>Position</label>
+              <select id="pPosition"><option value="promoter">Promoter</option><option value="trainer">Trainer</option><option value="supervisor">Supervisor</option><option value="manager">Manager</option></select>
+            </div>
+            <div class="actions"><button class="btn primary" id="saveProfile" type="button">Save</button></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </section>
+
+  <div class="overlay" id="notifOverlay" aria-hidden="true">
+    <div class="modal">
+      <div class="mhead">
+        <div class="ttl">Notifications</div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn" id="clearNotif" type="button">Clear</button>
+          <button class="btn" id="closeNotif" type="button"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="mbody" id="notifList"><div class="muted">No notifications.</div></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="dayOverlay" aria-hidden="true">
+    <div class="modal">
+      <div class="mhead">
+        <div class="ttl" id="dayTitle">—</div>
+        <button class="btn" id="closeDay" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mbody">
+        <div>
+          <h3 style="margin:0 0 8px 0;">Courses</h3>
+          <div id="dayCourses" class="muted">—</div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 8px 0;">Your notes</h3>
+          <div class="field">
+            <label>Note</label>
+            <textarea id="dayNote" placeholder="Add a note for this day..."></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn danger" id="deleteNote" type="button">Delete note</button>
+            <button class="btn primary" id="saveNote" type="button">Save note</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="courseOverlay" aria-hidden="true">
+    <div class="modal">
+      <div class="mhead">
+        <div class="ttl" id="courseTitle">Course</div>
+        <button class="btn" id="closeCourse" type="button"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mbody" style="max-height: 72vh; overflow:auto;">
+        <div class="muted small" id="courseMeta"></div>
+        <div id="courseContent" style="line-height:1.7;"></div>
+
+        <div class="card" style="box-shadow:none;">
+          <h3 style="margin-top:0;">Completion</h3>
+          <div class="muted small">Scroll to the bottom and click “Mark as Read”.</div>
+          <div class="actions" style="justify-content:flex-start;">
+            <button class="btn primary" id="markRead" type="button">Mark as Read</button>
+          </div>
+        </div>
+
+        <div class="card" id="examCard" style="box-shadow:none;">
+          <h3 style="margin-top:0;">Exam</h3>
+          <div class="muted small">Answer the questions then submit. Passing is 70%.</div>
+          <div id="examArea"></div>
+          <div class="actions" style="justify-content:flex-start;">
+            <button class="btn" id="retakeExam" type="button">Retake</button>
+            <button class="btn primary" id="submitExam" type="button">Submit</button>
+          </div>
+          <div class="muted small" id="examResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const SUPABASE_URL = "https://bgbzbhohwnhwrmqmvbjn.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJnYnpiaG9od25od3JtcW12YmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2NTI0NjcsImV4cCI6MjA4NTIyODQ2N30.TlwKeobFGHZvTJtgCkLgRb-r9HpM5n1CAKoqNnuuazY";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    const $ = (q) => document.querySelector(q);
+    const $$ = (q) => Array.from(document.querySelectorAll(q));
+
+    function escapeHtml(str) {
+      return (str ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function toast(title, message, type="ok") {
+      const wrap = $("#toast");
+      const node = document.createElement("div");
+      node.className = "t" + (type==="danger" ? " danger" : type==="warn" ? " warn" : "");
+      node.innerHTML = `
+        <i class="fa-solid ${type==="danger" ? "fa-circle-xmark" : type==="warn" ? "fa-triangle-exclamation" : "fa-circle-check"}"></i>
+        <div class="msg"><b>${escapeHtml(title)}</b>${escapeHtml(message)}</div>
+      `;
+      wrap.appendChild(node);
+      setTimeout(() => node.remove(), 4200);
+    }
+
+    function toEmail(employeeId) {
+      const clean = (employeeId || "").trim();
+      return `${clean}@infinix.local`;
+    }
+
+    function fmtDate(d) {
+      const dt = new Date(d);
+      return dt.toLocaleDateString(undefined, { year:"numeric", month:"short", day:"2-digit" });
+    }
+
+    function clamp(n,min,max) { return Math.max(min, Math.min(max, n)); }
+
+    function scoreToPill(score) {
+      if (score == null) return `<span class="pill">—</span>`;
+      if (score >= 70) return `<span class="pill ok"><i class="fa-solid fa-award"></i> ${score}%</span>`;
+      return `<span class="pill warn"><i class="fa-solid fa-triangle-exclamation"></i> ${score}%</span>`;
+    }
+
+    let session = null;
+    let me = null;
+    let courses = [];
+    let progress = [];
+    let notesByDate = new Map();
+    let coursesByDate = new Map();
+    let notif = [];
+    let calCursor = new Date();
+    let selectedDateKey = null;
+    let openCourse = null;
+    let openQuestions = [];
+
+    function loadSettings() {
+      const s = JSON.parse(localStorage.getItem("ira_settings") || "{}");
+      const theme = s.theme || "light";
+      document.body.dataset.theme = theme;
+      $("#themeSelect").value = theme;
+      $("#themeBtn i").className = theme==="dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+      $("#mobileLayout").value = s.mobileLayout || "auto";
+    }
+    function saveSettings() {
+      const s = { theme: $("#themeSelect").value, mobileLayout: $("#mobileLayout").value };
+      localStorage.setItem("ira_settings", JSON.stringify(s));
+      loadSettings();
+      toast("Saved", "Settings updated.");
+    }
+
+    function showLogin() {
+      $("#tabLogin").classList.add("active");
+      $("#tabSignup").classList.remove("active");
+      $("#loginForm").classList.remove("hidden");
+      $("#signupForm").classList.add("hidden");
+    }
+    function showSignup() {
+      $("#tabSignup").classList.add("active");
+      $("#tabLogin").classList.remove("active");
+      $("#signupForm").classList.remove("hidden");
+      $("#loginForm").classList.add("hidden");
+    }
+
+    function friendlyAuthError(err) {
+      const msg = (err?.message || "").toLowerCase();
+      if (msg.includes("invalid login credentials")) return "Wrong Employee ID or password.";
+      if (msg.includes("password") && msg.includes("compromised")) return "That password is not allowed. Try a stronger password.";
+      if (msg.includes("user already registered") || msg.includes("already been registered")) return "Employee ID already registered. Please log in instead.";
+      if (msg.includes("email not confirmed")) return "Account needs confirmation. Disable confirmation in Supabase Auth.";
+      if (msg.includes("rate limit")) return "Too many attempts. Please wait and try again.";
+      return err?.message || "Something went wrong.";
+    }
+
+    async function doLogin(employeeId, password) {
+      const email = toEmail(employeeId);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      return data;
+    }
+
+    async function doSignup({ employeeId, password, firstName, lastName, position }) {
+      const email = toEmail(employeeId);
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        options: { data: { employee_id: employeeId, first_name: firstName, last_name: lastName, position } }
+      });
+      if (error) throw error;
+
+      const userId = data?.user?.id;
+      if (!userId) throw new Error("Signup succeeded but no user returned.");
+
+      const { error: pErr } = await supabase.from("profiles").insert({
+        user_id: userId,
+        employee_id: employeeId,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        position,
+        role: "user",
+        status: "active"
+      });
+      if (pErr) {
+        const m = (pErr.message || "").toLowerCase();
+        if (!m.includes("duplicate key") && !m.includes("already exists")) throw pErr;
+      }
+      return data;
+    }
+
+    async function loadMe() {
+      const { data: s } = await supabase.auth.getSession();
+      session = s.session;
+      if (!session) return null;
+
+      const userId = session.user.id;
+      const { data, error } = await supabase.from("profiles").select("*").eq("user_id", userId).maybeSingle();
+      if (error) throw error;
+      me = data;
+
+      if (!me) {
+        const employeeId = session.user.user_metadata?.employee_id || (session.user.email || "").split("@")[0] || "1700xxxx";
+        const firstName = session.user.user_metadata?.first_name || "User";
+        const lastName = session.user.user_metadata?.last_name || "";
+        const position = session.user.user_metadata?.position || "promoter";
+        const email = session.user.email || toEmail(employeeId);
+
+        const { data: ins, error: insErr } = await supabase.from("profiles").insert({
+          user_id: userId, employee_id: employeeId, first_name: firstName, last_name: lastName, email, position, role: "user", status: "active"
+        }).select("*").maybeSingle();
+        if (insErr) throw insErr;
+        me = ins;
+      }
+
+      const isAdmin = ["admin","super_admin"].includes(me.role);
+      $$(".admin-only").forEach(el => el.classList.toggle("hidden", !isAdmin));
+
+      const initials = (me.first_name?.[0] || "I") + (me.last_name?.[0] || "A");
+      $("#avatar").textContent = initials.toUpperCase();
+      $("#chipName").textContent = `${me.first_name} ${me.last_name}`.trim();
+      $("#chipRole").textContent = me.role.replaceAll("_"," ");
+
+      $("#pEmployeeId").value = me.employee_id || "";
+      $("#pStatus").value = me.status || "";
+      $("#pFirstName").value = me.first_name || "";
+      $("#pLastName").value = me.last_name || "";
+      $("#pPosition").value = me.position || "promoter";
+
+      return me;
+    }
+
+    async function loadCourses() {
+      const { data, error } = await supabase
+        .from("courses")
+        .select("id,title,description,category,duration,has_exam,content,is_active,created_at,scheduled_date")
+        .eq("is_active", true)
+        .order("scheduled_date", { ascending: true });
+      if (error) throw error;
+      courses = data || [];
+    }
+
+    async function loadProgress() {
+      const { data, error } = await supabase
+        .from("user_progress")
+        .select("user_id,course_id,read,exam_taken,score,progress,attempts,date_completed,updated_at")
+        .eq("user_id", session.user.id);
+      if (error) throw error;
+      progress = data || [];
+    }
+
+    async function loadNotesForMonth(monthDate) {
+      const start = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+      const end = new Date(monthDate.getFullYear(), monthDate.getMonth()+1, 1);
+      const startKey = start.toISOString().slice(0,10);
+      const endKey = end.toISOString().slice(0,10);
+
+      const { data, error } = await supabase
+        .from("calendar_notes")
+        .select("note_date,note_text")
+        .gte("note_date", startKey)
+        .lt("note_date", endKey)
+        .order("note_date");
+      if (error) throw error;
+
+      notesByDate = new Map();
+      (data || []).forEach(r => notesByDate.set(r.note_date, r.note_text));
+    }
+
+    function buildCourseDateMap() {
+      coursesByDate = new Map();
+      for (const c of courses) {
+        const key = (c.scheduled_date || c.created_at || "").toString().slice(0,10);
+        if (!coursesByDate.has(key)) coursesByDate.set(key, []);
+        coursesByDate.get(key).push(c);
+      }
+    }
+
+    function computeDashboard() {
+      const total = courses.length;
+      const completed = progress.filter(p => p.progress === 100 || p.date_completed != null).length;
+      const scores = progress.filter(p => p.score != null).map(p => p.score);
+      const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : null;
+
+      $("#kpiCourses").textContent = total.toString();
+      $("#kpiCompleted").textContent = completed.toString();
+      $("#kpiAvgScore").textContent = avg == null ? "—" : `${avg}%`;
+
+      const nowKey = new Date().toISOString().slice(0,10);
+      const upcoming = courses
+        .map(c => ({ key: (c.scheduled_date || c.created_at).toString().slice(0,10), c }))
+        .filter(x => x.key >= nowKey)
+        .slice(0, 6);
+
+      const tbody = $("#upcomingTable tbody");
+      tbody.innerHTML = "";
+      if (!upcoming.length) {
+        tbody.innerHTML = `<tr><td colspan="3" class="muted">No upcoming scheduled courses.</td></tr>`;
+      } else {
+        for (const x of upcoming) {
+          tbody.insertAdjacentHTML("beforeend", `
+            <tr>
+              <td>${escapeHtml(fmtDate(x.key))}</td>
+              <td>${escapeHtml(x.c.title)}</td>
+              <td class="right">${x.c.has_exam ? '<span class="pill ok">Has exam</span>' : '<span class="pill">No exam</span>'}</td>
+            </tr>
+          `);
+        }
+      }
+    }
+
+    async function loadLeaderboard() {
+      const { data, error } = await supabase.rpc("get_leaderboard", { p_limit: 3 });
+      const tbody = $("#leaderTable tbody");
+      tbody.innerHTML = "";
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="3" class="muted">Leaderboard unavailable.</td></tr>`;
+        return;
+      }
+      const rows = data || [];
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="3" class="muted">No data yet.</td></tr>`;
+        return;
+      }
+      rows.forEach((r, idx) => {
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td>${idx+1}</td>
+            <td>${escapeHtml(r.user_name)}</td>
+            <td class="right"><span class="pill ok"><i class="fa-solid fa-circle-check"></i> ${r.completed_count}</span></td>
+          </tr>
+        `);
+      });
+    }
+
+    function renderProgressTable() {
+      const byCourse = new Map(progress.map(p => [p.course_id, p]));
+      const tbody = $("#progressTable tbody");
+      tbody.innerHTML = "";
+
+      if (!courses.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="muted">No courses yet.</td></tr>`;
+        return;
+      }
+
+      for (const c of courses) {
+        const p = byCourse.get(c.id);
+        const pct = p?.progress ?? 0;
+        const status = (pct===100 || p?.date_completed) ? `<span class="pill ok"><i class="fa-solid fa-circle-check"></i> Completed</span>`
+                     : pct>0 ? `<span class="pill warn"><i class="fa-solid fa-hourglass-half"></i> In progress</span>`
+                     : `<span class="pill"><i class="fa-regular fa-circle"></i> Not started</span>`;
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td>${escapeHtml(c.title)}</td>
+            <td>${status}</td>
+            <td class="right"><b>${pct}%</b></td>
+            <td class="right">${scoreToPill(p?.score)}</td>
+          </tr>
+        `);
+      }
+    }
+
+    function renderCourseCards(filter="") {
+      const q = (filter || "").trim().toLowerCase();
+      const byCourse = new Map(progress.map(p => [p.course_id, p]));
+      const list = $("#courseList");
+      list.innerHTML = "";
+
+      const filtered = courses.filter(c => {
+        if (!q) return true;
+        return (c.title||"").toLowerCase().includes(q) || (c.category||"").toLowerCase().includes(q);
+      });
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="muted">No courses match your search.</div>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const p = byCourse.get(c.id);
+        const pct = p?.progress ?? 0;
+        const tag = (pct===100 || p?.date_completed) ? `<span class="pill ok"><i class="fa-solid fa-circle-check"></i> Completed</span>`
+                  : pct>0 ? `<span class="pill warn"><i class="fa-solid fa-hourglass-half"></i> ${pct}%</span>`
+                  : `<span class="pill">New</span>`;
+        const dateKey = (c.scheduled_date || c.created_at).toString().slice(0,10);
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.boxShadow = "none";
+        card.innerHTML = `
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+            <div style="min-width:0;">
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <h3 style="margin:0; font-size:16px;">${escapeHtml(c.title)}</h3>
+                ${tag}
+                <span class="pill"><i class="fa-regular fa-calendar"></i> ${escapeHtml(fmtDate(dateKey))}</span>
+                ${c.has_exam ? `<span class="pill ok"><i class="fa-solid fa-file-circle-check"></i> Exam</span>` : `<span class="pill"><i class="fa-regular fa-file"></i> No exam</span>`}
+              </div>
+              <div class="muted small" style="margin-top:6px;">${escapeHtml(c.description || "—")}</div>
+            </div>
+            <button class="btn primary" type="button"><i class="fa-solid fa-play"></i> Open</button>
+          </div>
+        `;
+        card.querySelector("button").addEventListener("click", () => openCourseModal(c));
+        list.appendChild(card);
+      });
+    }
+
+    function renderCalendar() {
+      const y = calCursor.getFullYear();
+      const m = calCursor.getMonth();
+      $("#calTitle").textContent = calCursor.toLocaleDateString(undefined, { month:"long", year:"numeric" });
+
+      const dow = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      const dowWrap = $("#calDow");
+      dowWrap.innerHTML = "";
+      dow.forEach(d => {
+        const el = document.createElement("div");
+        el.className = "cal-dow";
+        el.textContent = d;
+        dowWrap.appendChild(el);
+      });
+
+      const first = new Date(y, m, 1);
+      const startDay = first.getDay();
+      const start = new Date(y, m, 1 - startDay);
+
+      const grid = $("#calGrid");
+      grid.innerHTML = "";
+
+      for (let i=0;i<42;i++) {
+        const d = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+        const key = d.toISOString().slice(0,10);
+        const inMonth = d.getMonth() === m;
+        const dayCourses = coursesByDate.get(key) || [];
+        const hasNote = notesByDate.has(key);
+
+        const cell = document.createElement("div");
+        cell.className = "day" + (inMonth ? "" : " mutedday");
+        cell.innerHTML = `
+          <div class="dnum">
+            <span>${d.getDate()}</span>
+            <span>${hasNote ? '<span class="note-dot" title="Has note"></span>' : ''}</span>
+          </div>
+          <div style="display:grid; gap:6px;"></div>
+        `;
+        const stack = cell.querySelector("div:nth-child(2)");
+        dayCourses.slice(0,3).forEach(c => {
+          const ev = document.createElement("div");
+          ev.className = "event";
+          ev.innerHTML = `<i class="fa-solid fa-book-open"></i><div style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(c.title)}</div>`;
+          stack.appendChild(ev);
+        });
+        if (dayCourses.length > 3) {
+          const more = document.createElement("div");
+          more.className = "muted small";
+          more.textContent = `+${dayCourses.length - 3} more`;
+          stack.appendChild(more);
+        }
+
+        cell.addEventListener("click", () => openDayModal(key, dayCourses));
+        grid.appendChild(cell);
+      }
+    }
+
+    function openDayModal(dateKey, dayCourses) {
+      selectedDateKey = dateKey;
+      $("#dayTitle").textContent = fmtDate(dateKey);
+
+      if (!dayCourses.length) {
+        $("#dayCourses").innerHTML = `<div class="muted">No scheduled courses.</div>`;
+      } else {
+        $("#dayCourses").innerHTML = dayCourses.map(c => `
+          <div class="event" style="margin-bottom:8px; border-color: rgba(148,163,184,.22); background: rgba(148,163,184,.08);">
+            <i class="fa-solid fa-book-open"></i>
+            <div style="min-width:0;">
+              <b>${escapeHtml(c.title)}</b>
+              <div class="muted small">${escapeHtml(c.category || "General")}</div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      $("#dayNote").value = notesByDate.get(dateKey) || "";
+      $("#dayOverlay").classList.add("show");
+    }
+
+    async function saveNote() {
+      const text = $("#dayNote").value.trim();
+      if (!selectedDateKey) return;
+
+      if (!text) {
+        await deleteNote();
+        return;
+      }
+
+      const { error } = await supabase.from("calendar_notes").upsert({
+        user_id: session.user.id,
+        note_date: selectedDateKey,
+        note_text: text
+      });
+      if (error) { toast("Error", "Could not save note.", "danger"); return; }
+      notesByDate.set(selectedDateKey, text);
+      toast("Saved", "Note saved.");
+      renderCalendar();
+    }
+
+    async function deleteNote() {
+      if (!selectedDateKey) return;
+      const { error } = await supabase.from("calendar_notes")
+        .delete()
+        .eq("user_id", session.user.id)
+        .eq("note_date", selectedDateKey);
+      if (error) { toast("Error", "Could not delete note.", "danger"); return; }
+      notesByDate.delete(selectedDateKey);
+      $("#dayNote").value = "";
+      toast("Deleted", "Note removed.");
+      renderCalendar();
+    }
+
+    function getMyProgress(courseId) { return progress.find(p => p.course_id === courseId) || null; }
+
+    async function openCourseModal(course) {
+      openCourse = course;
+      $("#courseTitle").textContent = course.title;
+      const dateKey = (course.scheduled_date || course.created_at).toString().slice(0,10);
+      $("#courseMeta").innerHTML = `
+        <span class="pill"><i class="fa-regular fa-calendar"></i> ${escapeHtml(fmtDate(dateKey))}</span>
+        <span class="pill"><i class="fa-solid fa-tag"></i> ${escapeHtml(course.category || "General")}</span>
+        <span class="pill"><i class="fa-regular fa-clock"></i> ${escapeHtml(String(course.duration||20))} min</span>
+      `;
+      $("#courseContent").innerHTML = course.content || "<p class='muted'>No content.</p>";
+
+      $("#examResult").textContent = "";
+      $("#examArea").innerHTML = "";
+      openQuestions = [];
+
+      const p = getMyProgress(course.id);
+      if (!p) {
+        await supabase.from("user_progress").upsert({
+          user_id: session.user.id,
+          course_id: course.id,
+          progress: 0,
+          read: false,
+          exam_taken: false,
+          attempts: 0
+        });
+        await loadProgress();
+      }
+
+      const showExam = !!course.has_exam;
+      $("#examCard").classList.toggle("hidden", !showExam);
+      if (showExam) await loadExamQuestions(course.id);
+
+      $("#courseOverlay").classList.add("show");
+    }
+
+    async function loadExamQuestions(courseId) {
+      const { data, error } = await supabase
+        .from("exam_questions")
+        .select("id,question,option_a,option_b,option_c,option_d,correct_option")
+        .eq("course_id", courseId)
+        .order("id");
+      if (error) { $("#examArea").innerHTML = `<div class="muted">Could not load questions.</div>`; return; }
+      openQuestions = data || [];
+
+      if (!openQuestions.length) { $("#examArea").innerHTML = `<div class="muted">No questions for this course yet.</div>`; return; }
+
+      $("#examArea").innerHTML = openQuestions.map((q, idx) => {
+        const name = `q_${q.id}`;
+        const opts = ["A","B","C","D"].map(opt => {
+          const label = opt==="A"?q.option_a:opt==="B"?q.option_b:opt==="C"?q.option_c:q.option_d;
+          return `
+            <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+              <input type="radio" name="${name}" value="${opt}" style="accent-color: var(--brand-600);" />
+              <span>${escapeHtml(label)}</span>
+            </label>
+          `;
+        }).join("");
+        return `
+          <div class="card" style="box-shadow:none; margin-top:10px;">
+            <div style="font-weight:900; margin-bottom:8px;">Q${idx+1}. ${escapeHtml(q.question)}</div>
+            <div style="display:grid; gap:8px;">${opts}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function markAsRead() {
+      if (!openCourse) return;
+      const { error } = await supabase.from("user_progress").upsert({
+        user_id: session.user.id,
+        course_id: openCourse.id,
+        read: true,
+        progress: 100,
+        date_completed: new Date().toISOString()
+      });
+      if (error) { toast("Error", "Could not update progress.", "danger"); return; }
+      toast("Done", "Marked as read.");
+      await loadProgress();
+      computeDashboard(); renderProgressTable(); renderCourseCards($("#searchInput").value);
+      await loadLeaderboard();
+    }
+
+    async function submitExam(retake=false) {
+      if (!openCourse) return;
+      if (!openQuestions.length) { toast("No exam", "This course has no exam questions yet.", "warn"); return; }
+
+      let correct = 0, answered = 0;
+      for (const q of openQuestions) {
+        const picked = document.querySelector(`input[name="q_${q.id}"]:checked`)?.value || null;
+        if (picked) answered++;
+        if (picked && picked === q.correct_option) correct++;
+      }
+      if (!retake && answered < openQuestions.length) { toast("Incomplete", "Please answer all questions.", "warn"); return; }
+
+      const pct = Math.round((correct / openQuestions.length) * 100);
+      const passed = pct >= 70;
+
+      const cur = getMyProgress(openCourse.id);
+      const attempts = (cur?.attempts || 0) + 1;
+
+      const { error } = await supabase.from("user_progress").upsert({
+        user_id: session.user.id,
+        course_id: openCourse.id,
+        exam_taken: true,
+        score: pct,
+        attempts,
+        progress: clamp(Math.max(cur?.progress||0, 100), 0, 100),
+        updated_at: new Date().toISOString()
+      });
+      if (error) { toast("Error", "Could not submit exam.", "danger"); return; }
+
+      $("#examResult").innerHTML = passed
+        ? `<span class="pill ok"><i class="fa-solid fa-award"></i> Passed: ${pct}%</span>`
+        : `<span class="pill warn"><i class="fa-solid fa-triangle-exclamation"></i> Failed: ${pct}%</span>`;
+
+      toast(passed ? "Passed" : "Failed", passed ? "Great job! Leaderboard updated." : "Try again (Retake).", passed ? "ok" : "warn");
+      await loadProgress();
+      computeDashboard(); renderProgressTable(); renderCourseCards($("#searchInput").value);
+      await loadLeaderboard();
+    }
+
+    function resetExamSelections() {
+      $$("#examArea input[type=radio]").forEach(i => i.checked = false);
+      $("#examResult").textContent = "";
+    }
+
+    async function adminSaveCourse() {
+      if (!["admin","super_admin"].includes(me.role)) return toast("Denied", "Admin only.", "danger");
+
+      const id = $("#adminCourseId").value.trim();
+      const payload = {
+        title: $("#adminCourseTitle").value.trim(),
+        description: $("#adminCourseDesc").value.trim(),
+        category: $("#adminCourseCategory").value.trim(),
+        has_exam: $("#adminCourseHasExam").value === "true",
+        content: $("#adminCourseContent").value.trim(),
+        is_active: true,
+        scheduled_date: $("#adminCourseDate").value || null,
+      };
+      if (!payload.title) return toast("Missing", "Course title is required.", "warn");
+
+      const res = id
+        ? await supabase.from("courses").update(payload).eq("id", Number(id))
+        : await supabase.from("courses").insert(payload);
+
+      if (res.error) { toast("Error", "Could not save course.", "danger"); return; }
+      toast("Saved", "Course saved.");
+      await loadCourses(); await loadProgress(); buildCourseDateMap();
+      computeDashboard(); renderProgressTable(); renderCourseCards($("#searchInput").value);
+      await loadNotesForMonth(calCursor); renderCalendar();
+    }
+
+    async function adminDeleteCourse() {
+      const id = $("#adminCourseId").value.trim();
+      if (!id) return toast("Missing", "Enter Course ID to delete.", "warn");
+      if (!confirm("Delete this course and its questions?")) return;
+
+      const res = await supabase.from("courses").delete().eq("id", Number(id));
+      if (res.error) { toast("Error", "Could not delete course.", "danger"); return; }
+      toast("Deleted", "Course removed.");
+      $("#adminCourseId").value = "";
+      await loadCourses(); buildCourseDateMap();
+      computeDashboard(); renderProgressTable(); renderCourseCards($("#searchInput").value);
+    }
+
+    async function adminAddQuestion() {
+      const courseId = Number($("#qCourseId").value.trim());
+      if (!courseId) return toast("Missing", "Course ID required.", "warn");
+
+      const payload = {
+        course_id: courseId,
+        question: $("#qText").value.trim(),
+        option_a: $("#qA").value.trim(),
+        option_b: $("#qB").value.trim(),
+        option_c: $("#qC").value.trim(),
+        option_d: $("#qD").value.trim(),
+        correct_option: $("#qCorrect").value
+      };
+      if (!payload.question || !payload.option_a || !payload.option_b || !payload.option_c || !payload.option_d) {
+        return toast("Missing", "Complete the question + options.", "warn");
+      }
+      const res = await supabase.from("exam_questions").insert(payload);
+      if (res.error) { toast("Error", "Could not add question.", "danger"); return; }
+      toast("Added", "Question added.");
+      $("#qText").value = $("#qA").value = $("#qB").value = $("#qC").value = $("#qD").value = "";
+    }
+
+    async function adminLoadQuestions() {
+      const courseId = Number($("#qLoadCourseId").value.trim());
+      if (!courseId) return toast("Missing", "Course ID required.", "warn");
+
+      const { data, error } = await supabase.from("exam_questions").select("id,question").eq("course_id", courseId).order("id");
+      if (error) { toast("Error", "Could not load questions.", "danger"); return; }
+
+      const tbody = $("#questionsTable tbody");
+      tbody.innerHTML = "";
+      if (!data?.length) { tbody.innerHTML = `<tr><td colspan="3" class="muted">No questions.</td></tr>`; return; }
+
+      data.forEach(q => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${q.id}</td><td>${escapeHtml(q.question)}</td><td class="right"><button class="btn danger" type="button">Delete</button></td>`;
+        tr.querySelector("button").addEventListener("click", async () => {
+          if (!confirm("Delete this question?")) return;
+          const res = await supabase.from("exam_questions").delete().eq("id", q.id);
+          if (res.error) return toast("Error", "Could not delete.", "danger");
+          toast("Deleted", "Question removed.");
+          await adminLoadQuestions();
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function go(page) {
+      $$(".nav .item").forEach(i => i.classList.toggle("active", i.dataset.page === page));
+      $$(".page").forEach(p => p.classList.add("hidden"));
+      $(`#page-${page}`).classList.remove("hidden");
+      $("#sidebar").classList.remove("show");
+    }
+
+    function pushNotif(text) {
+      notif.unshift({ id: crypto.randomUUID(), text, ts: new Date().toISOString() });
+      renderNotif();
+    }
+    function renderNotif() {
+      const badge = $("#notifBadge");
+      badge.textContent = String(notif.length);
+      badge.classList.toggle("hidden", notif.length === 0);
+
+      const list = $("#notifList");
+      if (!notif.length) { list.innerHTML = `<div class="muted">No notifications.</div>`; return; }
+      list.innerHTML = notif.map(n => `
+        <div class="event" style="border-color: rgba(148,163,184,.22); background: rgba(148,163,184,.08);">
+          <i class="fa-regular fa-bell"></i>
+          <div style="min-width:0;">
+            <div>${escapeHtml(n.text)}</div>
+            <div class="muted small">${escapeHtml(fmtDate(n.ts))}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function refreshAll() {
+      await loadCourses();
+      await loadProgress();
+      buildCourseDateMap();
+      computeDashboard();
+      renderProgressTable();
+      renderCourseCards($("#searchInput").value);
+      await loadLeaderboard();
+      await loadNotesForMonth(calCursor);
+      renderCalendar();
+    }
+
+    function wireAuthEvents() {
+      $("#tabLogin").onclick = showLogin;
+      $("#tabSignup").onclick = showSignup;
+      $("#switchToSignup").onclick = showSignup;
+      $("#switchToLogin").onclick = showLogin;
+
+      $("#loginEye").onclick = () => {
+        const inp = $("#loginPassword");
+        inp.type = inp.type === "password" ? "text" : "password";
+        $("#loginEye i").className = inp.type === "password" ? "fa-regular fa-eye" : "fa-regular fa-eye-slash";
+      };
+      $("#signupEye").onclick = () => {
+        const inp = $("#signupPassword");
+        inp.type = inp.type === "password" ? "text" : "password";
+        $("#signupEye i").className = inp.type === "password" ? "fa-regular fa-eye" : "fa-regular fa-eye-slash";
+      };
+
+      $("#forgotBtn").onclick = () => toast("Forgot Password", "Ask your admin to reset via Supabase Auth.", "warn");
+
+      $("#loginForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const employeeId = $("#loginEmployeeId").value.trim();
+        const password = $("#loginPassword").value;
+        try {
+          await doLogin(employeeId, password);
+          toast("Welcome", "Logged in successfully.");
+          $("#auth").classList.add("hidden");
+          $("#app").classList.remove("hidden");
+          await loadMe();
+          wireAppEvents();
+          await refreshAll();
+          go("dashboard");
+        } catch (err) {
+          toast("Login failed", friendlyAuthError(err), "danger");
+        }
+      };
+
+      $("#signupForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+          employeeId: $("#signupEmployeeId").value.trim(),
+          password: $("#signupPassword").value,
+          firstName: $("#signupFirstName").value.trim(),
+          lastName: $("#signupLastName").value.trim(),
+          position: $("#signupPosition").value
+        };
+        try {
+          await doSignup(payload);
+          toast("Account created", "You can log in now.");
+          showLogin();
+          $("#loginEmployeeId").value = payload.employeeId;
+          $("#loginPassword").value = payload.password;
+        } catch (err) {
+          toast("Sign up failed", friendlyAuthError(err), "danger");
+        }
+      };
+    }
+
+    function wireAppEvents() {
+      $$("#nav .item[data-page]").forEach(it => it.onclick = () => go(it.dataset.page));
+      $("#brandApp").onclick = () => go("dashboard");
+
+      $("#logoutItem").onclick = async () => { await supabase.auth.signOut(); toast("Signed out", "See you next time."); location.reload(); };
+
+      $("#themeBtn").onclick = () => {
+        const next = document.body.dataset.theme === "dark" ? "light" : "dark";
+        document.body.dataset.theme = next;
+        $("#themeSelect").value = next;
+        $("#themeBtn i").className = next==="dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        const s = JSON.parse(localStorage.getItem("ira_settings") || "{}");
+        s.theme = next;
+        localStorage.setItem("ira_settings", JSON.stringify(s));
+      };
+      $("#saveSettings").onclick = saveSettings;
+
+      $("#toggleSidebar").onclick = () => {
+        const sb = $("#sidebar");
+        const collapsed = sb.classList.toggle("collapsed");
+        $("#collapseIcon").className = collapsed ? "fa-solid fa-angles-right" : "fa-solid fa-angles-left";
+        $("#toggleSidebar span").textContent = collapsed ? "Expand" : "Collapse";
+      };
+      $("#openSidebar").onclick = () => $("#sidebar").classList.toggle("show");
+
+      $("#searchInput").oninput = (e) => renderCourseCards(e.target.value);
+
+      $("#notifBtn").onclick = () => { renderNotif(); $("#notifOverlay").classList.add("show"); };
+      $("#closeNotif").onclick = () => $("#notifOverlay").classList.remove("show");
+      $("#clearNotif").onclick = () => { notif = []; renderNotif(); };
+
+      $("#calPrev").onclick = async () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1); await loadNotesForMonth(calCursor); renderCalendar(); };
+      $("#calNext").onclick = async () => { calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 1); await loadNotesForMonth(calCursor); renderCalendar(); };
+      $("#calToday").onclick = async () => { const t = new Date(); calCursor = new Date(t.getFullYear(), t.getMonth(), 1); await loadNotesForMonth(calCursor); renderCalendar(); };
+
+      $("#closeDay").onclick = () => $("#dayOverlay").classList.remove("show");
+      $("#saveNote").onclick = saveNote;
+      $("#deleteNote").onclick = deleteNote;
+
+      $("#closeCourse").onclick = () => $("#courseOverlay").classList.remove("show");
+      $("#markRead").onclick = markAsRead;
+      $("#submitExam").onclick = () => submitExam(false);
+      $("#retakeExam").onclick = () => { resetExamSelections(); toast("Retake ready", "You can answer again now."); };
+
+      $("#saveProfile").onclick = async () => {
+        const payload = { first_name: $("#pFirstName").value.trim(), last_name: $("#pLastName").value.trim(), position: $("#pPosition").value };
+        const { error } = await supabase.from("profiles").update(payload).eq("user_id", session.user.id);
+        if (error) return toast("Error", "Could not save profile.", "danger");
+        toast("Saved", "Profile updated.");
+        await loadMe();
+      };
+
+      $("#refreshCourses").onclick = async () => { await refreshAll(); toast("Refreshed", "Data updated."); };
+
+      $("#adminSaveCourse").onclick = adminSaveCourse;
+      $("#adminDeleteCourse").onclick = adminDeleteCourse;
+      $("#adminAddQuestion").onclick = adminAddQuestion;
+      $("#adminLoadQuestions").onclick = adminLoadQuestions;
+
+      ["notifOverlay","dayOverlay","courseOverlay"].forEach(id => {
+        const ov = document.getElementById(id);
+        ov.addEventListener("click", (e) => { if (e.target === ov) ov.classList.remove("show"); });
+      });
+    }
+
+    supabase.auth.onAuthStateChange((_event, sess) => { session = sess; });
+
+    async function boot() {
+      loadSettings();
+      const { data: s } = await supabase.auth.getSession();
+      if (s.session) {
+        $("#auth").classList.add("hidden");
+        $("#app").classList.remove("hidden");
+        await loadMe();
+        await refreshAll();
+        wireAppEvents();
+        go("dashboard");
+        setTimeout(() => pushNotif("Tip: Use Calendar to see course schedules and add personal notes."), 1200);
+      } else {
+        $("#auth").classList.remove("hidden");
+        $("#app").classList.add("hidden");
+        wireAuthEvents();
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
