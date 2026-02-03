@@ -1,0 +1,2558 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Infinix Retail Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1210;
+      --panel: #0f1c18;
+      --panel2: #0d1714;
+      --text: #e6f2ee;
+      --muted: #a6c3ba;
+      --line: rgba(255,255,255,.08);
+      --brand: #2fbf8e; /* silk green-ish */
+      --brand2: #1aa977;
+      --danger: #ff5c7a;
+      --warn: #ffcc66;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --r: 16px;
+    }
+    [data-theme="light"] {
+      --bg: #f4fbf8;
+      --panel: #ffffff;
+      --panel2: #f0faf5;
+      --text: #0f1c18;
+      --muted: #40665b;
+      --line: rgba(0,0,0,.08);
+      --shadow: 0 16px 50px rgba(0,0,0,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial; 
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(47,191,142,.18), transparent 50%),
+                  radial-gradient(900px 600px at 85% 15%, rgba(26,169,119,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{min-height:100vh; display:flex;}
+    .sidebar{
+      width: 280px; padding:18px; border-right:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%), var(--panel2);
+      position:sticky; top:0; height:100vh;
+      transition: width .2s ease, transform .2s ease;
+    }
+    .sidebar.collapsed{width:86px}
+    .brand{display:flex; align-items:center; gap:12px; padding:10px 10px 14px;}
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: radial-gradient(120% 120% at 20% 20%, rgba(255,255,255,.35), rgba(255,255,255,.08)),
+                  linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: var(--shadow);
+    }
+    .brand h1{font-size:14px; margin:0; line-height:1.15}
+    .brand p{margin:2px 0 0; font-size:11px; color:var(--muted)}
+    .nav{display:flex; flex-direction:column; gap:6px; margin-top:10px}
+    .nav button{
+      all:unset; cursor:pointer; display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:12px; color:var(--muted);
+      border:1px solid transparent;
+    }
+    .nav button:hover{background:rgba(255,255,255,.04); color:var(--text)}
+    .nav button.active{background:rgba(47,191,142,.14); color:var(--text); border-color:rgba(47,191,142,.22)}
+    .ico{width:20px; height:20px; display:grid; place-items:center}
+    .sb-bottom{margin-top:auto; padding-top:14px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:8px}
+    .pill{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid var(--line)}
+#adminTabs{display:flex; gap:10px; align-items:center; justify-content:center; padding:12px 14px; margin:0 auto; flex-wrap:wrap;}
+#adminTabs .pill{
+  justify-content:center; cursor:pointer; border-radius:999px; padding:10px 16px; min-width: 150px;
+  background:rgba(255,255,255,.04); color:var(--text); border:1px solid var(--line);
+  font-weight:800;
+}
+[data-theme="light"] #adminTabs .pill{ background:#ffffff; color:#0f1c18; border:1px solid rgba(0,0,0,.10); }
+
+#adminTabs .pill small{color:#40665b;}
+#adminTabs .pill.active{
+  background:linear-gradient(135deg, var(--brand), var(--brand2));
+  color:#04110c; border-color:rgba(47,191,142,.55);
+}
+
+    .pill small{color:var(--muted)}
+    .main{flex:1; padding:18px;}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
+    .leftTop{display:flex; align-items:center; gap:10px}
+    .toggle{all:unset; cursor:pointer; width:42px; height:42px; border-radius:14px; border:1px solid var(--line); display:grid; place-items:center; background:rgba(255,255,255,.03)}
+    .toggle:hover{background:rgba(255,255,255,.06)}
+    .search{flex:1; max-width:520px; display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.03)}
+    .search input{all:unset; flex:1; color:var(--text)}
+    .actions{display:flex; align-items:center; gap:10px; position:relative}
+    .iconbtn{all:unset; cursor:pointer; width:42px; height:42px; border-radius:14px; border:1px solid var(--line); display:grid; place-items:center; background:rgba(255,255,255,.03); position:relative}
+    .badge{position:absolute; top:8px; right:8px; width:8px; height:8px; border-radius:99px; background:var(--danger)}
+    .card{background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow);}
+    .grid{display:grid; gap:14px}
+    .grid.cols2{grid-template-columns: 1.15fr .85fr}
+    .grid.cols3{grid-template-columns: repeat(3,1fr)}
+    @media (max-width: 980px){ .grid.cols2{grid-template-columns:1fr} }
+    @media (max-width: 860px){
+      .sidebar{position:fixed; left:0; top:0; z-index:50; transform:translateX(-105%); width:280px;}
+      .sidebar.open{transform:translateX(0)}
+    }
+    .card-h{padding:14px 14px 0}
+    .card-h h2{margin:0; font-size:14px}
+    .card-h p{margin:6px 0 0; color:var(--muted); font-size:12px}
+    .card-b{padding:14px}
+    .kpi{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:14px; border-radius:14px; background:rgba(255,255,255,.03); border:1px solid var(--line)}
+    .kpi b{font-size:18px}
+    .kpi small{color:var(--muted)}
+    .btn{
+      all:unset; cursor:pointer; padding:10px 12px; border-radius:12px;
+      background:linear-gradient(135deg, var(--brand), var(--brand2));
+      color:#04110c; font-weight:700; text-align:center;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .btn.secondary{background:rgba(255,255,255,.03); color:var(--text); border:1px solid var(--line); font-weight:600}
+    .btn:disabled{opacity:.55; cursor:not-allowed}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .field{display:flex; flex-direction:column; gap:8px}
+    .field label{font-size:12px; color:var(--muted)}
+    .field input,.field select,.field textarea{
+      padding:12px 12px; border-radius:12px; border:1px solid var(--line);
+      background:rgba(255,255,255,.03); color:var(--text);
+      outline:none;
+    }
+    .field textarea{min-height:110px; resize:vertical}
+    .auth-wrap{min-height:100vh; display:grid; place-items:center; padding:18px}
+    .auth{width:min(980px, 100%); display:grid; grid-template-columns: 1.2fr .8fr; gap:14px}
+    @media (max-width: 980px){ .auth{grid-template-columns:1fr} }
+    .hero{padding:22px; border-radius:var(--r); background:linear-gradient(135deg, rgba(47,191,142,.18), rgba(26,169,119,.10)); border:1px solid rgba(47,191,142,.25)}
+    .hero h1{margin:0; font-size:26px}
+    .hero p{margin:10px 0 0; color:var(--muted)}
+    .tabs{display:flex; gap:8px; margin-top:12px}
+    .tab{all:unset; cursor:pointer; padding:10px 12px; border-radius:12px; border:1px solid var(--line); color:var(--muted)}
+    .tab.active{border-color:rgba(47,191,142,.35); background:rgba(47,191,142,.12); color:var(--text)}
+    .toast{position:fixed; bottom:18px; right:18px; max-width:360px; padding:12px 14px; border-radius:14px; background:rgba(0,0,0,.7); border:1px solid var(--line); color:var(--text); z-index:99; display:none}
+    [data-theme="light"] .toast{background:rgba(255,255,255,.92); color:var(--text)}
+    .toast.show{display:block}
+    .calendar{display:grid; grid-template-columns: repeat(7, 1fr); gap:8px}
+    .cal-head{display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; margin-bottom:8px}
+    .dow{font-size:11px; color:var(--muted); padding:0 8px}
+    .day{min-height:88px; padding:10px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.03); overflow:hidden}
+    .day .n{font-size:12px; color:var(--muted)}
+    .chip{margin-top:8px; padding:6px 8px; border-radius:999px; font-size:11px; border:1px solid rgba(47,191,142,.22); background:rgba(47,191,142,.12)}
+    .muted{color:var(--muted)}
+    .split{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
+    .list{display:flex; flex-direction:column; gap:10px}
+    .item{padding:12px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.03)}
+  
+/* Calendar redesign v2 (dashboard mini + upcoming + indicators) */
+.calWrap{ display:grid; grid-template-columns: 1.25fr .85fr; gap:14px; align-items:start; }
+@media (max-width: 980px){ .calWrap{ grid-template-columns: 1fr; } }
+.miniCal .calendar .day{ min-height:56px !important; }
+.miniCal .calendar .day .n{ font-size:12px !important; }
+.calIndicators{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.ind{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:18px; height:18px; padding:0 6px;
+  border-radius:999px; border:1px solid var(--line);
+  font-size:11px; line-height:1; color:inherit;
+  background: rgba(255,255,255,.04);
+}
+[data-theme="light"] .ind{ background: rgba(0,0,0,.03); }
+.ind.note{ background: rgba(47,191,142,.14); }
+.ind.course{ background: rgba(74,140,255,.14); }
+.ind.event{ background: rgba(255,167,38,.16); }
+.upcomingCard{
+  border:1px solid var(--line); border-radius:16px; padding:12px;
+  background: rgba(255,255,255,.03);
+}
+[data-theme="light"] .upcomingCard{ background: rgba(255,255,255,.85); }
+.upcomingRow{ display:grid; gap:10px; }
+.upcomingSectionTitle{ font-weight:800; margin:6px 0 10px; }
+.dot{
+  width:10px; height:10px; border-radius:999px; display:inline-block; margin-right:8px;
+  border:1px solid rgba(0,0,0,.12);
+}
+.dot.course{ background: rgba(74,140,255,.9); }
+.dot.event{ background: rgba(255,167,38,.95); }
+.badgeDate{ color:var(--muted); font-size:12px; }
+
+
+/* === Week View + Mobile Polish (stable) === */
+.calModeRow{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; position:relative; z-index:5; pointer-events:auto;}
+.calModeRow .tablike{all:unset; cursor:pointer; padding:8px 10px; border-radius:12px; border:1px solid var(--line); color:var(--muted); background:rgba(255,255,255,.03); pointer-events:auto;}
+.calModeRow .tablike.active{border-color:rgba(47,191,142,.35); background:rgba(47,191,142,.12); color:var(--text)}
+.weekWrap{border:1px solid var(--line); border-radius:16px; overflow:hidden; background:rgba(255,255,255,.02);}
+.weekGrid{display:grid; grid-template-columns: 88px repeat(7, 1fr); min-width: 980px;}
+.weekTop{position:sticky; top:0; z-index:2; background:rgba(255,255,255,.02); backdrop-filter: blur(6px);}
+.weekCell{border-top:1px solid var(--line); border-left:1px solid var(--line); padding:8px; min-height:46px;}
+.weekCell.time{border-left:none; color:var(--muted); font-size:12px; background:rgba(255,255,255,.01);}
+.weekCell.head{border-top:none; font-size:12px; color:var(--muted); background:rgba(255,255,255,.02);}
+.weekCell.slot{cursor:pointer;}
+.weekCell.slot:hover{background:rgba(47,191,142,.08);}
+.weekItem{margin-top:6px; padding:6px 8px; border-radius:12px; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03); font-size:11px;}
+.weekItem.course{border-color:rgba(74,140,255,.22); background:rgba(74,140,255,.10);}
+.weekItem.note{border-style:dashed; border-color:rgba(47,191,142,.25); background:rgba(47,191,142,.10);}
+@media (max-width: 980px){ .weekWrap{overflow:auto;} .weekGrid{min-width: 980px;} }
+@media (max-width: 860px){ .search{display:none;} #dashAnalyticsRow{grid-template-columns:1fr !important;} }
+
+
+/* leaderboard smaller */
+#leaderboard .item{ padding:10px 12px; }
+#leaderboard b{ font-size:13px; }
+#leaderboard .muted{ font-size:12px; }
+#leaderboard{ max-height: 220px; overflow:auto; }
+/* announcements not crowded */
+#annList .item{ padding:10px 12px; }
+#annList{ max-height: 220px; overflow:auto; }
+
+/* === Mini calendar dot indicators (dashboard) === */
+.calDots{ display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.dotMini{ width:10px; height:10px; border-radius:999px; display:inline-block; border:1px solid rgba(0,0,0,.12); }
+[data-theme="dark"] .dotMini{ border:1px solid rgba(255,255,255,.18); }
+.dotMini.course{ background: rgba(74,140,255,.95); }
+.dotMini.note{ background: rgba(47,191,142,.95); }
+.dotMini.event{ background: rgba(255,167,38,.95); }
+.dotMini.urgent{ background: rgba(255,92,122,.95); }
+
+/* === Notifications dropdown === */
+.actions{ position:relative; }
+.notifPanel{
+  position:absolute; right:0; top:54px;
+  width:min(360px, calc(100vw - 48px));
+  max-height: 420px;
+  overflow:auto;
+  display:none;
+  z-index:200;
+}
+.notifPanel.show{ display:block; }
+.notifPanel .item{ margin:0; }
+.notifPanel .headRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 12px 0; }
+.notifPanel .headRow b{ font-size:13px; }
+.notifPanel .body{ padding:12px; padding-top:10px; }
+
+
+/* v8 fixes: ensure Today/Week buttons clickable (no overlap) */
+.calModeRow{ position:relative; z-index:20; pointer-events:auto; }
+.calModeRow .tablike{ pointer-events:auto; }
+/* Admin tabs: white pills + centered */
+.adminTabs{ display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; margin:10px 0 14px; }
+.adminTabs .admTab{
+  all:unset; cursor:pointer;
+  padding:10px 14px;
+  border-radius:14px;
+  background:#ffffff;
+  color:#0f1c18;
+  border:1px solid rgba(0,0,0,.12);
+  font-weight:700;
+}
+.adminTabs .admTab:hover{ background:#f4fbf8; }
+.adminTabs .admTab.active{ background: linear-gradient(135deg, var(--brand), var(--brand2)); color:#04110c; border-color: rgba(0,0,0,.06); }
+#view-admin .card-b{ padding:18px; }
+
+
+/* v13 FIX: Force Month calendar to render full 7-column grid and not clip rows/cols */
+#calHead2, #calGrid2, #calHead, #calGrid{
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+#view-calendar .card-b, #view-dashboard .card-b{
+  overflow: visible !important;
+}
+#calGrid2, #calGrid{
+  height: auto !important;
+  align-content: start;
+}
+
+
+/* v14 hard fix: prevent calendar horizontal clipping on narrow layouts */
+#calGrid2, #calGrid { max-width: 100% !important; }
+#view-calendar .card, #view-dashboard .card { overflow: visible !important; }
+
+</style>
+</head>
+<body data-theme="dark">
+<div id="authScreen" class="auth-wrap" style="display:none;">
+  <div class="auth">
+    <div class="hero">
+      <div class="row" style="align-items:center; justify-content:space-between;">
+        <div>
+          <h1>Infinix Retail Academy</h1>
+          <p>Employee Training & Development Platform</p>
+        </div>
+        <button class="btn secondary" id="themeBtn">Toggle Theme</button>
+      </div>
+      <div class="tabs">
+        <button class="tab active" id="tabLogin">Log In</button>
+        <button class="tab" id="tabSignup">Sign Up</button>
+      </div>
+      <div id="loginForm" class="card" style="margin-top:12px;">
+        <div class="card-b">
+          <div class="grid" style="grid-template-columns:1fr; gap:12px">
+            <div class="field">
+              <label>Employee ID</label>
+              <input id="loginEmployee" placeholder="1700xxxx" autocomplete="username"/>
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="loginPassword" type="password" placeholder="••••••••" style="flex:1" autocomplete="current-password"/>
+                <button class="btn secondary" id="loginEye" type="button" style="min-width:90px;">Show</button>
+              </div>
+              <small class="muted">Tip: Use the same Employee ID you registered with.</small>
+            </div>
+            <div class="row" style="justify-content:space-between; align-items:center;">
+              <label style="display:flex; gap:8px; align-items:center; color:var(--muted); font-size:12px;">
+                <input id="rememberMe" type="checkbox"> Remember me
+              </label>
+              <button class="btn secondary" id="forgotBtn" type="button">Forgot Password</button>
+            </div>
+            <button class="btn" id="loginBtn">Log In</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="signupForm" class="card" style="margin-top:12px; display:none;">
+        <div class="card-b">
+          <div class="grid" style="grid-template-columns:1fr; gap:12px">
+            <div class="field">
+              <label>Employee ID</label>
+              <input id="suEmployee" placeholder="1700xxxx" autocomplete="username"/>
+            </div>
+            <div class="row">
+              <div class="field" style="flex:1">
+                <label>First Name</label>
+                <input id="suFirst" placeholder="First name" autocomplete="given-name"/>
+              </div>
+              <div class="field" style="flex:1">
+                <label>Last Name</label>
+                <input id="suLast" placeholder="Last name" autocomplete="family-name"/>
+              </div>
+            </div>
+            <div class="field">
+              <label>Position</label>
+              <select id="suPos">
+                <option value="promoter">Promoter</option>
+                <option value="senior_promoter">Senior Promoter</option>
+                <option value="trainer">Trainer</option>
+                <option value="area_head">Area Head</option>
+                <option value="manager">Manager</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="suPass" type="password" placeholder="Create password" style="flex:1" autocomplete="new-password"/>
+                <button class="btn secondary" id="suEye" type="button" style="min-width:90px;">Show</button>
+              </div>
+            </div>
+            <button class="btn" id="signupBtn">Create Account</button>
+            <small class="muted">Super Admin auto-bootstraps for Employee ID <b>17000001</b>.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">
+        <h2>What you get</h2>
+        <p>Courses, progress tracking, calendar schedule, certificates, leaderboard, admin tools.</p>
+      </div>
+      <div class="card-b">
+        <div class="list">
+          <div class="item"><b>🗓 Calendar</b><div class="muted">Monthly schedule with course dates + personal notes.</div></div>
+          <div class="item"><b>📊 Dashboard</b><div class="muted">Progress, completion, average score, quick stats.</div></div>
+          <div class="item"><b>📈 Ranking</b><div class="muted">Top learners leaderboard.</div></div>
+          <div class="item"><b>🎨 Silk-green UI</b><div class="muted">Eye-safe dark mode + clean mobile layout.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="wrap" style="display:none;">
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div class="brandText">
+        <h1 id="brandHome" style="cursor:pointer;">Infinix Retail Academy</h1>
+        <p id="roleLine">Signed in</p>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="active" data-view="dashboard"><span class="ico">🏠</span><span class="lbl">Dashboard</span></button>
+      <button data-view="calendar"><span class="ico">🗓</span><span class="lbl">Calendar</span></button>
+      <button data-view="progress"><span class="ico">📊</span><span class="lbl">Progress</span></button>
+      <button data-view="courses"><span class="ico">📚</span><span class="lbl">Course & Exam</span></button>
+      <button data-view="admin" id="adminNav" style="display:none;"><span class="ico">🛠</span><span class="lbl">Admin</span></button>
+    </div>
+
+    <div class="sb-bottom">
+      <div class="pill">
+        <div>
+          <div style="font-weight:700; font-size:12px" id="meName">—</div>
+          <small id="meEmp">—</small>
+        </div>
+        <button class="btn secondary" id="themeBtn2" style="padding:8px 10px;">Theme</button>
+      </div>
+      <button class="btn secondary" id="logoutBtn">Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="leftTop">
+        <button class="toggle" id="sbToggle">☰</button>
+        <div class="search">
+          <span class="muted">⌕</span>
+          <input id="search" placeholder="Search courses, categories…"/>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="iconbtn" id="notifBtn" title="Notifications">
+          🔔<span id="notifDot" class="badge" style="display:none;"></span>
+        </button>
+
+        <div id="notifPanel" class="notifPanel card" aria-hidden="true">
+          <div class="headRow">
+            <b>Notifications</b>
+            <span class="muted" style="font-size:12px;" id="notifSub">—</span>
+          </div>
+          <div class="body" id="notifBody"></div>
+        </div>
+</div>
+    </div>
+
+    <section id="view-dashboard">
+  <div class="grid cols3">
+    <div class="kpi"><div><small>Courses</small><div><b id="kCourses">0</b></div></div><div class="muted">📚</div></div>
+    <div class="kpi"><div><small>Completed</small><div><b id="kCompleted">0</b></div></div><div class="muted">✅</div></div>
+    <div class="kpi"><div><small>Avg Exam Score</small><div><b id="kAvg">—</b></div></div><div class="muted">🧠</div></div>
+  </div>
+
+  <div class="grid" style="grid-template-columns:repeat(2,1fr); gap:14px; margin-top:14px;" id="dashAnalyticsRow">
+    <div class="kpi"><div><small>Pass Rate</small><div><b id="kPassRate">—</b></div></div><div class="muted">🎯</div></div>
+    <div class="kpi"><div><small>Exams Taken</small><div><b id="kExamsTaken">0</b></div></div><div class="muted">📝</div></div>
+  </div>
+
+  <!-- Announcements: full width -->
+  <div class="card" style="margin-top:14px;">
+    <div class="card-h">
+      <h2>Announcements</h2>
+      <p>Latest updates from Admin.</p>
+    </div>
+    <div class="card-b">
+      <div class="list" id="annList"></div>
+      <div class="muted" id="annEmpty" style="display:none;">No announcements yet.</div>
+    </div>
+  </div>
+
+  <!-- Schedule + Leaderboard side-by-side -->
+  <div class="grid cols2" style="margin-top:14px;">
+    <div class="card">
+      <div class="card-h">
+        <h2>Course Schedule</h2>
+        <p>This month’s planned courses.</p>
+      </div>
+      <div class="card-b">
+        <div class="split" style="margin-bottom:10px;">
+          <button class="btn secondary" id="calPrev">←</button>
+          <div style="font-weight:700" id="calTitle">—</div>
+          <button class="btn secondary" id="calNext">→</button>
+        </div>
+
+        <div class="calWrap">
+          <div class="miniCal">
+            <div class="cal-head" id="calHead"></div>
+            <div class="calendar" id="calGrid"></div>
+          </div>
+
+          <div class="upcomingCard">
+            <div class="upcomingSectionTitle">Upcoming</div>
+            <div class="upcomingRow" id="upcomingList"></div>
+            <div class="muted" id="upcomingEmpty" style="display:none;">No upcoming items.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">
+        <h2>Top Learners</h2>
+        <p>Top 3 by completion + score.</p>
+      </div>
+      <div class="card-b">
+        <div id="leaderboard"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    </section>
+
+    <section id="view-calendar" style="display:none;">
+      <div class="card">
+        <div class="card-h">
+          <h2>Calendar</h2>
+          <p>Add your notes on any date. Courses show on scheduled dates.</p>
+        </div>
+        <div class="card-b">
+          <div class="split" style="margin-bottom:10px;">
+            <button class="btn secondary" id="calPrev2">←</button>
+            <div style="font-weight:700" id="calTitle2">—</div>
+            <div class="calModeRow" style="margin-left:auto;"><button class="tablike active" id="calModeMonth">Month</button><button class="tablike" id="calModeWeek">Week</button><button class="tablike" id="calToday">Today</button></div>
+            <button class="btn secondary" id="calNext2">→</button>
+          </div>
+          <div class="cal-head" id="calHead2"></div>
+          <div class="calendar" id="calGrid2"></div>
+          <div id="weekWrap" class="weekWrap" style="display:none; margin-top:12px;"><div class="weekGrid" id="weekGrid"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-progress" style="display:none;">
+      <div class="card">
+        <div class="card-h"><h2>Progress</h2><p>Your course completion & exam results.</p></div>
+        <div class="card-b"><div id="progressList" class="list"></div></div>
+      </div>
+    </section>
+
+    <section id="view-courses" style="display:none;">
+      <div class="card">
+        <div class="card-h"><h2>Courses</h2><p>Browse courses and track reading completion.</p></div>
+        <div class="card-b"><div id="courseList" class="list"></div></div>
+      </div>
+    </section>
+
+    <section id="view-admin" style="display:none;">
+      <div class="card">
+        <div class="card-h"><h2>Admin</h2><p>Manage courses and schedules. (Admin only)</p></div>
+        <div class="row" id="adminTabs" style="gap:10px; flex-wrap:wrap; margin: 6px 0 14px;">
+          <button class="pill active" data-admin-tab="courses">Courses</button>
+          <button class="pill" data-admin-tab="announcements">Announcements</button>
+          <button class="pill" data-admin-tab="users">Users</button>
+          <button class="pill" data-admin-tab="analytics">Analytics</button>
+        </div>
+
+        <div class="card-b">
+          <div class="grid" style="grid-template-columns:1fr; gap:12px;">
+            <div class="item" data-admin-sec="courses">
+              <b>Create Course</b>
+              <div class="grid" style="grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                <div class="field"><label>Title</label><input id="adTitle" placeholder="Course title"></div>
+                <div class="field"><label>Category</label><input id="adCat" placeholder="Category"></div>
+              </div>
+              <div class="grid" style="grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                <div class="field"><label>Duration (mins)</label><input id="adDur" type="number" value="20"></div>
+                <div class="field"><label>Scheduled Date</label><input id="adDate" type="date"></div>
+              </div>
+              <div class="field" style="margin-top:10px;"><label>Description</label><textarea id="adDesc" placeholder="Short description"></textarea></div>
+              <div class="row" style="justify-content:flex-end; margin-top:10px;">
+                <button class="btn" id="adCreate">Create</button>
+              </div>
+            </div>
+            <div class="item" data-admin-sec="courses">
+              <b>Existing Courses</b>
+              <div id="adminCourses" class="list" style="margin-top:10px;"></div>
+            </div>
+          </div>
+        
+            <div class="item" data-admin-sec="announcements">
+              <b>Announcements</b>
+              <div class="muted">Add, edit, or delete dashboard announcements.</div>
+              <div class="grid" style="grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                <div class="field"><label>Title</label><input id="adAnnTitle" placeholder="Announcement title"></div>
+                <div class="field"><label>Action</label>
+                  <div class="row" style="gap:10px;">
+                    <button class="btn" id="adAnnAdd">Add</button>
+                    <button class="btn secondary" id="adAnnUpdate" disabled>Update</button>
+                    <button class="btn secondary" id="adAnnCancel" disabled>Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <div class="field" style="margin-top:10px;"><label>Message</label><textarea id="adAnnMsg" placeholder="Write announcement..."></textarea></div>
+              <div class="list" id="adAnnList" style="margin-top:10px;"></div>
+              <div class="muted" id="adAnnEmpty" style="display:none;">No announcements yet.</div>
+            </div>
+</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  // ===== GLOBAL AbortError silencer =====
+  function isAbortError(e) {
+    return (
+      e?.name === "AbortError" ||
+      e?.message?.toLowerCase?.().includes("aborted") ||
+      e?.message?.toLowerCase?.().includes("signal")
+    );
+  }
+
+  window.addEventListener("unhandledrejection", (e) => {
+    if (isAbortError(e.reason)) {
+      e.preventDefault();
+    }
+  });
+
+
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  // =========================
+  // SUPABASE CONFIG
+  // =========================
+  const SUPABASE_URL = "https://bgbzbhohwnhwrmqmvbjn.supabase.co";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJnYnpiaG9od25od3JtcW12YmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2NTI0NjcsImV4cCI6MjA4NTIyODQ2N30.TlwKeobFGHZvTJtgCkLgRb-r9HpM5n1CAKoqNnuuazY";
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // =========================
+  // HELPERS
+  // =========================
+  const $ = (id)=>document.getElementById(id);
+  const toastEl = $("toast");
+  function toast(msg, type="info") {
+    toastEl.textContent = msg;
+    toastEl.style.borderColor =
+      type==="error" ? "rgba(255,92,122,.45)" :
+      type==="ok" ? "rgba(47,191,142,.35)" :
+      "var(--line)";
+    toastEl.classList.add("show");
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(()=>toastEl.classList.remove("show"), 3200);
+  }
+
+  function empToEmail(emp) { return `${emp}@infinix.local`; }
+
+  function safeMsg(err, fallback="Something went wrong.") {
+    const msg = (err?.message || err || "").toString();
+    if(/JWT expired/i.test(msg)) return "Session expired. Please log in again.";
+    if(/Invalid login credentials/i.test(msg)) return "Login failed. Please check your Employee ID and password.";
+    if(/permission denied|row-level security|RLS|not allowed/i.test(msg)) return "Action blocked by security (RLS). Make sure your account is admin and policies are set.";
+    if(/relation .* does not exist|does not exist/i.test(msg)) return "Database table is missing. Please run your SQL schema on Supabase.";
+    return msg || fallback;
+  }
+
+  function esc(s){ return (s??"").toString().replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+  function ymd(d) {
+    const z = new Date(d);
+    const y = z.getFullYear();
+    const m = String(z.getMonth()+1).padStart(2,"0");
+    const da = String(z.getDate()).padStart(2,"0");
+    return `${y}-${m}-${da}`;
+  }
+
+  // Format timestamp in Philippines time (Asia/Manila)
+  function fmtPH(ts){
+    if(!ts) return "";
+    try{
+      return new Intl.DateTimeFormat('en-PH',{
+        timeZone:'Asia/Manila',
+        year:'numeric',month:'short',day:'2-digit',
+        hour:'2-digit',minute:'2-digit',hour12:true
+      }).format(new Date(ts));
+    }catch(_){
+      return new Date(ts).toLocaleString();
+    }
+  }
+
+  function parseYMDLocal(s){
+    if(!s) return null;
+    const parts = String(s).split("-");
+    if(parts.length<3) return new Date(s);
+    const y = Number(parts[0]), m = Number(parts[1]), d = Number(parts[2]);
+    return new Date(y, (m||1)-1, d||1);
+  }
+  function fmtDateTime(ts){
+    try{
+      return new Date(ts).toLocaleString(undefined,{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    }catch(_){ return ""; }
+  }
+  function fmtMonth(y,m){ return new Date(y,m,1).toLocaleString(undefined, { month:"long", year:"numeric" }); }
+  function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+    function startOfWeek(d){ const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; }
+  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function hm(h){ return String(h).padStart(2,'0')+':00'; }
+// =========================
+  // THEME
+  // =========================
+  function toggleTheme() {
+    const b = document.body;
+    b.dataset.theme = b.dataset.theme === "light" ? "dark" : "light";
+    localStorage.setItem("ira_theme", b.dataset.theme);
+  }
+  const savedTheme = localStorage.getItem("ira_theme");
+  if(savedTheme) document.body.dataset.theme = savedTheme;
+  $("themeBtn").onclick = toggleTheme;
+  $("themeBtn2").onclick = toggleTheme;
+
+  // Eye toggles
+  function eye(btn, input) {
+    btn.onclick = () => {
+      input.type = input.type === "password" ? "text" : "password";
+      btn.textContent = input.type === "password" ? "Show" : "Hide";
+    };
+  }
+  eye($("loginEye"), $("loginPassword"));
+  eye($("suEye"), $("suPass"));
+
+  // Tabs
+  function setTab(which) {
+    $("tabLogin").classList.toggle("active", which==="login");
+    $("tabSignup").classList.toggle("active", which==="signup");
+    $("loginForm").style.display = which==="login" ? "block" : "none";
+    $("signupForm").style.display = which==="signup" ? "block" : "none";
+  }
+  $("tabLogin").onclick = ()=>setTab("login");
+  $("tabSignup").onclick = ()=>setTab("signup");
+
+  // Sidebar
+  $("sbToggle").onclick = () => {
+    const sbEl = $("sidebar");
+    if (window.matchMedia("(max-width: 860px)").matches) {
+      sbEl.classList.toggle("open");
+    } else {
+      sbEl.classList.toggle("collapsed");
+      document.querySelectorAll(".lbl").forEach(el=>el.style.display = sbEl.classList.contains("collapsed") ? "none" : "inline");
+      document.querySelector(".brandText").style.display = sbEl.classList.contains("collapsed") ? "none" : "block";
+    }
+  };
+
+  // Views
+  const views = ["dashboard","calendar","progress","courses","admin"];
+  let currentView = "dashboard";
+  function showView(v) {
+    currentView = v;
+    views.forEach(x=>{
+      const el = document.getElementById("view-"+x);
+      if(el) el.style.display = (x===v ? "block" : "none");
+    });
+    document.querySelectorAll(".nav button[data-view]").forEach(b=>{
+      b.classList.toggle("active", b.dataset.view===v);
+    });
+
+    // View-specific renders
+    if(v==="courses"){ try{ renderCourses(); }catch(_){} }
+    if(v==="calendar"){ try{ ensureCalendarControls(); if(typeof applyCalendarMode==="function") applyCalendarMode(calMode||"month"); wireCalendarDelegation(); ensureCalendarControls(); }catch(_){} }
+    if(v==="dashboard"){ try{ loadDashboard(); }catch(_){} }
+    if(v==="admin"){
+      try{
+        refreshAdmin();
+        refreshAdminAnnouncements();
+        wireAdminTabs();
+        // Preload Users & Analytics so they show data immediately when opened
+        loadAdminUsers().catch(()=>{});
+        loadAdminAnalytics().catch(()=>{});
+        wireAdminAnnouncements();
+      }catch(_){}
+    }
+  }
+
+  document.querySelectorAll(".nav button[data-view]").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+  $("brandHome").onclick = ()=>showView("dashboard");
+
+  
+  // =========================
+  // CALENDAR CONTROL HARD-WIRING (fix Today/Week/Month not clickable)
+  // =========================
+  async function goToday(){
+    const now = new Date();
+    cal.year = now.getFullYear();
+    cal.month = now.getMonth();
+    selectedDate = ymd(now);
+    try{ await loadMonthNotes(); }catch(_){}
+    try{ await loadMonthEvents(); }catch(_){}
+    try{ await loadUpcoming(); }catch(_){}
+    if(calMode==='month'){
+      try{ renderCal('calHead2','calGrid2','calTitle2'); }catch(e){ console.warn(e); }
+      wireCalendarDelegation();
+    } else {
+      try{ renderWeek(); }catch(e){ console.warn(e); }
+    }
+  }
+
+  function ensureCalendarControls(){
+    const m = document.getElementById("calModeMonth");
+    const w = document.getElementById("calModeWeek");
+    const t = document.getElementById("calToday");
+    if(m && !m.dataset.bound){
+      m.dataset.bound="1";
+      m.addEventListener("click", (e)=>{ e.preventDefault(); applyCalendarMode('month'); }, true);
+    }
+    if(w && !w.dataset.bound){
+      w.dataset.bound="1";
+      w.addEventListener("click", (e)=>{ e.preventDefault(); applyCalendarMode('week'); }, true);
+    }
+    if(t && !t.dataset.bound){
+      t.dataset.bound="1";
+      t.addEventListener("click", async (e)=>{ e.preventDefault(); await goToday(); }, true);
+    }
+  }
+
+  // Global delegation as backup (in case of rerenders)
+  document.addEventListener("click", async (e)=>{
+    const t = e.target.closest && e.target.closest("#calToday");
+    const m = e.target.closest && e.target.closest("#calModeMonth");
+    const w = e.target.closest && e.target.closest("#calModeWeek");
+    if(t){ e.preventDefault(); await goToday(); }
+    if(m){ e.preventDefault(); applyCalendarMode('month'); }
+    if(w){ e.preventDefault(); applyCalendarMode('week'); }
+  }, true);
+
+// =========================
+  // NOTIFICATIONS (Announcements-based)
+  // =========================
+  let annCache = [];
+  function getSeenAnnTs(){
+    return Number(localStorage.getItem("ira_seen_ann_ts") || "0");
+  }
+  function setSeenAnnTs(ts){
+    localStorage.setItem("ira_seen_ann_ts", String(ts||0));
+  }
+  function syncNotifDot(){
+    const seen = getSeenAnnTs();
+    const newest = annCache.reduce((mx,a)=>Math.max(mx, Date.parse(a.created_at||0)||0), 0);
+    const hasNew = newest > seen;
+    const dot = document.getElementById("notifDot");
+    if(dot) dot.style.display = hasNew ? "block" : "none";
+  }
+
+  // Notification modal (created later after makeModal is defined)
+
+  function renderNotifPanel(){
+    const body = document.getElementById("notifBody");
+    const sub = document.getElementById("notifSub");
+    if(!body) return;
+    if(sub) sub.textContent = "Announcements";
+    const rows = (annCache||[]).slice(0,10);
+    body.innerHTML = rows.length ? `
+      <div class="list">
+        ${rows.map(a=>`
+          <div class="item">
+            <div class="split"><b>${esc(a.title||"Announcement")}</b><span class="muted">${new Date(a.created_at).toLocaleDateString()}</span></div>
+            <div class="muted">${esc(a.message||"")}</div>
+          </div>
+        `).join("")}
+      </div>
+    ` : `<div class="muted">No notifications.</div>`;
+  }
+
+  $("notifBtn").onclick = (e) => {
+    e.stopPropagation();
+    renderNotifPanel();
+    const panel = document.getElementById("notifPanel");
+    if(!panel) return;
+    panel.classList.toggle("show");
+    panel.setAttribute("aria-hidden", panel.classList.contains("show") ? "false" : "true");
+    // mark as seen when opened
+    const newest = annCache.reduce((mx,a)=>Math.max(mx, Date.parse(a.created_at||0)||0), 0);
+    if(newest) setSeenAnnTs(newest);
+    syncNotifDot();
+  };
+
+  syncNotifDot();
+
+  // Close notifications dropdown on outside click
+  document.addEventListener("click", () => {
+    const panel = document.getElementById("notifPanel");
+    if(panel) { panel.classList.remove("show"); panel.setAttribute("aria-hidden","true"); }
+  });
+  const np = document.getElementById("notifPanel");
+  if(np) np.addEventListener("click", (e)=>e.stopPropagation());
+
+  // =========================
+  // MODALS
+  // =========================
+  const modalCSS = document.createElement("style");
+  modalCSS.textContent = `
+    .modalBack { position:fixed; inset:0; background:rgba(0,0,0,.70); backdrop-filter: blur(4px); display:none; z-index:1000; padding:16px; }
+    [data-theme="light"] .modalBack{ background:rgba(0,0,0,.35); }
+    .modalBack.show{ display:grid; place-items:center; }
+    .modal { width:min(980px, 100%); max-height: calc(100vh - 32px); overflow:auto; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+    .modalTop { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px; border-bottom:1px solid var(--line); background: rgba(255,255,255,.02); }
+    .modalTop h3{ margin:0; font-size:14px; }
+    .modalBody{ padding:14px; }
+    .modalClose{ all:unset; cursor:pointer; width:40px; height:40px; border-radius:14px; border:1px solid var(--line); display:grid; place-items:center; background:rgba(255,255,255,.03); }
+    .modalClose:hover{ background:rgba(255,255,255,.06); }
+    .pager { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .contentBox { border:1px solid var(--line); border-radius:14px; padding:14px; background:rgba(255,255,255,.03); min-height:220px; overflow:auto; }
+    .qBox { border:1px solid var(--line); border-radius:14px; padding:14px; background:rgba(255,255,255,.03); }
+    .qOpt{ display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.02); cursor:pointer; }
+    .qOpt:hover{ background:rgba(255,255,255,.05); }
+    .qOpt input{ margin-top:3px; }
+    .muter{ color:var(--muted); font-size:12px; }
+  `;
+  document.head.appendChild(modalCSS);
+
+  function makeModal(id, title){
+    const back = document.createElement("div");
+    back.className = "modalBack";
+    back.id = id;
+    back.innerHTML = `
+      <div class="card modal">
+        <div class="modalTop">
+          <div>
+            <h3>${esc(title)}</h3>
+            <div class="muter" id="${id}-sub"></div>
+          </div>
+          <button class="modalClose" data-close="${id}" title="Close">✕</button>
+        </div>
+        <div class="modalBody" id="${id}-body"></div>
+      </div>
+    `;
+    document.body.appendChild(back);
+    back.addEventListener("click", (e)=>{ if(e.target === back) closeModal(id); });
+    back.querySelector(`[data-close="${id}"]`).onclick = ()=>closeModal(id);
+    return back;
+  }
+  makeModal("courseModal","Course Reader");
+  makeModal("examModal","Course Exam");
+  makeModal("editModal","Edit Course");
+  makeModal("importModal","Import / Export");
+  makeModal("noteModal","Calendar Note");
+  makeModal("notifModal","Notifications");
+
+  function openModal(id){ $(id).classList.add("show"); }
+  function closeModal(id){ $(id).classList.remove("show"); }
+
+  function openNoteModal(dateStr, dayCourses, currentNote) {
+    $("noteModal-sub").textContent = `${dateStr} • ${dayCourses.length ? (dayCourses.length + " course" + (dayCourses.length>1?"s":"")) : "No courses"}`;
+    $("noteModal-body").innerHTML = `
+      <div class="grid" style="grid-template-columns:1fr; gap:12px;">
+        <div class="item">
+          <div class="split">
+            <b>📝 Note</b>
+            <span class="muted">Saved to Supabase</span>
+          </div>
+          <div class="field" style="margin-top:10px;">
+            <label>Note for ${dateStr}</label>
+            <textarea id="noteModalText" placeholder="Type your note…"></textarea>
+          </div>
+          <div class="row" style="justify-content:flex-end; margin-top:10px;">
+            <button class="btn secondary" id="noteModalDelete">Delete</button>
+            <button class="btn secondary" id="noteModalClose">Close</button>
+            <button class="btn" id="noteModalSave">Save</button>
+          </div>
+        </div>
+
+        ${dayCourses.length ? `
+        <div class="item">
+          <b>📚 Courses on this date</b>
+          <div class="list" style="margin-top:10px;">
+            ${dayCourses.map(c=>`
+              <div class="item">
+                <div class="split"><b>${esc(c.title)}</b><span class="muted">${esc(c.category||"")}</span></div>
+                <div class="muted">${esc(c.description||"")}</div>
+                <div class="row" style="justify-content:flex-end; margin-top:10px;">
+                  <button class="btn secondary" data-open="${c.id}">Open</button>
+                  ${c.has_exam ? `<button class="btn" data-exam="${c.id}">Take Exam</button>` : ``}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>` : ``}
+      </div>
+    `;
+    openModal("noteModal");
+    $("noteModalText").value = currentNote || "";
+
+    document.querySelectorAll('#noteModal-body [data-open]').forEach(btn=>btn.onclick = ()=>openCourseReader(Number(btn.getAttribute("data-open"))));
+    document.querySelectorAll('#noteModal-body [data-exam]').forEach(btn=>btn.onclick = ()=>startExam(Number(btn.getAttribute("data-exam"))));
+
+    $("noteModalClose").onclick = ()=>closeModal("noteModal");
+
+    $("noteModalSave").onclick = async ()=>{
+      const note = $("noteModalText").value.trim();
+      try{
+        const res = await sb.from("calendar_notes")
+          .upsert({ user_id: me.user_id, note_date: dateStr, note }, { onConflict: "user_id,note_date" })
+          .select("note,note_date,created_at,updated_at")
+          .single();
+        if(res.error) throw res.error;
+        const row = res.data || {};
+        const savedAt = row.updated_at || row.created_at || new Date().toISOString();
+        notesCache.set(dateStr, { note, created_at: row.created_at||null, updated_at: savedAt });
+        notesCache.set(selectedDate, { note, created_at: row.created_at||null, updated_at: savedAt });
+        toast(`Note saved • ${fmtPH(savedAt)}`, "ok");
+        const __btn = $("noteModalSave"); if(__btn){ __btn.disabled = true; __btn.textContent = "Saved"; }
+        setTimeout(()=>{ closeModal("noteModal"); if(__btn){ __btn.disabled = false; __btn.textContent = "Save"; } }, 450);
+      renderCal("calHead","calGrid","calTitle");
+      renderCal("calHead2","calGrid2","calTitle2");
+    wireCalendarModeButtons();
+    wireCalendarDelegation();
+    wireCalendarModeButtons();
+    if(typeof applyCalendarMode==="function") applyCalendarMode(calMode||"month");
+
+        renderCal("calHead","calGrid","calTitle");
+        renderCal("calHead2","calGrid2","calTitle2");
+    wireCalendarDelegation();
+    mBtn = document.getElementById('calModeMonth');
+    wBtn = document.getElementById('calModeWeek');
+    tBtn = document.getElementById('calToday');
+    if(mBtn) mBtn.onclick=()=>applyCalendarMode('month');
+    if(wBtn) wBtn.onclick=()=>applyCalendarMode('week');
+    if(tBtn) tBtn.onclick=async()=>{ const now=new Date(); cal.year=now.getFullYear(); cal.month=now.getMonth(); selectedDate=ymd(now); await loadMonthNotes().catch(()=>{}); await loadMonthEvents().catch(()=>{}); await loadUpcoming().catch(()=>{}); if(calMode==='month'){ renderCal('calHead2','calGrid2','calTitle2'); wireCalendarDelegation(); } else { renderWeek(); } };
+
+        closeModal("noteModal");
+      }catch(e){ toast(safeMsg(e, "Could not save note."), "error"); }
+    };
+
+    $("noteModalDelete").onclick = async ()=>{
+      try{
+        const res = await sb.from("calendar_notes").delete().eq("user_id", me.user_id).eq("note_date", dateStr);
+        if(res.error) throw res.error;
+        notesCache.delete(dateStr);
+        toast("Note deleted.", "ok");
+        renderCal("calHead","calGrid","calTitle");
+        renderCal("calHead2","calGrid2","calTitle2");
+    wireCalendarDelegation();
+    mBtn = document.getElementById('calModeMonth');
+    wBtn = document.getElementById('calModeWeek');
+    tBtn = document.getElementById('calToday');
+    if(mBtn) mBtn.onclick=()=>applyCalendarMode('month');
+    if(wBtn) wBtn.onclick=()=>applyCalendarMode('week');
+    if(tBtn) tBtn.onclick=async()=>{ const now=new Date(); cal.year=now.getFullYear(); cal.month=now.getMonth(); selectedDate=ymd(now); await loadMonthNotes().catch(()=>{}); await loadMonthEvents().catch(()=>{}); await loadUpcoming().catch(()=>{}); if(calMode==='month'){ renderCal('calHead2','calGrid2','calTitle2'); wireCalendarDelegation(); } else { renderWeek(); } };
+
+        closeModal("noteModal");
+      }catch(e){ toast(safeMsg(e, "Could not delete note."), "error"); }
+    };
+  }
+
+  // =========================
+  // AUTH + PROFILE
+  // =========================
+  async function ensureProfile(employee_id, meta) {
+    try {
+      const { data, error } = await sb.rpc("ensure_profile", {
+        p_employee_id: employee_id,
+        p_first_name: meta.first_name || "User",
+        p_last_name: meta.last_name || "User",
+        p_position: meta.position || "promoter"
+      });
+      if(!error) return data;
+    } catch(_) {}
+
+    const user = (await sb.auth.getUser()).data.user;
+    if(!user) throw new Error("No session");
+
+    const sel = await sb.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+    if(sel.data) return sel.data;
+
+    const ins = await sb.from("profiles").insert({
+      user_id: user.id,
+      employee_id,
+      first_name: meta.first_name || "User",
+      last_name: meta.last_name || "User",
+      email: empToEmail(employee_id),
+      position: meta.position || "promoter",
+      role: (employee_id === "17000001") ? "super_admin" : "user",
+      status: "active"
+    }).select("*").single();
+    if(ins.error) throw ins.error;
+    return ins.data;
+  }
+
+  async function signUp() {
+    const employee_id = $("suEmployee").value.trim();
+    const first_name = $("suFirst").value.trim();
+    const last_name = $("suLast").value.trim();
+    const position = $("suPos").value;
+    const password = $("suPass").value;
+
+    if(!/^\d{6,20}$/.test(employee_id)) return toast("Employee ID must be numbers only.", "error");
+    if(password.length < 6) return toast("Password must be at least 6 characters.", "error");
+    if(!first_name || !last_name) return toast("Please enter first and last name.", "error");
+
+    $("signupBtn").disabled = true;
+    try {
+      const email = empToEmail(employee_id);
+      const res = await sb.auth.signUp({ email, password });
+      if(res.error) {
+        const msg = (res.error.message||"").toLowerCase().includes("already") ? "Employee ID already registered." : res.error.message;
+        throw new Error(msg);
+      }
+      const li = await sb.auth.signInWithPassword({ email, password });
+      if(li.error) throw li.error;
+
+      await ensureProfile(employee_id, { first_name, last_name, position });
+      toast("Account created. You’re logged in.", "ok");
+      await bootstrapApp();
+    } catch (e) {
+      toast(safeMsg(e, "Sign up failed."), "error");
+    } finally {
+      $("signupBtn").disabled = false;
+    }
+  }
+
+  async function logIn() {
+    const employee_id = $("loginEmployee").value.trim();
+    const password = $("loginPassword").value;
+    if(!employee_id || !password) return toast("Enter Employee ID and password.", "error");
+
+    $("loginBtn").disabled = true;
+    try {
+      const email = empToEmail(employee_id);
+      const res = await sb.auth.signInWithPassword({ email, password });
+      if(res.error) throw res.error;
+
+      await ensureProfile(employee_id, { });
+      if($("rememberMe").checked) localStorage.setItem("ira_remember", employee_id);
+      else localStorage.removeItem("ira_remember");
+
+      toast("Welcome back!", "ok");
+      await bootstrapApp();
+    } catch (e) {
+      toast(safeMsg(e, "Login failed."), "error");
+    } finally {
+      $("loginBtn").disabled = false;
+    }
+  }
+
+  $("signupBtn").onclick = signUp;
+  $("loginBtn").onclick = logIn;
+
+  $("forgotBtn").onclick = async () => {
+    const employee_id = $("loginEmployee").value.trim();
+    if(!employee_id) return toast("Enter your Employee ID first.", "error");
+    const email = empToEmail(employee_id);
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+    if(error) return toast("Could not start reset. Ask admin to reset.", "error");
+    toast("Password reset started (check email settings).", "ok");
+  };
+
+  const remembered = localStorage.getItem("ira_remember");
+  if(remembered) $("loginEmployee").value = remembered;
+
+  let me = null;
+
+  $("logoutBtn").onclick = async () => {
+    try { $("logoutBtn").disabled = true; await sb.auth.signOut({ scope: "local" }); } catch(_) {}
+    try {
+      for (const k of Object.keys(localStorage)) {
+        if (k.startsWith("sb-") && k.includes("-auth-token")) localStorage.removeItem(k);
+      }
+    } catch(_) {}
+    me = null;
+    $("app").style.display = "none";
+    $("authScreen").style.display = "grid";
+    $("loginPassword").value = "";
+    $("suPass").value = "";
+    $("logoutBtn").disabled = false;
+    try{ document.querySelectorAll(".modal").forEach(m=>m.classList.remove("open")); }catch(_){ }
+    try{ $("sidebar").classList.remove("open"); }catch(_){ }
+    try{ $("loginTab").click(); }catch(_){ }
+    toast("Logged out.", "ok");
+  };
+
+  // =========================
+  // DATA + UI
+  // =========================
+  let cal = { year: new Date().getFullYear(), month: new Date().getMonth() };
+  let calMode = 'month'; // month | week
+  let mBtn, wBtn, tBtn;
+  let selectedDate = null;
+  let __noteFromView = "dashboard";
+  let courseCache = [];
+  let progressCache = [];
+  let notesCache = new Map(); // YYYY-MM-DD -> note
+  let notesMetaCache = new Map(); // YYYY-MM-DD -> updated_at (timestamptz)
+  let eventsCache = new Map(); // YYYY-MM-DD -> events array text
+
+  function startOfMonth(y,m){ return new Date(y,m,1); }
+  function endOfMonth(y,m){ return new Date(y,m+1,0); }
+
+  function renderCal(headId, gridId, titleId) {
+    const head = document.getElementById(headId);
+    const grid = document.getElementById(gridId);
+    const title = document.getElementById(titleId);
+    // v14 hard-fix: enforce month grid layout every render (prevents 1-4 clipping)
+    if(grid){
+      grid.style.display = "grid";
+      grid.style.gridTemplateColumns = "repeat(7, minmax(0, 1fr))";
+      grid.style.width = "100%";
+      grid.style.overflow = "visible";
+      grid.style.alignContent = "start";
+    }
+    const dows = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    head.innerHTML = dows.map(x=>`<div class="dow">${x}</div>`).join("");
+    title.textContent = fmtMonth(cal.year, cal.month);
+
+    const first = startOfMonth(cal.year, cal.month);
+    const last = endOfMonth(cal.year, cal.month);
+    const leading = first.getDay();
+    const days = last.getDate();
+    const totalCells = Math.ceil((leading + days) / 7) * 7;
+
+    const byDate = new Map();
+    for(const c of courseCache) if(c.scheduled_date) byDate.set(c.scheduled_date, (byDate.get(c.scheduled_date)||[]).concat([c]));
+
+    grid.innerHTML = "";
+    for(let i=0; i<totalCells; i++) {
+      const dayNum = i - leading + 1;
+      const inMonth = dayNum>=1 && dayNum<=days;
+      const dateObj = new Date(cal.year, cal.month, inMonth ? dayNum : 1);
+      const dateStr = inMonth ? ymd(dateObj) : "";
+      const courses = inMonth ? (byDate.get(dateStr)||[]) : [];
+      const div = document.createElement("div");
+      div.className = "day";
+      div.style.opacity = inMonth ? "1" : ".35";
+      const noteEntry = inMonth ? (notesCache.get(dateStr) || null) : null;
+      let noteVal = "";
+      let noteTs = null;
+      if(typeof noteEntry === "string") { noteVal = noteEntry; }
+      else if(noteEntry) { noteVal = (noteEntry.note||""); noteTs = noteEntry.updated_at || noteEntry.created_at || null; }
+      const hasNote = inMonth && noteVal.trim().length>0;
+      const noteTip = noteTs ? `Saved: ${fmtPH(noteTs)}` : `Saved`;
+      const noteChip = hasNote ? `<div class="chip" style="border-style:dashed;" title="${esc(noteTip)}">📝 ${esc(noteVal.trim().slice(0,18))}${noteVal.trim().length>18?"…":""}</div>` : ``;
+      const evs = inMonth ? (eventsCache.get(dateStr)||[]) : [];
+      const courseCount = courses.length;
+      const evCount = evs.length;
+      const hasUrgent = evs.some(e => String(e.kind||"") === "urgent");
+      const indicators = (inMonth && (hasNote || courseCount || evCount)) ? `
+        <div class="calDots">
+          ${courseCount ? `<span class="dotMini course" title="${courseCount} course${courseCount>1?"s":""}"></span>` : ``}
+          ${hasUrgent ? `<span class="dotMini urgent" title="Urgent"></span>` : (evCount ? `<span class="dotMini event" title="${evCount} event${evCount>1?"s":""}"></span>` : ``)}
+          ${hasNote ? `<span class="dotMini note" title="Note"></span>` : ``}
+        </div>` : ``;
+
+      // Dashboard mini calendar: indicators only
+      if(gridId === "calGrid"){
+        div.innerHTML = `<div class="n">${inMonth ? dayNum : ""}</div>` + indicators;
+      } else {
+        // Full calendar: keep short chips (2 max)
+        div.innerHTML = `<div class="n">${inMonth ? dayNum : ""}</div>` + noteChip + courses.slice(0,2).map(c=>`<div class="chip">${esc(c.title)}</div>`).join("");
+      }
+      if(inMonth) {
+        div.style.cursor = "pointer";
+        div.setAttribute("data-date", dateStr);
+      }
+grid.appendChild(div);
+    }
+  }
+
+  function renderWeek(){
+    const grid = document.getElementById("weekGrid");
+    if(!grid) return;
+    const base = selectedDate ? parseYMDLocal(selectedDate) : new Date(cal.year, cal.month, 1);
+    const ws = startOfWeek(base);
+    const days = Array.from({length:7}, (_,i)=>addDays(ws,i));
+    const dayKeys = days.map(d=>ymd(d));
+
+    const byCourseDate = new Map();
+    for(const c of courseCache){
+      if(c.scheduled_date){
+        const k = String(c.scheduled_date);
+        if(!byCourseDate.has(k)) byCourseDate.set(k, []);
+        byCourseDate.get(k).push(c);
+      }
+    }
+
+    const hours = [];
+    for(let h=8; h<=20; h++) hours.push(h);
+
+    let out = '';
+    out += `<div class="weekCell head time weekTop"></div>`;
+    for(let i=0;i<7;i++){
+      const d = parseYMDLocal(dayKeys[i]);
+      const lbl = d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+      const isToday = dayKeys[i]===ymd(new Date());
+      out += `<div class="weekCell head weekTop" style="${isToday?'box-shadow: inset 0 -2px 0 rgba(47,191,142,.55);':''}">${esc(lbl)}</div>`;
+    }
+
+    for(const h of hours){
+      out += `<div class="weekCell time">${esc(hm(h))}</div>`;
+      for(let i=0;i<7;i++){
+        const dk = dayKeys[i];
+        const _nObj = (notesCache.get(dk)||null);
+        const noteVal = (_nObj && _nObj.note ? String(_nObj.note) : '').trim();
+        const cs = byCourseDate.get(dk)||[];
+        let items='';
+        if(h===8){
+          if(cs.length){
+            items += cs.slice(0,2).map(c=>`<div class="weekItem course">📚 ${esc(c.title)}</div>`).join('');
+            if(cs.length>2) items += `<div class="weekItem course">+${cs.length-2} more</div>`;
+          }
+          if(noteVal){
+            items += `<div class="weekItem note">📝 ${esc(noteVal.slice(0,22))}${noteVal.length>22?'…':''}</div>`;
+          }
+        }
+        out += `<div class="weekCell slot" data-date="${esc(dk)}">${items}</div>`;
+      }
+    }
+    grid.innerHTML = out;
+
+    grid.querySelectorAll('[data-date]').forEach(cell=>{
+      cell.addEventListener('click', async ()=>{
+        const d = cell.getAttribute('data-date');
+        await selectDate(d);
+      });
+    });
+  }
+
+  function applyCalendarMode(mode){
+    calMode = mode;
+    mBtn = document.getElementById("calModeMonth");
+    wBtn = document.getElementById("calModeWeek");
+    if(mBtn) mBtn.classList.toggle("active", mode==='month');
+    if(wBtn) wBtn.classList.toggle("active", mode==='week');
+    const head2 = document.getElementById("calHead2");
+    const grid2 = document.getElementById("calGrid2");
+    const weekWrap = document.getElementById("weekWrap");
+    if(head2) head2.style.display = (mode==='month') ? "grid" : "none";
+    if(grid2) grid2.style.display = (mode==='month') ? "grid" : "none";
+    if(weekWrap) weekWrap.style.display = (mode==='week') ? "block" : "none";
+    if(mode==='month'){ renderCal("calHead2","calGrid2","calTitle2"); wireCalendarDelegation(); }
+    else { renderWeek(); }
+    ensureCalendarControls();
+  }
+
+
+  async function selectDate(dateStr) {
+    selectedDate = dateStr;
+    __noteFromView = currentView || "dashboard";
+    let current = "";
+    try {
+      const { data } = await sb.from("calendar_notes").select("note,updated_at,created_at").eq("user_id", me.user_id).eq("note_date", dateStr).maybeSingle();
+      current = (data && data.note) ? data.note : "";
+    } catch(_) { current = ""; }
+    const dayCourses = (courseCache||[]).filter(c => String(c.scheduled_date||"") === String(dateStr));
+    openNoteModal(dateStr, dayCourses, current);
+  }
+
+  async function loadCoursesAndProgress() {
+    const courses = await sb.from("courses").select("id,title,category,description,duration,has_exam,is_active,scheduled_date,content").or("is_active.is.null,is_active.eq.true").order("scheduled_date", { ascending:true });
+    if(courses.error) throw courses.error;
+    courseCache = courses.data || [];
+
+    const prog = await sb.from("user_progress").select("course_id,read,exam_taken,score,progress,updated_at").eq("user_id", me.user_id);
+    if(prog.error) throw prog.error;
+    progressCache = prog.data || [];
+  }
+
+  async function loadMonthNotes() {
+    if(!me) return;
+    const y = cal.year;
+    const mth = cal.month;
+    const startStr = ymd(new Date(y, mth, 1));
+    const endStr = ymd(new Date(y, mth + 1, 0));
+    const { data, error } = await sb
+      .from("calendar_notes")
+      .select("note_date,note,updated_at,created_at")
+      .eq("user_id", me.user_id)
+      .gte("note_date", startStr)
+      .lte("note_date", endStr);
+    if(error) throw error;
+    notesCache = new Map((data||[]).map(r => [String(r.note_date), { note:(r.note||""), created_at:(r.created_at||null), updated_at:(r.updated_at||r.created_at||null) }]));
+  }
+
+  // =========================
+  // DASHBOARD: ANNOUNCEMENTS + UPCOMING + EVENTS
+  // =========================
+  async function loadAnnouncements(){
+    const list = $("annList");
+    const empty = $("annEmpty");
+    if(!list) return;
+    try{
+      const { data, error } = await sb.from("announcements").select("id,title,message,created_at").order("created_at",{ascending:false}).limit(10);
+      if(error) throw error;
+      const rows = data || [];
+      annCache = rows;
+      syncNotifDot();
+      list.innerHTML = rows.map(a=>`
+        <div class="item" style="margin:0;">
+          <div class="split"><b>${esc(a.title||"Announcement")}</b><span class="muted">${new Date(a.created_at).toLocaleDateString()}</span></div>
+          <div class="muted">${esc(a.message||"")}</div>
+        </div>
+      `).join("");
+      if(empty) empty.style.display = rows.length ? "none" : "block";
+    }catch(_){
+      list.innerHTML = "";
+      if(empty) empty.style.display = "block";
+    }
+  }
+
+  async function loadMonthEvents(){
+    if(!me) return;
+    const y = cal.year, mth = cal.month;
+    const startStr = ymd(new Date(y, mth, 1));
+    const endStr = ymd(new Date(y, mth+1, 0));
+    try{
+      const { data, error } = await sb
+        .from("calendar_events")
+        .select("id,event_date,start_time,end_time,title,kind")
+        .eq("user_id", me.user_id)
+        .gte("event_date", startStr)
+        .lte("event_date", endStr);
+      if(error) throw error;
+      const map = new Map();
+      (data||[]).forEach(r=>{
+        const k = String(r.event_date);
+        if(!map.has(k)) map.set(k, []);
+        map.get(k).push(r);
+      });
+      eventsCache = map;
+    }catch(_){
+      eventsCache = new Map();
+    }
+  }
+
+  async function loadUpcoming(){
+    const wrap = $("upcomingList");
+    const empty = $("upcomingEmpty");
+    if(!wrap) return;
+
+    const today = new Date();
+    const startStr = ymd(today);
+    const end = new Date(today); end.setDate(end.getDate()+14);
+    const endStr = ymd(end);
+
+    let ev = [];
+    try{
+      const { data, error } = await sb
+        .from("calendar_events")
+        .select("id,event_date,start_time,end_time,title,kind")
+        .eq("user_id", me.user_id)
+        .gte("event_date", startStr)
+        .lte("event_date", endStr)
+        .order("event_date",{ascending:true})
+        .order("start_time",{ascending:true});
+      if(error) throw error;
+      ev = data || [];
+    }catch(_){
+      ev = [];
+    }
+
+    const courseItems = (courseCache||[])
+      .filter(c => c.scheduled_date && String(c.scheduled_date) >= startStr && String(c.scheduled_date) <= endStr)
+      .map(c => ({ kind:"course", title:c.title, event_date:String(c.scheduled_date), start_time:null, end_time:null }));
+
+    const all = [...ev.map(x=>({ ...x, event_date:String(x.event_date) })), ...courseItems]
+      .sort((a,b)=> (a.event_date>b.event_date?1:-1) || String(a.start_time||"").localeCompare(String(b.start_time||"")));
+
+    function labelDay(d){
+      if(d===startStr) return "Today";
+      const tmr = ymd(new Date(today.getFullYear(), today.getMonth(), today.getDate()+1));
+      if(d===tmr) return "Tomorrow";
+      return parseYMDLocal(d).toLocaleDateString(undefined, { weekday:"long", month:"short", day:"numeric" });
+    }
+
+    let cur="";
+    wrap.innerHTML = all.map(item=>{
+      const d=item.event_date;
+      const hdr = (d!==cur) ? (cur=d, `<div class="muted" style="margin-top:10px;">${labelDay(d)}</div>`) : "";
+      const dotClass = item.kind==="course" ? "course" : "event";
+      const time = item.start_time ? `${String(item.start_time).slice(0,5)}${item.end_time? " - "+String(item.end_time).slice(0,5):""}` : "";
+      return `${hdr}
+        <div class="item" style="margin:0;">
+          <div class="split">
+            <b><span class="dot ${dotClass}"></span>${esc(item.title||"")}</b>
+            <span class="badgeDate">${parseYMDLocal(d).toLocaleDateString()}</span>
+          </div>
+          ${time ? `<div class="muted">${esc(time)}</div>` : ``}
+        </div>`;
+    }).join("");
+
+    if(empty) empty.style.display = all.length ? "none" : "block";
+  }
+
+  function computeKpis() {
+    const completed = progressCache.filter(r=>r.progress===100 || r.read).length;
+    const scores = progressCache.filter(r=>r.exam_taken && typeof r.score==="number").map(r=>r.score);
+    const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : null;
+
+    $("kCourses").textContent = courseCache.length;
+    $("kCompleted").textContent = completed;
+    $("kAvg").textContent = avg===null ? "—" : avg;
+    const taken = progressCache.filter(r=>r.exam_taken && typeof r.score==='number');
+    const passed = taken.filter(r=>Number(r.score)>=70);
+    const pr = taken.length ? Math.round((passed.length/taken.length)*100) : null;
+    const prEl = document.getElementById('kPassRate'); if(prEl) prEl.textContent = pr===null ? '—' : (pr+'%');
+    const exEl = document.getElementById('kExamsTaken'); if(exEl) exEl.textContent = String(taken.length);
+  }
+
+  function renderProgress() {
+    $("progressList").innerHTML = (courseCache.map(c=>{
+      const p = progressCache.find(x=>x.course_id===c.id);
+      const pct = p ? (p.progress ?? 0) : 0;
+      const s = p && p.exam_taken ? `Score: ${p.score ?? "—"}` : (c.has_exam ? "Exam: not taken" : "No exam");
+      const st = p && (p.progress===100 || p.read) ? "✅ Completed" : "⏳ In progress";
+      return `<div class="item"><div class="split"><b>${esc(c.title)}</b><span class="muted">${pct}%</span></div><div class="muted">${esc(s)} • ${st}</div></div>`;
+    })).join("") || (q ? `<div class="muted">No results found.</div>` : `<div class="muted">No courses yet.</div>`);
+  }
+
+  function renderCourses() {
+    const q = (typeof searchQuery==="string" ? searchQuery.toLowerCase() : "");
+    const list = q ? (courseCache||[]).filter(c=>{
+      const hay = `${c.title||""} ${c.category||""} ${c.description||""}`.toLowerCase();
+      return hay.includes(q);
+    }) : (courseCache||[]);
+    $("courseList").innerHTML = (list.map(c=>{
+      const p = progressCache.find(x=>x.course_id===c.id);
+      const done = !!(p && (p.progress===100 || p.read));
+      const taken = !!(p && p.exam_taken);
+      return `<div class="item">
+        <div class="split"><b>${esc(c.title)}</b><span class="muted">${c.scheduled_date || ""}</span></div>
+        <div class="muted">${esc(c.description||"")}</div>
+        <div class="row" style="justify-content:flex-end; margin-top:10px;">
+          <button class="btn secondary" data-open="${c.id}">Open</button>
+          <button class="btn secondary" data-read="${c.id}">${done ? "Completed" : "Mark Read"}</button>
+          ${c.has_exam ? `<button class="btn" data-exam="${c.id}">${taken ? "Retake Exam" : "Take Exam"}</button>` : ``}
+        </div>
+      </div>`;
+    })).join("") || `<div class="muted">No courses yet.</div>`;
+
+    document.querySelectorAll("[data-read]").forEach(btn=>btn.onclick = ()=>markRead(btn.getAttribute("data-read")));
+    document.querySelectorAll("[data-open]").forEach(btn=>btn.onclick = ()=>openCourseReader(Number(btn.getAttribute("data-open"))));
+    document.querySelectorAll("[data-exam]").forEach(btn=>btn.onclick = ()=>startExam(Number(btn.getAttribute("data-exam"))));
+  }
+
+  async function renderLeaderboard() {
+    try {
+      const lb = await sb.rpc("get_leaderboard", { p_limit: 3 });
+      if(!lb.error) {
+        const rows = lb.data || [];
+        $("leaderboard").innerHTML = rows.length
+          ? rows.map((r,i)=>`<div class="item"><div class="split"><b>#${i+1} ${esc(r.full_name)}</b><span class="muted">${r.points} pts</span></div><div class="muted">Completed: ${r.completed} • Avg score: ${r.avg_score ?? "—"}</div></div>`).join("")
+          : `<div class="muted">No rankings yet.</div>`;
+        return;
+      }
+    } catch(_) {}
+    $("leaderboard").innerHTML = `<div class="muted">Leaderboard not available yet.</div>`;
+  }
+
+  
+  function initCalendarModeButtons(){
+    mBtn = document.getElementById('calModeMonth');
+    wBtn = document.getElementById('calModeWeek');
+    tBtn = document.getElementById('calToday');
+    if(mBtn) mBtn.onclick = ()=>applyCalendarMode('month');
+    if(wBtn) wBtn.onclick = ()=>applyCalendarMode('week');
+    if(tBtn) tBtn.onclick = ()=>{
+      const now = new Date();
+      cal.year = now.getFullYear(); cal.month = now.getMonth();
+      selectedDate = ymd(now);
+      try{ applyCalendarMode(calMode||'month'); }catch(_){}
+    };
+  }
+async function loadDashboard() {
+    await loadAnnouncements();
+    await loadCoursesAndProgress();
+    try { await loadMonthNotes();
+    await loadMonthEvents();
+    await loadUpcoming(); } catch(_) { notesCache = new Map(); }
+    computeKpis();
+    renderCal("calHead","calGrid","calTitle");
+    renderCal("calHead2","calGrid2","calTitle2");
+    wireCalendarDelegation();
+    mBtn = document.getElementById('calModeMonth');
+    wBtn = document.getElementById('calModeWeek');
+    tBtn = document.getElementById('calToday');
+    if(mBtn) mBtn.onclick=()=>applyCalendarMode('month');
+    if(wBtn) wBtn.onclick=()=>applyCalendarMode('week');
+    if(tBtn) tBtn.onclick=async()=>{ const now=new Date(); cal.year=now.getFullYear(); cal.month=now.getMonth(); selectedDate=ymd(now); await loadMonthNotes().catch(()=>{}); await loadMonthEvents().catch(()=>{}); await loadUpcoming().catch(()=>{}); if(calMode==='month'){ renderCal('calHead2','calGrid2','calTitle2'); wireCalendarDelegation(); } else { renderWeek(); } };
+
+    renderProgress();
+    renderCourses();
+    await renderLeaderboard();
+    await refreshAdmin();
+  }
+
+  async function markRead(courseId) {
+    const cid = Number(courseId);
+    try {
+      const up = await sb.from("user_progress").upsert({
+        user_id: me.user_id,
+        course_id: cid,
+        read: true,
+        progress: 100,
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id,course_id" });
+      if(up.error) throw up.error;
+      toast("Marked as completed.", "ok");
+      await loadDashboard();
+    } catch(e) {
+      toast(safeMsg(e, "Could not save progress."), "error");
+    }
+  }
+
+  // =========================
+  // COURSE READER
+  // =========================
+  function splitPages(html) {
+    const marker1 = /<!--\s*page\s*-->/i;
+    if(marker1.test(html)) return html.split(marker1).map(s=>s.trim()).filter(Boolean);
+    const marker2 = /<hr\s+[^>]*data-page[^>]*>/i;
+    if(marker2.test(html)) return html.split(marker2).map(s=>s.trim()).filter(Boolean);
+    return [html || "<p class='muted'>No content yet.</p>"];
+  }
+
+  let reader = { course:null, pages:[], idx:0, seconds:0, t:null };
+  function stopReaderTimer(){ if(reader.t) clearInterval(reader.t); reader.t=null; }
+
+  function renderReader(){
+    const c = reader.course;
+    const sub = $("courseModal-sub");
+    const body = $("courseModal-body");
+    const pageCount = reader.pages.length;
+    const mm = String(Math.floor(reader.seconds/60)).padStart(2,"0");
+    const ss = String(reader.seconds%60).padStart(2,"0");
+    sub.textContent = `${c.title} • Time: ${mm}:${ss} • Page ${reader.idx+1} of ${pageCount}`;
+
+    body.innerHTML = `
+      <div class="contentBox" id="readerBox">${reader.pages[reader.idx]}</div>
+      <div class="pager">
+        <button class="btn secondary" id="rPrev" ${reader.idx===0?"disabled":""}>Previous</button>
+        <button class="btn secondary" id="rNext" ${reader.idx===pageCount-1?"disabled":""}>Next</button>
+        <button class="btn" id="rDone">Complete Course</button>
+      </div>
+      <div class="muter" style="margin-top:10px;">Tip: Completing sets your progress to 100%.</div>
+    `;
+    $("rPrev").onclick = ()=>{ reader.idx = clamp(reader.idx-1,0,pageCount-1); renderReader(); };
+    $("rNext").onclick = ()=>{ reader.idx = clamp(reader.idx+1,0,pageCount-1); renderReader(); };
+    $("rDone").onclick = async ()=>{ await markRead(c.id); closeModal("courseModal"); stopReaderTimer(); };
+  }
+
+  async function openCourseReader(courseId){
+    const c = courseCache.find(x=>x.id===courseId);
+    if(!c) return toast("Course not found.", "error");
+    reader.course = c;
+    reader.pages = splitPages(c.content || "");
+    reader.idx = 0;
+    reader.seconds = 0;
+    stopReaderTimer();
+    renderReader();
+    openModal("courseModal");
+    reader.t = setInterval(()=>{ reader.seconds++; renderReader(); }, 1000);
+  }
+
+  // =========================
+  // EXAM ENGINE
+  // =========================
+  let exam = { course:null, q:[], idx:0, answers:new Map(), secondsLeft:0, t:null, passing:70 };
+  function stopExam(){ if(exam.t) clearInterval(exam.t); exam.t=null; }
+
+  async function loadQuestions(courseId){
+    const { data, error } = await sb.from("exam_questions")
+      .select("id,course_id,question,opt_a,opt_b,opt_c,opt_d,correct_opt")
+      .eq("course_id", courseId)
+      .order("id", { ascending:true });
+    if(error) throw error;
+    return data || [];
+  }
+
+  function renderExam(){
+    const c = exam.course;
+    const sub = $("examModal-sub");
+    const body = $("examModal-body");
+
+    const mm = String(Math.floor(exam.secondsLeft/60)).padStart(2,"0");
+    const ss = String(exam.secondsLeft%60).padStart(2,"0");
+    sub.textContent = `${c.title} • Time left: ${mm}:${ss} • ${exam.idx+1} of ${exam.q.length} • Passing: ${exam.passing}%`;
+
+    const q = exam.q[exam.idx];
+    const picked = exam.answers.get(q.id) || "";
+    const opts = [["A", q.opt_a],["B", q.opt_b],["C", q.opt_c],["D", q.opt_d]]
+      .filter(([,t])=>t!==null && t!==undefined && String(t).trim()!=="");
+
+    body.innerHTML = `
+      <div class="qBox">
+        <div style="font-weight:700; margin-bottom:8px;">${esc(q.question)}</div>
+        <div class="list">
+          ${opts.map(([k,t])=>`
+            <label class="qOpt">
+              <input type="radio" name="q" value="${k}" ${picked===k?"checked":""}/>
+              <div><b>${k}.</b> ${esc(t)}</div>
+            </label>
+          `).join("")}
+        </div>
+      </div>
+      <div class="pager">
+        <button class="btn secondary" id="ePrev" ${exam.idx===0?"disabled":""}>Previous</button>
+        <div class="muter">Questions: ${exam.q.length}</div>
+        <button class="btn secondary" id="eNext" ${exam.idx===exam.q.length-1?"disabled":""}>Next</button>
+        <button class="btn" id="eSubmit">Submit Exam</button>
+      </div>
+    `;
+
+    body.querySelectorAll('input[type="radio"][name="q"]').forEach(r=>{
+      r.onchange = ()=> exam.answers.set(q.id, r.value);
+    });
+    $("ePrev").onclick = ()=>{ exam.idx = clamp(exam.idx-1,0,exam.q.length-1); renderExam(); };
+    $("eNext").onclick = ()=>{ exam.idx = clamp(exam.idx+1,0,exam.q.length-1); renderExam(); };
+    $("eSubmit").onclick = ()=>submitExam();
+  }
+
+  function scoreExam(){
+    let correct = 0;
+    for(const q of exam.q){
+      const a = exam.answers.get(q.id) || "";
+      if(a && q.correct_opt && a.toUpperCase() === String(q.correct_opt).toUpperCase()) correct++;
+    }
+    const total = exam.q.length || 1;
+    const pct = Math.round((correct/total)*100);
+    return { correct, total, pct };
+  }
+
+  async function submitExam(){
+    stopExam();
+    const { correct, total, pct } = scoreExam();
+    const passed = pct >= exam.passing;
+    try {
+      const up = await sb.from("user_progress").upsert({
+        user_id: me.user_id,
+        course_id: exam.course.id,
+        exam_taken: true,
+        score: pct,
+        progress: 100,
+        read: true,
+        updated_at: new Date().toISOString()
+      }, { onConflict:"user_id,course_id" });
+      if(up.error) throw up.error;
+
+      if(passed) {
+        try {
+          const rpc = await sb.rpc("generate_certificate", { p_user_id: me.user_id, p_course_id: exam.course.id, p_score: pct });
+          if(rpc.error) throw rpc.error;
+        } catch(_) {
+          try { await sb.from("certificates").insert({ user_id: me.user_id, course_id: exam.course.id, score: pct }); } catch(_) {}
+        }
+      }
+
+      toast(passed ? `Passed! Score ${pct}% (${correct}/${total}).` : `Submitted. Score ${pct}% (${correct}/${total}).`, passed ? "ok" : "info");
+      closeModal("examModal");
+      await loadDashboard();
+    } catch(e) {
+      toast(safeMsg(e, "Could not save exam."), "error");
+      closeModal("examModal");
+    }
+  }
+
+  async function startExam(courseId){
+    const c = courseCache.find(x=>x.id===courseId);
+    if(!c) return toast("Course not found.", "error");
+    exam.course = c;
+    exam.idx = 0;
+    exam.answers = new Map();
+    exam.passing = 70;
+
+    try {
+      const q = await loadQuestions(courseId);
+      if(!q.length) {
+        toast("No exam questions yet for this course.", "error");
+        if(me.role==="admin" || me.role==="super_admin") toast("Admin: add questions in Admin > Existing Courses > Questions.", "info");
+        return;
+      }
+      exam.q = q;
+      const mins = clamp(Math.round((Number(c.duration||20))/2), 5, 30);
+      exam.secondsLeft = mins * 60;
+      renderExam();
+      openModal("examModal");
+      stopExam();
+      exam.t = setInterval(()=>{
+        exam.secondsLeft--;
+        if(exam.secondsLeft <= 0){
+          exam.secondsLeft = 0;
+          submitExam();
+          return;
+        }
+        renderExam();
+      }, 1000);
+    } catch(e) {
+      toast(safeMsg(e, "Could not load exam."), "error");
+    }
+  }
+
+  // =========================
+  // ADMIN
+  // =========================
+  function isAdmin(){ return me && (me.role==="admin" || me.role==="super_admin"); }
+
+  async function refreshAdmin() {
+    if(!isAdmin()) return;
+    const res = await sb.from("courses").select("id,title,scheduled_date,is_active,category,duration,description,has_exam,content").order("id", { ascending:false }).limit(50);
+    if(res.error) return toast(safeMsg(res.error, "Admin load failed."), "error");
+
+    $("adminCourses").innerHTML = (res.data||[]).map(c=>`<div class="item">
+      <div class="split"><b>${esc(c.title)}</b><span class="muted">${c.scheduled_date||""}</span></div>
+      <div class="muted">${esc(c.category||"")} • ${Number(c.duration||0)} min • ${c.has_exam ? "With exam" : "No exam"}</div>
+      <div class="row" style="justify-content:flex-end; margin-top:10px;">
+        <button class="btn secondary" data-edit="${c.id}">Edit</button>
+        <button class="btn secondary" data-q="${c.id}">Questions</button>
+        <button class="btn secondary" data-del="${c.id}">Delete</button>
+      </div>
+    </div>`).join("") || `<div class="muted">No courses yet.</div>`;
+
+    document.querySelectorAll("[data-del]").forEach(b=>b.onclick = ()=>delCourse(b.getAttribute("data-del")));
+    document.querySelectorAll("[data-edit]").forEach(b=>b.onclick = ()=>openEditCourse(Number(b.getAttribute("data-edit"))));
+    document.querySelectorAll("[data-q]").forEach(b=>b.onclick = ()=>openQuestionManager(Number(b.getAttribute("data-q"))));
+  }
+  let __editingAnnId = null;
+
+  async function refreshAdminAnnouncements(){
+    const list = document.getElementById("adAnnList");
+    const empty = document.getElementById("adAnnEmpty");
+    if(!list) return;
+    try{
+      const { data, error } = await sb.from("announcements").select("id,title,message,created_at").order("created_at",{ascending:false}).limit(20);
+      if(error) throw error;
+      const rows = data || [];
+      list.innerHTML = rows.map(a=>`
+        <div class="item" style="margin:0;">
+          <div class="split">
+            <b>${esc(a.title||"")}</b>
+            <div class="row" style="gap:8px;">
+              <button class="btn secondary" data-ann-edit="${a.id}" style="padding:8px 10px;">Edit</button>
+              <button class="btn secondary" data-ann-del="${a.id}" style="padding:8px 10px;">Delete</button>
+            </div>
+          </div>
+          <div class="muted">${esc(a.message||"")}</div>
+        </div>
+      `).join("");
+      if(empty) empty.style.display = rows.length ? "none" : "block";
+
+      list.querySelectorAll("[data-ann-edit]").forEach(b=>b.onclick=()=>{
+        const id = Number(b.getAttribute("data-ann-edit"));
+        const row = rows.find(x=>x.id===id);
+        if(!row) return;
+        __editingAnnId = id;
+        const t = document.getElementById("adAnnTitle");
+        const m = document.getElementById("adAnnMsg");
+        if(t) t.value = row.title||"";
+        if(m) m.value = row.message||"";
+        const up = document.getElementById("adAnnUpdate");
+        const ca = document.getElementById("adAnnCancel");
+        if(up) up.disabled = false;
+        if(ca) ca.disabled = false;
+        const add = document.getElementById("adAnnAdd");
+        if(add) add.disabled = true;
+      });
+
+      list.querySelectorAll("[data-ann-del]").forEach(b=>b.onclick=async()=>{
+        try{
+          const id = Number(b.getAttribute("data-ann-del"));
+          const { error } = await sb.from("announcements").delete().eq("id", id);
+          if(error) throw error;
+          toast("Announcement deleted.","ok");
+          await loadAnnouncements();
+          await refreshAdminAnnouncements();
+        }catch(e){ toast(safeMsg(e,"Could not delete announcement."),"error"); }
+      });
+
+    }catch(e){
+      list.innerHTML = `<div class="muted">Announcements table not available yet.</div>`;
+      if(empty) empty.style.display="none";
+    }
+  }
+
+  function wireAdminAnnouncements(){
+    const add = document.getElementById("adAnnAdd");
+    const upd = document.getElementById("adAnnUpdate");
+    const can = document.getElementById("adAnnCancel");
+    if(add) add.onclick = async ()=>{
+      const title = (document.getElementById("adAnnTitle")?.value||"").trim();
+      const msg = (document.getElementById("adAnnMsg")?.value||"").trim();
+      if(!title || !msg) return toast("Please enter title and message.","error");
+      try{
+        const { error } = await sb.from("announcements").insert({ title, message: msg });
+        if(error) throw error;
+        toast("Announcement added.","ok");
+        document.getElementById("adAnnTitle").value="";
+        document.getElementById("adAnnMsg").value="";
+        await loadAnnouncements();
+        await refreshAdminAnnouncements();
+      }catch(e){ toast(safeMsg(e,"Could not add announcement."),"error"); }
+    };
+    if(upd) upd.onclick = async ()=>{
+      if(!__editingAnnId) return;
+      const title = (document.getElementById("adAnnTitle")?.value||"").trim();
+      const msg = (document.getElementById("adAnnMsg")?.value||"").trim();
+      if(!title || !msg) return toast("Please enter title and message.","error");
+      try{
+        const { error } = await sb.from("announcements").update({ title, message: msg }).eq("id", __editingAnnId);
+        if(error) throw error;
+        toast("Announcement updated.","ok");
+        __editingAnnId = null;
+        document.getElementById("adAnnTitle").value="";
+        document.getElementById("adAnnMsg").value="";
+        if(upd) upd.disabled = true;
+        if(can) can.disabled = true;
+        const addBtn = document.getElementById("adAnnAdd");
+        if(addBtn) addBtn.disabled = false;
+        await loadAnnouncements();
+        await refreshAdminAnnouncements();
+      }catch(e){ toast(safeMsg(e,"Could not update announcement."),"error"); }
+    };
+    if(can) can.onclick = ()=>{
+      __editingAnnId = null;
+      const t = document.getElementById("adAnnTitle");
+      const m = document.getElementById("adAnnMsg");
+      if(t) t.value="";
+      if(m) m.value="";
+      const updBtn = document.getElementById("adAnnUpdate");
+      if(updBtn) updBtn.disabled = true;
+      can.disabled = true;
+      const addBtn = document.getElementById("adAnnAdd");
+      if(addBtn) addBtn.disabled = false;
+    };
+  }
+  // =========================
+  // ADMIN TABS (Courses / Announcements / Users / Analytics)
+  // =========================
+  function showAdminTab(tab){
+    const pills = document.querySelectorAll("#adminTabs [data-admin-tab]");
+    pills.forEach(b=>b.classList.toggle("active", b.getAttribute("data-admin-tab")===tab));
+    document.querySelectorAll('#view-admin [data-admin-sec]').forEach(el=>{
+      el.style.display = (el.getAttribute("data-admin-sec")===tab) ? "" : "none";
+    });
+    localStorage.setItem("ira_admin_tab", tab);
+    if(tab==="announcements"){ refreshAdminAnnouncements().catch(()=>{}); wireAdminAnnouncements(); }
+    if(tab==="users"){ loadAdminUsers().catch(()=>{}); }
+    if(tab==="analytics"){ loadAdminAnalytics().catch(()=>{}); }
+  }
+
+  function wireAdminTabs(){
+    const bar = document.getElementById("adminTabs");
+    if(!bar || bar.__wired) return;
+    bar.__wired = true;
+    bar.addEventListener("click",(e)=>{
+      const b = e.target.closest("[data-admin-tab]");
+      if(!b) return;
+      showAdminTab(b.getAttribute("data-admin-tab"));
+    });
+    const saved = localStorage.getItem("ira_admin_tab") || "courses";
+    showAdminTab(saved);
+  }
+
+  async function loadAdminUsers(){
+    if(!isAdmin()) return;
+    const list = document.getElementById("adminUsersList");
+    const empty = document.getElementById("adminUsersEmpty");
+    const meta = document.getElementById("adminUsersMeta");
+    if(!list) return;
+    list.innerHTML = `<div class="muted">Loading users…</div>`;
+    try{
+      const prof = await sb.from("profiles").select("user_id,employee_id,first_name,last_name,position,role,status,created_at").order("created_at",{ascending:false}).limit(250);
+      if(prof.error) throw prof.error;
+      const users = prof.data || [];
+      if(meta) meta.textContent = `${users.length} users`;
+      if(!users.length){ list.innerHTML=""; if(empty) empty.style.display="block"; return; }
+      if(empty) empty.style.display="none";
+
+      // Pull progress (lightweight) to compute simple summary
+      const prog = await sb.from("user_progress").select("user_id,read,exam_taken,score").limit(5000);
+      const p = prog.data || [];
+      const byUser = new Map();
+      for(const r of p){
+        const k = r.user_id;
+        if(!byUser.has(k)) byUser.set(k,{courses:0,read:0,exams:0,sum:0});
+        const o = byUser.get(k);
+        o.courses += 1;
+        if(r.read) o.read += 1;
+        if(r.exam_taken){ o.exams += 1; o.sum += Number(r.score||0); }
+      }
+
+      list.innerHTML = users.map(u=>{
+        const s = byUser.get(u.user_id) || {courses:0,read:0,exams:0,sum:0};
+        const avg = s.exams ? Math.round((s.sum/s.exams)*10)/10 : 0;
+        return `<div class="item">
+          <div class="split">
+            <b>${esc(u.first_name||"")} ${esc(u.last_name||"")} <span class="muted">(${esc(u.employee_id||"")})</span></b>
+            <span class="muted">${esc(u.role||"user")} • ${esc(u.status||"active")}</span>
+          </div>
+          <div class="muted">${esc(u.position||"")}</div>
+          <div class="row" style="gap:10px; flex-wrap:wrap; margin-top:10px;">
+            <span class="chip">Courses: ${s.courses}</span>
+            <span class="chip">Read: ${s.read}</span>
+            <span class="chip">Exams: ${s.exams}</span>
+            <span class="chip">Avg: ${avg||0}</span>
+          </div>
+        </div>`;
+      }).join("");
+    }catch(e){
+      list.innerHTML = "";
+      if(empty) empty.style.display="block";
+      toast(safeMsg(e,"Could not load users."),"error");
+    }
+  }
+
+  async function loadAdminAnalytics(){
+    if(!isAdmin()) return;
+    const kUsers = document.getElementById("kpiUsers");
+    const kCourses = document.getElementById("kpiCourses");
+    const kExams = document.getElementById("kpiExams");
+    const kAvg = document.getElementById("kpiAvg");
+    try{
+      const u = await sb.from("profiles").select("user_id", { count:"exact", head:true });
+      const c = await sb.from("courses").select("id", { count:"exact", head:true });
+      const p = await sb.from("user_progress").select("exam_taken,score");
+      const rows = p.data || [];
+      const exams = rows.filter(r=>r.exam_taken).length;
+      const avg = exams ? Math.round((rows.filter(r=>r.exam_taken).reduce((a,r)=>a+Number(r.score||0),0)/exams)*10)/10 : 0;
+
+      if(kUsers) kUsers.textContent = String(u.count ?? "—");
+      if(kCourses) kCourses.textContent = String(c.count ?? "—");
+      if(kExams) kExams.textContent = String(exams);
+      if(kAvg) kAvg.textContent = String(avg);
+    }catch(e){
+      toast(safeMsg(e,"Could not load analytics."),"error");
+    }
+  }
+
+  (function(){
+    const btn = document.getElementById("adminUsersRefresh");
+    if(btn) btn.onclick = ()=>loadAdminUsers();
+  })();
+
+
+
+  async function delCourse(id) {
+    if(!confirm("Delete this course?")) return;
+    try {
+      try { await sb.from("exam_questions").delete().eq("course_id", Number(id)); } catch(_) {}
+      const res = await sb.from("courses").delete().eq("id", Number(id));
+      if(res.error) throw res.error;
+      toast("Deleted.", "ok");
+      await loadDashboard();
+    } catch(e) {
+      toast(safeMsg(e, "Delete blocked."), "error");
+    }
+  }
+
+  $("adCreate").onclick = async () => {
+    if(!isAdmin()) return toast("Admin only.", "error");
+    const title = $("adTitle").value.trim();
+    const category = $("adCat").value.trim() || null;
+    const duration = Number($("adDur").value || 20);
+    const scheduled_date = $("adDate").value || null;
+    const description = $("adDesc").value.trim() || null;
+    if(!title) return toast("Enter a title.", "error");
+
+    try {
+      const res = await sb.from("courses").insert({
+        title, category, duration, scheduled_date, description,
+        content:"<p>Course content here.</p><!-- page --><p>Second page.</p>",
+        is_active:true, has_exam:true
+      });
+      if(res.error) throw res.error;
+      toast("Course created.", "ok");
+      $("adTitle").value=""; $("adCat").value=""; $("adDesc").value="";
+      await loadDashboard();
+    } catch(e) {
+      toast(safeMsg(e, "Create blocked."), "error");
+    }
+  };
+
+  function openEditCourse(courseId){
+    const c = courseCache.find(x=>x.id===courseId);
+    if(!c) return toast("Course not found.", "error");
+
+    $("editModal-sub").textContent = `Course ID: ${c.id}`;
+    $("editModal-body").innerHTML = `
+      <div class="grid" style="grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="field"><label>Title</label><input id="edTitle" value="${esc(c.title)}"></div>
+        <div class="field"><label>Category</label><input id="edCat" value="${esc(c.category||"")}"></div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+        <div class="field"><label>Duration (mins)</label><input id="edDur" type="number" value="${Number(c.duration||20)}"></div>
+        <div class="field"><label>Scheduled Date</label><input id="edDate" type="date" value="${esc(c.scheduled_date||"")}"></div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+        <div class="field"><label>Status</label>
+          <select id="edActive">
+            <option value="true" ${c.is_active ? "selected":""}>Active</option>
+            <option value="false" ${!c.is_active ? "selected":""}>Inactive</option>
+          </select>
+        </div>
+        <div class="field"><label>Include Exam</label>
+          <select id="edExam">
+            <option value="true" ${c.has_exam ? "selected":""}>Yes</option>
+            <option value="false" ${!c.has_exam ? "selected":""}>No</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px;"><label>Description</label><textarea id="edDesc">${esc(c.description||"")}</textarea></div>
+      <div class="field" style="margin-top:10px;"><label>Course Content (HTML)</label><textarea id="edContent" style="min-height:220px;">${esc(c.content||"")}</textarea><div class="muter">Add pages using <code>&lt;!-- page --&gt;</code> between sections.</div></div>
+      <div class="row" style="justify-content:flex-end; margin-top:10px;">
+        <button class="btn secondary" id="edCancel">Cancel</button>
+        <button class="btn" id="edSave">Save Changes</button>
+      </div>
+    `;
+    $("edCancel").onclick = ()=>closeModal("editModal");
+    $("edSave").onclick = async ()=>{
+      try{
+        const payload = {
+          title: $("edTitle").value.trim(),
+          category: $("edCat").value.trim() || null,
+          duration: Number($("edDur").value || 20),
+          scheduled_date: $("edDate").value || null,
+          is_active: $("edActive").value === "true",
+          has_exam: $("edExam").value === "true",
+          description: $("edDesc").value.trim() || null,
+          content: $("edContent").value || ""
+        };
+        if(!payload.title) return toast("Title is required.", "error");
+        const res = await sb.from("courses").update(payload).eq("id", c.id);
+        if(res.error) throw res.error;
+        toast("Saved.", "ok");
+        closeModal("editModal");
+        await loadDashboard();
+      }catch(e){
+        toast(safeMsg(e, "Save blocked."), "error");
+      }
+    };
+    openModal("editModal");
+  }
+
+  async function openQuestionManager(courseId){
+    const c = courseCache.find(x=>x.id===courseId);
+    if(!c) return toast("Course not found.", "error");
+
+    $("editModal-sub").textContent = `Questions • ${c.title}`;
+    $("editModal-body").innerHTML = `<div class="muted">Loading questions…</div>`;
+    openModal("editModal");
+
+    let qs = [];
+    try{ qs = await loadQuestions(courseId); }
+    catch(e){ $("editModal-body").innerHTML = `<div class="muted">Exam questions table not available yet, or blocked by RLS.</div>`; return; }
+
+    const render = ()=>{
+      $("editModal-body").innerHTML = `
+        <div class="item">
+          <b>Add Question</b>
+          <div class="field" style="margin-top:10px;"><label>Question</label><textarea id="qText" placeholder="Type the question…"></textarea></div>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="field"><label>A</label><input id="qA"></div>
+            <div class="field"><label>B</label><input id="qB"></div>
+            <div class="field"><label>C</label><input id="qC"></div>
+            <div class="field"><label>D</label><input id="qD"></div>
+          </div>
+          <div class="field" style="margin-top:10px;"><label>Correct Option</label><select id="qCorrect"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+          <div class="row" style="justify-content:flex-end; margin-top:10px;"><button class="btn" id="qAdd">Add</button></div>
+        </div>
+
+        <div class="item" style="margin-top:12px;">
+          <b>Existing Questions (${qs.length})</b>
+          <div class="list" style="margin-top:10px;">
+            ${qs.map(q=>`
+              <div class="item">
+                <div style="font-weight:700;">${esc(q.question)}</div>
+                <div class="muted">Correct: ${esc(q.correct_opt||"")}</div>
+                <div class="row" style="justify-content:flex-end; margin-top:10px;"><button class="btn secondary" data-qdel="${q.id}">Delete</button></div>
+              </div>
+            `).join("") || `<div class="muted">No questions yet.</div>`}
+          </div>
+        </div>
+      `;
+
+      $("qAdd").onclick = async ()=>{
+        const payload = {
+          course_id: courseId,
+          question: $("qText").value.trim(),
+          opt_a: $("qA").value.trim(),
+          opt_b: $("qB").value.trim(),
+          opt_c: $("qC").value.trim(),
+          opt_d: $("qD").value.trim(),
+          correct_opt: $("qCorrect").value
+        };
+        if(!payload.question) return toast("Question is required.", "error");
+        try{
+          const ins = await sb.from("exam_questions").insert(payload).select("id,course_id,question,opt_a,opt_b,opt_c,opt_d,correct_opt").single();
+          if(ins.error) throw ins.error;
+          qs.unshift(ins.data);
+          toast("Question added.", "ok");
+          render();
+        }catch(e){
+          toast(safeMsg(e, "Add blocked."), "error");
+        }
+      };
+
+      document.querySelectorAll("[data-qdel]").forEach(btn=>btn.onclick = async ()=>{
+        const id = Number(btn.getAttribute("data-qdel"));
+        if(!confirm("Delete this question?")) return;
+        try{
+          const res = await sb.from("exam_questions").delete().eq("id", id);
+          if(res.error) throw res.error;
+          qs = qs.filter(x=>x.id!==id);
+          toast("Deleted.", "ok");
+          render();
+        }catch(e){
+          toast(safeMsg(e, "Delete blocked."), "error");
+        }
+      });
+    };
+
+    render();
+  }
+
+  // Import / Export button injected into Admin header
+  function downloadFile(name, content, mime="application/json"){
+    const blob = new Blob([content], { type:mime });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  }
+
+  async function openImportExport(){
+    if(!isAdmin()) return toast("Admin only.", "error");
+    $("importModal-sub").textContent = "Import / Export Courses + Questions";
+    $("importModal-body").innerHTML = `
+      <div class="item">
+        <b>Export</b>
+        <div class="muted">Download current courses and exam questions.</div>
+        <div class="row" style="justify-content:flex-end; margin-top:10px;">
+          <button class="btn secondary" id="exCourses">Export Courses</button>
+          <button class="btn secondary" id="exQuestions">Export Questions</button>
+        </div>
+      </div>
+      <div class="item" style="margin-top:12px;">
+        <b>Import (JSON)</b>
+        <div class="muted">Paste JSON array for courses or questions.</div>
+        <div class="field" style="margin-top:10px;">
+          <label>JSON</label>
+          <textarea id="imJson" style="min-height:220px;" placeholder='[{"title":"..."}]'></textarea>
+        </div>
+        <div class="row" style="justify-content:flex-end; margin-top:10px;">
+          <button class="btn secondary" id="imCourses">Import as Courses</button>
+          <button class="btn" id="imQuestions">Import as Questions</button>
+        </div>
+      </div>
+    `;
+    openModal("importModal");
+
+    $("exCourses").onclick = async ()=>{
+      try{
+        const r = await sb.from("courses").select("*").order("id",{ascending:true});
+        if(r.error) throw r.error;
+        downloadFile("courses_export.json", JSON.stringify(r.data||[], null, 2));
+      }catch(e){ toast(safeMsg(e,"Export failed."),"error"); }
+    };
+    $("exQuestions").onclick = async ()=>{
+      try{
+        const r = await sb.from("exam_questions").select("*").order("id",{ascending:true});
+        if(r.error) throw r.error;
+        downloadFile("exam_questions_export.json", JSON.stringify(r.data||[], null, 2));
+      }catch(e){ toast(safeMsg(e,"Export failed."),"error"); }
+    };
+    $("imCourses").onclick = async ()=>{
+      try{
+        const raw = $("imJson").value.trim();
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr)) throw new Error("JSON must be an array.");
+        const cleaned = arr.map(c=>({
+          title: c.title,
+          category: c.category ?? null,
+          description: c.description ?? null,
+          duration: Number(c.duration ?? 20),
+          has_exam: (c.has_exam ?? true),
+          is_active: (c.is_active ?? true),
+          scheduled_date: c.scheduled_date ?? null,
+          content: c.content ?? ""
+        })).filter(x=>x.title);
+        if(!cleaned.length) throw new Error("No valid courses found.");
+        const res = await sb.from("courses").insert(cleaned);
+        if(res.error) throw res.error;
+        toast(`Imported ${cleaned.length} courses.`, "ok");
+        await loadDashboard();
+      }catch(e){ toast(safeMsg(e,"Import failed."),"error"); }
+    };
+    $("imQuestions").onclick = async ()=>{
+      try{
+        const raw = $("imJson").value.trim();
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr)) throw new Error("JSON must be an array.");
+        const cleaned = arr.map(q=>({
+          course_id: Number(q.course_id),
+          question: q.question,
+          opt_a: q.opt_a ?? null,
+          opt_b: q.opt_b ?? null,
+          opt_c: q.opt_c ?? null,
+          opt_d: q.opt_d ?? null,
+          correct_opt: q.correct_opt ?? "A"
+        })).filter(x=>x.course_id && x.question);
+        if(!cleaned.length) throw new Error("No valid questions found.");
+        const res = await sb.from("exam_questions").insert(cleaned);
+        if(res.error) throw res.error;
+        toast(`Imported ${cleaned.length} questions.`, "ok");
+        await loadDashboard();
+      }catch(e){ toast(safeMsg(e,"Import failed."),"error"); }
+    };
+  }
+
+  (function addAdminToolsButton(){
+    const sec = $("view-admin");
+    if(!sec) return;
+    const h = sec.querySelector(".card-h");
+    if(!h) return;
+    const btn = document.createElement("button");
+    btn.className = "btn secondary";
+    btn.textContent = "Import/Export";
+    btn.style.marginTop = "10px";
+    btn.onclick = openImportExport;
+    h.appendChild(btn);
+  })();
+
+  // =========================
+  // NOTES
+  // =========================
+  const __noteSave = $("noteSave");
+  if(__noteSave) __noteSave.onclick = async () => {
+    if(!selectedDate) return toast("Select a date.", "error");
+    const note = (document.getElementById("noteText")?.value||"").trim();
+    try{
+      const res = await sb.from("calendar_notes").upsert(
+        { user_id: me.user_id, note_date: selectedDate, note },
+        { onConflict: "user_id,note_date" }
+      );
+      if(res.error) throw res.error;
+
+      const savedAt = new Date().toISOString();
+      notesCache.set(selectedDate, {note, updated_at:savedAt});
+      toast("Note saved.", "ok");
+
+      // Stay on the Calendar interface (do not kick back to Dashboard)
+      if((currentView||"") !== "calendar") showView("calendar");
+
+      // Refresh both calendars + keep buttons clickable
+      renderCal("calHead","calGrid","calTitle");      // mini dashboard calendar
+      renderCal("calHead2","calGrid2","calTitle2");   // full calendar
+      wireCalendarDelegation();
+      wireCalendarModeButtons();
+      if(typeof applyCalendarMode==="function") applyCalendarMode(calMode||"month");
+    }catch(e){
+      toast(safeMsg(e, "Could not save note."), "error");
+    }
+  };
+  const __noteClear = $("noteClear");
+  if(__noteClear) __noteClear.onclick = async () => {
+    if(!selectedDate) return;
+    try{
+      const res = await sb.from("calendar_notes").delete().eq("user_id", me.user_id).eq("note_date", selectedDate);
+      if(res.error) throw res.error;
+      const __nt2 = document.getElementById("noteText");
+      if(__nt2) __nt2.value = "";
+      notesCache.delete(selectedDate);
+      toast("Note cleared.", "ok");
+      renderCal("calHead","calGrid","calTitle");
+      renderCal("calHead2","calGrid2","calTitle2");
+    wireCalendarDelegation();
+    mBtn = document.getElementById('calModeMonth');
+    wBtn = document.getElementById('calModeWeek');
+    tBtn = document.getElementById('calToday');
+    if(mBtn) mBtn.onclick=()=>applyCalendarMode('month');
+    if(wBtn) wBtn.onclick=()=>applyCalendarMode('week');
+    if(tBtn) tBtn.onclick=async()=>{ const now=new Date(); cal.year=now.getFullYear(); cal.month=now.getMonth(); selectedDate=ymd(now); await loadMonthNotes().catch(()=>{}); await loadMonthEvents().catch(()=>{}); await loadUpcoming().catch(()=>{}); if(calMode==='month'){ renderCal('calHead2','calGrid2','calTitle2'); wireCalendarDelegation(); } else { renderWeek(); } };
+
+    }catch(e){
+      toast(safeMsg(e, "Could not clear note."), "error");
+    }
+  };
+
+  // Calendar nav
+  async function prevMonth() { cal.month--; if(cal.month<0) { cal.month=11; cal.year--; } try { await loadMonthNotes();
+    await loadMonthEvents();
+    await loadUpcoming(); } catch(_) { notesCache = new Map(); } renderCal("calHead","calGrid","calTitle"); renderCal("calHead2","calGrid2","calTitle2");
+    wireCalendarDelegation();
+    mBtn = document.getElementById('calModeMonth');
+    wBtn = document.getElementById('calModeWeek');
+    tBtn = document.getElementById('calToday');
+    if(mBtn) mBtn.onclick=()=>applyCalendarMode('month');
+    if(wBtn) wBtn.onclick=()=>applyCalendarMode('week');
+    if(tBtn) tBtn.onclick=async()=>{ const now=new Date(); cal.year=now.getFullYear(); cal.month=now.getMonth(); selectedDate=ymd(now); await loadMonthNotes().catch(()=>{}); await loadMonthEvents().catch(()=>{}); await loadUpcoming().catch(()=>{}); if(calMode==='month'){ renderCal('calHead2','calGrid2','calTitle2'); wireCalendarDelegation(); } else { renderWeek(); } };
+ }
+  async function nextMonth() { cal.month++; if(cal.month>11) { cal.month=0; cal.year++; } try { await loadMonthNotes();
+    await loadMonthEvents();
+    await loadUpcoming(); } catch(_) { notesCache = new Map(); } renderCal("calHead","calGrid","calTitle"); renderCal("calHead2","calGrid2","calTitle2");
+    wireCalendarDelegation();
+    mBtn = document.getElementById('calModeMonth');
+    wBtn = document.getElementById('calModeWeek');
+    tBtn = document.getElementById('calToday');
+    if(mBtn) mBtn.onclick=()=>applyCalendarMode('month');
+    if(wBtn) wBtn.onclick=()=>applyCalendarMode('week');
+    if(tBtn) tBtn.onclick=async()=>{ const now=new Date(); cal.year=now.getFullYear(); cal.month=now.getMonth(); selectedDate=ymd(now); await loadMonthNotes().catch(()=>{}); await loadMonthEvents().catch(()=>{}); await loadUpcoming().catch(()=>{}); if(calMode==='month'){ renderCal('calHead2','calGrid2','calTitle2'); wireCalendarDelegation(); } else { renderWeek(); } };
+ }
+  $("calPrev").onclick = prevMonth; $("calNext").onclick = nextMonth;
+  $("calPrev2").onclick = prevMonth; $("calNext2").onclick = nextMonth;
+
+  // Calendar mode buttons (Month / Week / Today) - always wired
+  
+  function renderWeekFallback(){
+    const weekWrap = document.getElementById("weekWrap");
+    const grid = document.getElementById("weekGrid");
+    if(!weekWrap || !grid) return;
+    const base = selectedDate ? parseYMDLocal(selectedDate) : new Date(cal.year, cal.month, 1);
+    const ws = startOfWeek(base);
+    const days = Array.from({length:7}, (_,i)=>addDays(ws,i));
+    const dayKeys = days.map(d=>ymd(d));
+
+    const byCourseDate = new Map();
+    for(const c of courseCache){
+      if(c.scheduled_date){
+        const k = String(c.scheduled_date);
+        if(!byCourseDate.has(k)) byCourseDate.set(k, []);
+        byCourseDate.get(k).push(c);
+      }
+    }
+
+    const hours = [];
+    for(let h=8; h<=20; h++) hours.push(h);
+
+    let out = '';
+    out += `<div class="weekCell head time weekTop"></div>`;
+    for(let i=0;i<7;i++){
+      const d = parseYMDLocal(dayKeys[i]);
+      const lbl = d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+      const isToday = dayKeys[i]===ymd(new Date());
+      out += `<div class="weekCell head weekTop" style="${isToday?'box-shadow: inset 0 -2px 0 rgba(47,191,142,.55);':''}">${esc(lbl)}</div>`;
+    }
+
+    for(const h of hours){
+      out += `<div class="weekCell time">${esc(hm(h))}</div>`;
+      for(let i=0;i<7;i++){
+        const dk = dayKeys[i];
+        const _nObj = (notesCache.get(dk)||null);
+        const noteVal = (_nObj && _nObj.note ? String(_nObj.note) : '').trim();
+        const cs = byCourseDate.get(dk)||[];
+        let items='';
+        if(h===8){
+          if(cs.length){
+            items += `<div class="weekItem course">📚 ${cs.length} course${cs.length>1?'s':''}</div>`;
+          }
+          if(noteVal){
+            items += `<div class="weekItem note">📝 ${esc(noteVal.slice(0,22))}${noteVal.length>22?'…':''}</div>`;
+          }
+        }
+        out += `<div class="weekCell slot" data-date="${esc(dk)}">${items}</div>`;
+      }
+    }
+    grid.innerHTML = out;
+    grid.querySelectorAll('[data-date]').forEach(cell=>{
+      cell.addEventListener('click', async ()=>{
+        const d = cell.getAttribute('data-date');
+        await selectDate(d);
+      });
+    });
+  }
+function wireCalendarModeButtons(){
+    const mB = document.getElementById("calModeMonth");
+    const wB = document.getElementById("calModeWeek");
+    const tB = document.getElementById("calToday");
+
+    if(mB && !mB.__wired){
+      mB.__wired = true;
+      mB.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation();
+        if(typeof applyCalendarMode==="function") applyCalendarMode("month");
+        else { calMode="month"; renderCal("calHead2","calGrid2","calTitle2"); wireCalendarDelegation(); }
+      }, true);
+    }
+    if(wB && !wB.__wired){
+      wB.__wired = true;
+      wB.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation();
+        if(typeof applyCalendarMode==="function") applyCalendarMode("week");
+        else { calMode="week"; try{ (typeof renderWeek==="function" ? renderWeek() : renderWeekFallback()); }catch(_){} }
+      }, true);
+    }
+    if(tB && !tB.__wired){
+      tB.__wired = true;
+      tB.addEventListener("click", async (e)=>{ e.preventDefault(); e.stopPropagation();
+        const now = new Date();
+        cal.year = now.getFullYear();
+        cal.month = now.getMonth();
+        selectedDate = ymd(now);
+        await loadMonthNotes().catch(()=>{});
+        await loadMonthEvents().catch(()=>{});
+        await loadUpcoming().catch(()=>{});
+        if(typeof applyCalendarMode==="function") applyCalendarMode(calMode||"month");
+        else { renderCal("calHead2","calGrid2","calTitle2"); wireCalendarDelegation(); }
+      }, true);
+    }
+  }
+
+
+  // Search (global)
+  let searchQuery = "";
+  function setSearch(q){
+    searchQuery = (q||"").trim();
+    if(searchQuery && currentView !== "courses") showView("courses");
+    if(currentView === "courses") { try{ renderCourses(); }catch(_){} }
+  }
+  $("search").addEventListener("input", ()=>setSearch($("search").value));
+  $("search").addEventListener("keydown", (e)=>{
+    if(e.key==="Enter"){
+      setSearch($("search").value);
+      if(currentView !== "courses") showView("courses");
+    }
+  });
+
+  // =========================
+  // BOOTSTRAP
+  // =========================
+  async function bootstrapApp() {
+    const session = (await sb.auth.getSession()).data.session;
+    if(!session) { $("app").style.display = "none"; $("authScreen").style.display = "grid"; return; }
+
+    const user = session.user;
+    const prof = await sb.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+
+    if(prof.error) {
+      toast("Profile read blocked. Check RLS policies.", "error");
+      $("app").style.display = "none";
+      $("authScreen").style.display = "grid";
+      return;
+    }
+    me = prof.data;
+
+    // Auto-sync super admin role for Employee ID 17000001 (prevents admin functions being blocked)
+    const empFromEmail = (user.email||"").split("@")[0];
+    if(me && empFromEmail === "17000001" && me.role !== "super_admin") {
+      try { await ensureProfile("17000001", { first_name: me.first_name, last_name: me.last_name, position: me.position }); } catch(_) {}
+      const p2 = await sb.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+      if(!p2.error && p2.data) me = p2.data;
+    }
+
+    if(!me) {
+      const emp = (user.email||"").split("@")[0];
+      try { me = await ensureProfile(emp, { }); }
+      catch(e){ toast(safeMsg(e, "Could not create profile."), "error"); $("app").style.display="none"; $("authScreen").style.display="grid"; return; }
+    }
+
+    $("meName").textContent = `${me.first_name} ${me.last_name}`;
+    $("meEmp").textContent = `Employee: ${me.employee_id}`;
+    $("roleLine").textContent = `Role: ${me.role}`;
+    $("adminNav").style.display = isAdmin() ? "flex" : "none";
+
+    $("authScreen").style.display = "none";
+    $("app").style.display = "flex";
+    showView("dashboard");
+
+    try { await loadDashboard(); } catch(e) { toast(safeMsg(e, "Could not load data."), "error"); }
+  }
+
+  $("authScreen").style.display = "grid";
+  await bootstrapApp();
+  sb.auth.onAuthStateChange(async ()=>{ await bootstrapApp(); });
+
+  function wireCalendarDelegation(){
+    ["calGrid","calGrid2"].forEach(id=>{
+      const grid=$(id);
+      if(!grid || grid.__wired) return;
+      grid.__wired = true;
+      grid.addEventListener("click",(e)=>{
+        const cell = e.target.closest("[data-date]");
+        if(!cell) return;
+        selectDate(cell.getAttribute("data-date"));
+      });
+    });
+  }
+</script>
+</body>
+</html>
